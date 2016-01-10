@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D5367E2E-E891-45A0-AB6D-8008AAB7550F}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ECSRogue</RootNamespace>
+    <AssemblyName>ECSRogue</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MonoGamePlatform>WindowsGL</MonoGamePlatform>
+    <MonoGameContentBuilderExe>
+    </MonoGameContentBuilderExe>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\WindowsGL\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\WindowsGL\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="BaseEngine\Camera.cs" />
+    <Compile Include="BaseEngine\Interfaces\IStateSpace.cs" />
+    <Compile Include="BaseEngine\Interfaces\IState.cs" />
+    <Compile Include="BaseEngine\StateSpaces\RandomlyGeneratedStateSpace.cs" />
+    <Compile Include="BaseEngine\States\PauseState.cs" />
+    <Compile Include="BaseEngine\States\PlayingState.cs" />
+    <Compile Include="BaseEngine\States\TitleState.cs" />
+    <Compile Include="ECS\Components.cs" />
+    <Compile Include="ECS\Components\AnimationComponent.cs" />
+    <Compile Include="ECS\Components\DisplayComponent.cs" />
+    <Compile Include="ECS\Components\HealthComponent.cs" />
+    <Compile Include="ECS\Components\LabelComponent.cs" />
+    <Compile Include="ECS\Components\PositionComponent.cs" />
+    <Compile Include="ECS\Components\SightRadiusComponent.cs" />
+    <Compile Include="ECS\Components\VelocityComponent.cs" />
+    <Compile Include="ECS\Entity.cs" />
+    <Compile Include="ECSRogue.cs" />
+    <Compile Include="ECS\Systems\AnimationSystem.cs" />
+    <Compile Include="ECS\Systems\DisplaySystem.cs" />
+    <Compile Include="ECS\Systems\InputMovementSystem.cs" />
+    <Compile Include="ECS\Systems\LabelDisplaySystem.cs" />
+    <Compile Include="ECS\Systems\TileRevealSystem.cs" />
+    <Compile Include="ProceduralGeneration\CaveArenaGeneration.cs" />
+    <Compile Include="ProceduralGeneration\CaveGeneration.cs" />
+    <Compile Include="ProceduralGeneration\DungeonTile.cs" />
+    <Compile Include="ProceduralGeneration\Interfaces\IGenerationAlgorithm.cs" />
+    <Compile Include="ProceduralGeneration\RuinsArenaGeneration.cs" />
+    <Compile Include="ProceduralGeneration\RuinsGeneration.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK">
+      <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsGL\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework">
+      <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsGL\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup />
+  <!-- Specify the search path explicitly so the ResolveAssemblyReferences task picks the right ones -->
+  <Target Name="BeforeResolveReferences">
+    <CreateProperty Value="$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows;$(AssemblySearchPaths)">
+      <Output TaskParameter="Value" PropertyName="AssemblySearchPaths" />
+    </CreateProperty>
+  </Target>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

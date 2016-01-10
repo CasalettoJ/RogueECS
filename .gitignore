@@ -1,0 +1,15 @@
+*.suo
+*.user
+*.sln.docstates
+*.pfx
+
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+[Pp]ublish/
+x64/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
