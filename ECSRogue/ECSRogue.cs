@@ -103,7 +103,7 @@ namespace ECSRogue
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin(transformMatrix: gameCamera.GetMatrix());
+            spriteBatch.Begin(transformMatrix: gameCamera.GetMatrix(), samplerState: SamplerState.PointClamp);
             currentState.DrawContent(spriteBatch, gameCamera);
             spriteBatch.End();
             base.Draw(gameTime);
