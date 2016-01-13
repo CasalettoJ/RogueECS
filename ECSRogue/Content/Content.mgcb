@@ -24,3 +24,9 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/ball.png
 
+#begin Fonts/InfoText.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/InfoText.spritefont
+

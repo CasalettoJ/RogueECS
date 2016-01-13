@@ -14,5 +14,6 @@ namespace ECSRogue.BaseEngine.Interfaces
         void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera);
         IStateSpace UpdateLevel(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera);
         void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera);
+        void DrawUserInterface(SpriteBatch spriteBatch, Camera camera);
     }
 }

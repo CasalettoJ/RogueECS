@@ -11,6 +11,7 @@ namespace ECSRogue.BaseEngine.Interfaces
     {
         IState UpdateContent(GameTime gameTime, Camera camera);
         void DrawContent(SpriteBatch spriteBatch, Camera camera);
+        void DrawUserInterface(SpriteBatch spriteBatch, Camera camera);
         void SetStateSpace(IStateSpace level, Camera camera);
     }
 }

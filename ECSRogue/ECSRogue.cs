@@ -20,7 +20,7 @@ namespace ECSRogue
         private Stack<IState> stateStack;
         private IState currentState;
         private Camera gameCamera;
-        private static readonly Vector2 _initialScale = new Vector2(1920, 1080);
+        private static readonly Vector2 _initialScale = new Vector2(1920*2, 1080*2);
         private static readonly Vector2 _initialSize = new Vector2(1024, 576);
 
         public ECSRogue()
@@ -46,7 +46,6 @@ namespace ECSRogue
             graphics.PreferredBackBufferHeight = (int)_initialSize.Y;
             graphics.ApplyChanges();
             
-            gameCamera = new Camera(Vector2.Zero, Vector2.Zero, 0.0f, _initialScale, graphics);
             base.Initialize();
         }
 
@@ -58,6 +57,8 @@ namespace ECSRogue
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            gameCamera = new Camera(Vector2.Zero, Vector2.Zero, 0.0f, _initialScale, graphics);
             RandomlyGeneratedStateSpace firstStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
             PlayingState firstState = new PlayingState(firstStateSpace, gameCamera, Content, graphics);
             stateStack.Push(firstState);
@@ -103,8 +104,13 @@ namespace ECSRogue
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
+            //Draw entities
             spriteBatch.Begin(transformMatrix: gameCamera.GetMatrix(), samplerState: SamplerState.PointClamp);
             currentState.DrawContent(spriteBatch, gameCamera);
+            spriteBatch.End();
+            //Draw UI
+            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            currentState.DrawUserInterface(spriteBatch, gameCamera);
             spriteBatch.End();
             base.Draw(gameTime);
         }

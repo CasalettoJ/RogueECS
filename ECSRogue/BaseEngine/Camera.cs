@@ -63,6 +63,16 @@ namespace ECSRogue.BaseEngine
                     Matrix.CreateTranslation(new Vector3((int)(Bounds.Width * 0.5f), (int)(Bounds.Height * 0.5f), 0)));
         }
 
+        public Vector2 ScreenToWorld(Point point)
+        {
+            return Vector2.Transform(point.ToVector2(), this.GetInverseMatrix());
+        }
+
+        public Vector2 WorldToScreen(Point point)
+        {
+            return Vector2.Transform(point.ToVector2(), this.GetMatrix());
+        }
+
         //public Rectangle GetVisibleArea(GraphicsDeviceManager graphics)
         //{
         //    var inverseViewMatrix = GetMatrix();

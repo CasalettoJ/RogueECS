@@ -70,5 +70,10 @@ namespace ECSRogue.BaseEngine.States
                 stateSpace.LoadLevel(Content, Graphics, camera);
             }
         }
+
+        public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
+        {
+            CurrentLevel.DrawUserInterface(spriteBatch, camera);
+        }
     }
 }

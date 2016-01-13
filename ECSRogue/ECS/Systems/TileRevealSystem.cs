@@ -9,7 +9,7 @@ namespace ECSRogue.ECS.Systems
 {
     public static class TileRevealSystem
     {
-        public static void RevealTiles(DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, StateSpaceComponents spaceComponents)
+        public static void RevealTiles(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, StateSpaceComponents spaceComponents)
         {
             Guid entity = spaceComponents.Entities.Where(z => (z.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault().Id;
             Vector2 position = spaceComponents.PositionComponents[entity].Position;
@@ -23,7 +23,9 @@ namespace ECSRogue.ECS.Systems
             {
                 for (int j = 0; j < dungeonDimensions.Y; j++)
                 {
-                    dungeonGrid[i, j].InRange = false;
+                    DungeonTile newTile = dungeonGrid[i, j];
+                    newTile.InRange = false;
+                    dungeonGrid[i, j] = newTile;
                 }
             }
             List<Vector2> visionRange = new List<Vector2>();
@@ -197,16 +199,19 @@ namespace ECSRogue.ECS.Systems
 
                 for (;;)
                 {  /* loop */
-
-                    if (!dungeonGrid[x0, y0].Found)
+                    DungeonTile newTile = dungeonGrid[x0, y0];
+                    if (!newTile.Found)
                     {
-                        dungeonGrid[x0, y0].NewlyFound = true;
+                        newTile.NewlyFound = true;
                     }
-                    dungeonGrid[x0, y0].Found = dungeonGrid[x0, y0].InRange = true; 
+                    newTile.Found = newTile.InRange = newTile.Occupiable = true; 
                     if (dungeonGrid[x0, y0].Type == TileType.TILE_WALL || dungeonGrid[x0,y0].Type == TileType.TILE_ROCK)
                     {
+                        newTile.Occupiable = false;
+                        dungeonGrid[x0, y0] = newTile;
                         break;
                     }
+                    dungeonGrid[x0, y0] = newTile;
 
                     if (x0 == (int)point.X && y0 == (int)point.Y) break;
                     e2 = 2 * err;

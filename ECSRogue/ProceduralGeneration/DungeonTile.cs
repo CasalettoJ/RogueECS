@@ -28,6 +28,7 @@ namespace ECSRogue.ProceduralGeneration
         public bool Found;
         public bool NewlyFound;
         public bool InRange;
+        public bool Occupiable;
         public float Opacity;
     }
 }

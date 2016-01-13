@@ -17,7 +17,8 @@ namespace ECSRogue.ECS
         COMPONENT_ANIMATION = 1 << 4,
         COMPONENT_HEALTH = 1 << 5,
         COMPONENT_INPUTMOVEMENT = 1 << 6,
-        COMPONENT_SIGHTRADIUS = 1 << 7
+        COMPONENT_SIGHTRADIUS = 1 << 7,
+        COMPONENT_GAMEMESSAGE = 1 << 8,
     }
 
     public struct ComponentMasks
@@ -43,6 +44,7 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, AnimationComponent> AnimationComponents { get; private set; }
         public Dictionary<Guid, SightRadiusComponent> SightRadiusComponents { get; private set; }
         public Dictionary<Guid, LabelComponent> LabelComponents { get; private set; }
+        public Dictionary<Guid, GameMessageComponent> GameMessageComponents { get; private set; }
 
         public StateSpaceComponents()
         {
@@ -55,6 +57,7 @@ namespace ECSRogue.ECS
             AnimationComponents = new Dictionary<Guid, AnimationComponent>();
             LabelComponents = new Dictionary<Guid, LabelComponent>();
             SightRadiusComponents = new Dictionary<Guid, SightRadiusComponent>();
+            GameMessageComponents = new Dictionary<Guid, GameMessageComponent>();
         }
 
         public Guid CreateEntity()
@@ -77,6 +80,7 @@ namespace ECSRogue.ECS
                 AnimationComponents.Remove(id);
                 SightRadiusComponents.Remove(id);
                 LabelComponents.Remove(id);
+                GameMessageComponents.Remove(id);
             }
         }
     }
