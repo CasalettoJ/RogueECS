@@ -21,8 +21,10 @@ namespace ECSRogue
         private Stack<IState> stateStack;
         private IState currentState;
         private Camera gameCamera;
-        private static readonly Vector2 _initialScale = new Vector2(1920*2, 1080*2);
+        private static readonly Vector2 _initialScale = new Vector2(1920, 1080);
         private static readonly Vector2 _initialSize = new Vector2(1024, 576);
+        private KeyboardState prevKey;
+        //private SpriteFont debugText;
 
         public ECSRogue()
         {
@@ -45,6 +47,7 @@ namespace ECSRogue
             Window.AllowUserResizing = true;
             graphics.PreferredBackBufferWidth = (int)_initialSize.X;
             graphics.PreferredBackBufferHeight = (int)_initialSize.Y;
+            //graphics.IsFullScreen = true;
             graphics.ApplyChanges();
 
             this.Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
@@ -65,6 +68,8 @@ namespace ECSRogue
             RandomlyGeneratedStateSpace firstStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
             PlayingState firstState = new PlayingState(firstStateSpace, gameCamera, Content, graphics);
             stateStack.Push(firstState);
+
+            //debugText = Content.Load<SpriteFont>("Fonts/InfoText");
         }
 
         /// <summary>
@@ -83,6 +88,10 @@ namespace ECSRogue
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if(Keyboard.GetState().IsKeyDown(Keys.F) && !prevKey.IsKeyDown(Keys.F))
+            {
+                graphics.ToggleFullScreen();
+            }
             currentState = stateStack.Peek();
             IState nextState = currentState.UpdateContent(gameTime, gameCamera);
             if (nextState != currentState && nextState != null)
@@ -97,6 +106,7 @@ namespace ECSRogue
             {
                 Exit();
             }
+            prevKey = Keyboard.GetState();
             base.Update(gameTime);
         }
 
@@ -114,6 +124,7 @@ namespace ECSRogue
             //Draw UI
             spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             currentState.DrawUserInterface(spriteBatch, gameCamera);
+            //spriteBatch.DrawString(debugText, (1 / (float)gameTime.ElapsedGameTime.TotalSeconds).ToString(), gameCamera.Bounds.Center.ToVector2(), Color.Yellow);
             spriteBatch.End();
             base.Draw(gameTime);
         }
