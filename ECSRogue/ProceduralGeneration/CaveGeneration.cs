@@ -239,14 +239,11 @@ namespace ECSRogue.ProceduralGeneration
                     {
                         if (dungeonGrid[fillX, fillY].Type == TileType.TILE_FLOOR)
                         {
-                            DungeonTile newTile = dungeonGrid[fillX, fillY];
-                            newTile.Occupiable = true;
                             totalTiles += 1.0;
                             if (dungeonGrid[i, j].Reached)
                             {
                                 connectedTiles += 1.0;
                             }
-                            dungeonGrid[fillX, fillY] = newTile;
                         }
                     }
                 }
@@ -325,18 +322,6 @@ namespace ECSRogue.ProceduralGeneration
                         }
                     }
 
-                }
-            }
-
-            List<DungeonTile> tiles = new List<DungeonTile>();
-            for(int i = 0; i < worldI; i++)
-            {
-                for(int j = 0; j < worldJ; j++)
-                {
-                    if(dungeonGrid[i,j].Type == TileType.TILE_FLOOR && !dungeonGrid[i,j].Occupiable)
-                    {
-                        tiles.Add(dungeonGrid[i, j]);
-                    }
                 }
             }
 

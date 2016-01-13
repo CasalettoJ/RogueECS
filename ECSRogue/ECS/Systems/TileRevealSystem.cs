@@ -199,19 +199,16 @@ namespace ECSRogue.ECS.Systems
 
                 for (;;)
                 {  /* loop */
-                    DungeonTile newTile = dungeonGrid[x0, y0];
-                    if (!newTile.Found)
+                    if (!dungeonGrid[x0, y0].Found)
                     {
-                        newTile.NewlyFound = true;
+                        dungeonGrid[x0, y0].NewlyFound = true;
                     }
-                    newTile.Found = newTile.InRange = newTile.Occupiable = true; 
+                    dungeonGrid[x0, y0].Found = dungeonGrid[x0, y0].InRange = dungeonGrid[x0, y0].Occupiable = true; 
                     if (dungeonGrid[x0, y0].Type == TileType.TILE_WALL || dungeonGrid[x0,y0].Type == TileType.TILE_ROCK)
                     {
-                        newTile.Occupiable = false;
-                        dungeonGrid[x0, y0] = newTile;
+                        dungeonGrid[x0, y0].Occupiable = false;
                         break;
                     }
-                    dungeonGrid[x0, y0] = newTile;
 
                     if (x0 == (int)point.X && y0 == (int)point.Y) break;
                     e2 = 2 * err;

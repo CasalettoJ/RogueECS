@@ -6,6 +6,7 @@ using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 
 namespace ECSRogue
@@ -45,7 +46,9 @@ namespace ECSRogue
             graphics.PreferredBackBufferWidth = (int)_initialSize.X;
             graphics.PreferredBackBufferHeight = (int)_initialSize.Y;
             graphics.ApplyChanges();
-            
+
+            this.Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
+
             base.Initialize();
         }
 
@@ -113,6 +116,15 @@ namespace ECSRogue
             currentState.DrawUserInterface(spriteBatch, gameCamera);
             spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+
+        void Window_ClientSizeChanged(object sender, EventArgs e)
+        {
+            graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
+            graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
+            graphics.ApplyChanges();
+            gameCamera.Bounds = graphics.GraphicsDevice.Viewport.Bounds;
         }
     }
 }
