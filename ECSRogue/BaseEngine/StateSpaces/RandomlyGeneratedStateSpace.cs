@@ -75,7 +75,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             Guid id = stateSpaceComponents.CreateEntity();
             stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = Component.COMPONENT_GAMEMESSAGE;
             stateSpaceComponents.GameMessageComponents[id] = new GameMessageComponent() { GlobalColor = Color.White, Font = messageFont, GlobalMessage = string.Empty, GameMessages = new List<Tuple<Color,string>>()};
-            MessageDisplaySystem.GenerateRandomGameMessage(random, stateSpaceComponents, Messages.CaveEntranceMessages, Color.White);
+            MessageDisplaySystem.GenerateRandomGameMessage(random, stateSpaceComponents, Messages.CaveEntranceMessages, MessageColors.SpecialAction);
         }
         #endregion
 

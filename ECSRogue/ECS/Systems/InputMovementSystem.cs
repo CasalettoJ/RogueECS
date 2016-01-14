@@ -66,7 +66,7 @@ namespace ECSRogue.ECS.Systems
                 }
                 else
                 {
-                    MessageDisplaySystem.GenerateRandomGameMessage(new Random(), spaceComponents, Messages.WallCollisionMessages, Color.White);
+                    MessageDisplaySystem.GenerateRandomGameMessage(new Random(Guid.NewGuid().GetHashCode()), spaceComponents, Messages.WallCollisionMessages, MessageColors.Normal);
                 }
 
             }
