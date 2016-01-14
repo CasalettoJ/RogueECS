@@ -21,7 +21,7 @@ namespace ECSRogue
         private Stack<IState> stateStack;
         private IState currentState;
         private Camera gameCamera;
-        private static readonly Vector2 _initialScale = new Vector2(1920, 1080);
+        private static readonly Vector2 _initialScale = new Vector2(2880, 1620);
         private static readonly Vector2 _initialSize = new Vector2(1024, 576);
         private KeyboardState prevKey;
         //private SpriteFont debugText;

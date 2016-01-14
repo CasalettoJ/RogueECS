@@ -9,9 +9,9 @@ namespace ECSRogue.ECS.Components
 {
     public struct GameMessageComponent
     {
-        public List<string> GameMessages;
+        public List<Tuple<Color,string>> GameMessages;
         public string GlobalMessage;
         public SpriteFont Font;
-        public Color Color;
+        public Color GlobalColor;
     }
 }
