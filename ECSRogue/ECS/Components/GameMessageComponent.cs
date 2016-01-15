@@ -22,6 +22,8 @@ namespace ECSRogue.ECS.Components
     {
         public List<Tuple<Color,string>> GameMessages;
         public string GlobalMessage;
+        public int IndexBegin;
+        public int MaxMessages;
         public SpriteFont Font;
         public Color GlobalColor;
     }

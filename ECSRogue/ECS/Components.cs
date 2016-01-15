@@ -45,6 +45,7 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, SightRadiusComponent> SightRadiusComponents { get; private set; }
         public Dictionary<Guid, LabelComponent> LabelComponents { get; private set; }
         public Dictionary<Guid, GameMessageComponent> GameMessageComponents { get; private set; }
+        public Random random { get; private set; }
 
         public StateSpaceComponents()
         {
@@ -58,6 +59,7 @@ namespace ECSRogue.ECS
             LabelComponents = new Dictionary<Guid, LabelComponent>();
             SightRadiusComponents = new Dictionary<Guid, SightRadiusComponent>();
             GameMessageComponents = new Dictionary<Guid, GameMessageComponent>();
+            random = new Random();
         }
 
         public Guid CreateEntity()

@@ -25,34 +25,34 @@ namespace ECSRogue.ECS.Systems
                 {
                     pos.Position.Y -= 1;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad2) && !prevKeyboardState.IsKeyDown(Keys.NumPad2))
+                else if (keyState.IsKeyDown(Keys.NumPad2) && !prevKeyboardState.IsKeyDown(Keys.NumPad2))
                 {
                     pos.Position.Y += 1;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad6) && !prevKeyboardState.IsKeyDown(Keys.NumPad6))
+                else if (keyState.IsKeyDown(Keys.NumPad6) && !prevKeyboardState.IsKeyDown(Keys.NumPad6))
                 {
                     pos.Position.X += 1;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad4) && !prevKeyboardState.IsKeyDown(Keys.NumPad4))
+                else if (keyState.IsKeyDown(Keys.NumPad4) && !prevKeyboardState.IsKeyDown(Keys.NumPad4))
                 {
                     pos.Position.X -= 1;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad7) && !prevKeyboardState.IsKeyDown(Keys.NumPad7))
+                else if (keyState.IsKeyDown(Keys.NumPad7) && !prevKeyboardState.IsKeyDown(Keys.NumPad7))
                 {
                     pos.Position.X -= 1;
                     pos.Position.Y -= 1;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad9) && !prevKeyboardState.IsKeyDown(Keys.NumPad9))
+                else if (keyState.IsKeyDown(Keys.NumPad9) && !prevKeyboardState.IsKeyDown(Keys.NumPad9))
                 {
                     pos.Position.X += 1;
                     pos.Position.Y -= 1;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad1) && !prevKeyboardState.IsKeyDown(Keys.NumPad1))
+                else if (keyState.IsKeyDown(Keys.NumPad1) && !prevKeyboardState.IsKeyDown(Keys.NumPad1))
                 {
                     pos.Position.X -= 1;
                     pos.Position.Y += 1;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad3) && !prevKeyboardState.IsKeyDown(Keys.NumPad3))
+                else if (keyState.IsKeyDown(Keys.NumPad3) && !prevKeyboardState.IsKeyDown(Keys.NumPad3))
                 {
                     pos.Position.X += 1;
                     pos.Position.Y += 1;
@@ -66,7 +66,7 @@ namespace ECSRogue.ECS.Systems
                 }
                 else
                 {
-                    MessageDisplaySystem.GenerateRandomGameMessage(new Random(Guid.NewGuid().GetHashCode()), spaceComponents, Messages.WallCollisionMessages, MessageColors.Normal);
+                    MessageDisplaySystem.GenerateRandomGameMessage(spaceComponents, Messages.WallCollisionMessages, MessageColors.Normal);
                 }
 
             }

@@ -29,5 +29,7 @@ namespace ECSRogue.BaseEngine
         {
             "Press \'R\' to reset the camera position."
         };
+
+        public static readonly string ScrollingMessages = "[Scrolling Log: \'PageUp\': Top, \'PageDown\': Bottom, \'Arrows\': Scroll]";
     }
 }
