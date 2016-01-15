@@ -18,8 +18,14 @@ namespace ECSRogue.ECS.Systems
             float decrement = .15f;
             int messageNumber = 0;
             int messageSpacing = 20;
+            SpriteFont font = null;
+            //Draw message log
             foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
             {
+                if(font == null)
+                {
+                    font = spaceComponents.GameMessageComponents[id].Font;
+                }
                 if(spaceComponents.GameMessageComponents[id].IndexBegin > 0)
                 {
                     spriteBatch.DrawString(spaceComponents.GameMessageComponents[id].Font, Messages.ScrollingMessages, new Vector2(10, (int)10 + (messageNumber * messageSpacing)), Color.MediumVioletRed);
@@ -36,6 +42,35 @@ namespace ECSRogue.ECS.Systems
                     spaceComponents.GameMessageComponents[id].GameMessages.RemoveAt(0);
                 }
                 spriteBatch.DrawString(spaceComponents.GameMessageComponents[id].Font, spaceComponents.GameMessageComponents[id].GlobalMessage, new Vector2(10, camera.Bounds.Height - messageSpacing), spaceComponents.GameMessageComponents[id].GlobalColor);
+            }
+
+            messageNumber = 0;
+            //Draw statistics
+            foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).Select(x => x.Id))
+            {
+                List<string> statsToPrint = new List<string>();
+                GameplayInfoComponent gameplayInfo = spaceComponents.GameplayInfoComponents[id];
+                SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
+                statsToPrint.Add(string.Format("Steps: {0}", gameplayInfo.StepsTaken));
+                statsToPrint.Add(string.Format("Kills: {0}", gameplayInfo.Kills));
+                statsToPrint.Add("\n");
+                statsToPrint.Add(string.Format("Health:  {0} / {1}", skills.CurrentHealth, skills.Health));
+                statsToPrint.Add(string.Format("Wealth: {0}", skills.Wealth));
+                statsToPrint.Add("\n");
+                statsToPrint.Add(string.Format("ATK: {0}", skills.PhysicalAttack));
+                statsToPrint.Add(string.Format("DEF: {0}", skills.PhysicalDefense));
+                statsToPrint.Add(string.Format("MATK: {0}", skills.MagicAttack));
+                statsToPrint.Add(string.Format("MDEF: {0}", skills.MagicDefense));
+
+                if (font != null)
+                {
+                    foreach (string stat in statsToPrint)
+                    {
+                        Vector2 messageSize = font.MeasureString(stat);
+                        spriteBatch.DrawString(font, stat, new Vector2(camera.Bounds.Width - messageSize.X - 10, 10 + (messageSpacing * messageNumber)), MessageColors.SpecialAction);
+                        messageNumber += 1;
+                    }
+                }
             }
         }
 

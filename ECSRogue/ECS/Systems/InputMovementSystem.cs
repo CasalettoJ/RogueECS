@@ -19,52 +19,64 @@ namespace ECSRogue.ECS.Systems
             foreach(Guid id in movableEntities)
             {
                 bool hitWall = false;
+                bool movement = false;
                 KeyboardState keyState = Keyboard.GetState();
                 PositionComponent pos = spaceComponents.PositionComponents[id];
+                GameplayInfoComponent gameInfo = spaceComponents.GameplayInfoComponents[id];
                 if (keyState.IsKeyDown(Keys.NumPad8) && !prevKeyboardState.IsKeyDown(Keys.NumPad8))
                 {
                     pos.Position.Y -= 1;
+                    movement = true;
                 }
                 else if (keyState.IsKeyDown(Keys.NumPad2) && !prevKeyboardState.IsKeyDown(Keys.NumPad2))
                 {
                     pos.Position.Y += 1;
+                    movement = true;
                 }
                 else if (keyState.IsKeyDown(Keys.NumPad6) && !prevKeyboardState.IsKeyDown(Keys.NumPad6))
                 {
                     pos.Position.X += 1;
+                    movement = true;
                 }
                 else if (keyState.IsKeyDown(Keys.NumPad4) && !prevKeyboardState.IsKeyDown(Keys.NumPad4))
                 {
                     pos.Position.X -= 1;
+                    movement = true;
                 }
                 else if (keyState.IsKeyDown(Keys.NumPad7) && !prevKeyboardState.IsKeyDown(Keys.NumPad7))
                 {
                     pos.Position.X -= 1;
                     pos.Position.Y -= 1;
+                    movement = true;
                 }
                 else if (keyState.IsKeyDown(Keys.NumPad9) && !prevKeyboardState.IsKeyDown(Keys.NumPad9))
                 {
                     pos.Position.X += 1;
                     pos.Position.Y -= 1;
+                    movement = true;
                 }
                 else if (keyState.IsKeyDown(Keys.NumPad1) && !prevKeyboardState.IsKeyDown(Keys.NumPad1))
                 {
                     pos.Position.X -= 1;
                     pos.Position.Y += 1;
+                    movement = true;
                 }
                 else if (keyState.IsKeyDown(Keys.NumPad3) && !prevKeyboardState.IsKeyDown(Keys.NumPad3))
                 {
                     pos.Position.X += 1;
                     pos.Position.Y += 1;
+                    movement = true;
                 }
 
                 hitWall = !dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Occupiable;
-                if (!hitWall)
+                if (!hitWall && movement)
                 {
                     //Check collisions.  If no collisions, move into spot.
                     spaceComponents.PositionComponents[id] = pos;
+                    gameInfo.StepsTaken += 1;
+                    spaceComponents.GameplayInfoComponents[id] = gameInfo;
                 }
-                else
+                if(hitWall)
                 {
                     MessageDisplaySystem.GenerateRandomGameMessage(spaceComponents, Messages.WallCollisionMessages, MessageColors.Normal);
                 }

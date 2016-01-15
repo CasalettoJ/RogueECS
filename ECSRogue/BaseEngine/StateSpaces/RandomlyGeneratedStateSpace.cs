@@ -19,6 +19,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
     {
         #region Components
         private StateSpaceComponents stateSpaceComponents;
+        private StateComponents stateComponents;
         #endregion
 
         #region Dungeon Environment Variables
@@ -37,8 +38,9 @@ namespace ECSRogue.BaseEngine.StateSpaces
         }
 
         #region Load Logic
-        public void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera)
+        public void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera, StateComponents stateComponents)
         {
+            this.stateComponents = stateComponents;
             player = content.Load<Texture2D>("Sprites/Ball");
             messageFont = content.Load<SpriteFont>("Fonts/InfoText");
             dungeonAlgorithm.LoadDungeonContent(content);
@@ -61,8 +63,28 @@ namespace ECSRogue.BaseEngine.StateSpaces
             } while (dungeonGrid[X, Y].Type != TileType.TILE_FLOOR);
             stateSpaceComponents.PositionComponents[id] = new PositionComponent() { Position = new Vector2(X, Y) };
             dungeonGrid[X, Y].Occupiable = true;
-            //Set Health
-            stateSpaceComponents.HealthComponents[id] = new HealthComponent() { CurrentHealth = 50, MaxHealth = 100, MinHealth = 0 };
+            if(stateComponents != null)
+            {
+                stateSpaceComponents.GameplayInfoComponents[id] = stateComponents.GameplayInfo;
+                stateSpaceComponents.SkillLevelsComponents[id] = stateComponents.PlayerSkillLevels;
+            }
+            else
+            {
+
+                //Set GameplayInfo
+                stateSpaceComponents.GameplayInfoComponents[id] = new GameplayInfoComponent() { Kills = 0, StepsTaken = 0 };
+                //Set Skills Level
+                stateSpaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent()
+                {
+                    CurrentHealth = 100,
+                    Health = 100,
+                    MagicAttack = 10,
+                    MagicDefense = 3,
+                    PhysicalAttack = 20,
+                    PhysicalDefense = 10,
+                    Wealth = 100
+                };
+            }
             //Set Display
             stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.Red, Texture = player };
             //Set Sightradius
@@ -94,6 +116,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             if (Keyboard.GetState().IsKeyDown(Keys.Enter) && !prevKeyboardState.IsKeyDown(Keys.Enter))
             {
                 nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
+                LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
             }
             if(Mouse.GetState().RightButton == ButtonState.Pressed)
             {

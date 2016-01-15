@@ -47,13 +47,15 @@
     <Compile Include="BaseEngine\States\PlayingState.cs" />
     <Compile Include="BaseEngine\States\TitleState.cs" />
     <Compile Include="ECS\Components.cs" />
+    <Compile Include="ECS\Components\AIComponent.cs" />
     <Compile Include="ECS\Components\AnimationComponent.cs" />
     <Compile Include="ECS\Components\DisplayComponent.cs" />
     <Compile Include="ECS\Components\GameMessageComponent.cs" />
-    <Compile Include="ECS\Components\HealthComponent.cs" />
+    <Compile Include="ECS\Components\GameplayInfoComponent.cs" />
     <Compile Include="ECS\Components\LabelComponent.cs" />
     <Compile Include="ECS\Components\PositionComponent.cs" />
     <Compile Include="ECS\Components\SightRadiusComponent.cs" />
+    <Compile Include="ECS\Components\SkillLevelsComponent.cs" />
     <Compile Include="ECS\Components\VelocityComponent.cs" />
     <Compile Include="ECS\Entity.cs" />
     <Compile Include="ECSRogue.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="ECS\Systems\DisplaySystem.cs" />
     <Compile Include="ECS\Systems\InputMovementSystem.cs" />
     <Compile Include="ECS\Systems\LabelDisplaySystem.cs" />
+    <Compile Include="ECS\Systems\LevelChangeSystem.cs" />
     <Compile Include="ECS\Systems\MessageDisplaySystem.cs" />
     <Compile Include="ECS\Systems\TileRevealSystem.cs" />
     <Compile Include="ProceduralGeneration\CaveArenaGeneration.cs" />

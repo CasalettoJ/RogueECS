@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
+using ECSRogue.ECS;
 
 namespace ECSRogue.BaseEngine.States
 {
@@ -19,6 +20,7 @@ namespace ECSRogue.BaseEngine.States
         private KeyboardState PrevKeyboardState;
         private IStateSpace CurrentLevel;
         private GraphicsDeviceManager Graphics;
+        private StateComponents StateComponents;
         #endregion
 
         public PlayingState(IStateSpace space, Camera camera, ContentManager content, GraphicsDeviceManager graphics, MouseState mouseState = new MouseState(), GamePadState gamePadState = new GamePadState(), KeyboardState keyboardState = new KeyboardState())
@@ -28,6 +30,7 @@ namespace ECSRogue.BaseEngine.States
             PrevMouseState = mouseState;
             PrevGamepadState = gamePadState;
             PrevKeyboardState = keyboardState;
+            StateComponents = new StateComponents();
             SetStateSpace(space, camera);
         }
 
@@ -67,7 +70,7 @@ namespace ECSRogue.BaseEngine.States
                 Content.Unload();
 
                 CurrentLevel = stateSpace;
-                stateSpace.LoadLevel(Content, Graphics, camera);
+                stateSpace.LoadLevel(Content, Graphics, camera, StateComponents);
             }
         }
 
