@@ -335,52 +335,56 @@ namespace ECSRogue.ProceduralGeneration
 
         public void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions)
         {
+            Matrix cameraMatrix = camera.GetMatrix();
             for(int i = 0; i < (int)dungeonDimensions.X; i++)
             {
                 for(int j = 0; j < (int)dungeonDimensions.Y; j++)
                 {
                     Rectangle tile = new Rectangle((int)i * cellSize, (int)j * cellSize, cellSize, cellSize);
-                    if (dungeonGrid[i, j].Found && !dungeonGrid[i,j].InRange)
+                    if(camera.IsInView(cameraMatrix, new Vector2(i * cellSize + cellSize, j * cellSize + cellSize), new Vector2(i * cellSize, j * cellSize))) // check if in view
                     {
-                        switch (dungeonGrid[i, j].Type)
+                        if (dungeonGrid[i, j].Found && !dungeonGrid[i, j].InRange)
                         {
-                            case TileType.TILE_FLOOR:
-                                spriteBatch.Draw(temporaryTile, tile, Color.DarkGreen);
-                                break;
-                            case TileType.TILE_WALL:
-                                spriteBatch.Draw(temporaryTile, tile, Color.DarkViolet);
-                                break;
+                            switch (dungeonGrid[i, j].Type)
+                            {
+                                case TileType.TILE_FLOOR:
+                                    spriteBatch.Draw(temporaryTile, tile, Color.DarkGreen);
+                                    break;
+                                case TileType.TILE_WALL:
+                                    spriteBatch.Draw(temporaryTile, tile, Color.DarkViolet);
+                                    break;
+                            }
                         }
-                    }
-                    else if(dungeonGrid[i,j].InRange && !dungeonGrid[i,j].NewlyFound)
-                    {
-                        switch (dungeonGrid[i, j].Type)
+                        else if (dungeonGrid[i, j].InRange && !dungeonGrid[i, j].NewlyFound)
                         {
-                            case TileType.TILE_FLOOR:
-                                spriteBatch.Draw(temporaryTile, tile, Color.Green);
-                                break;
-                            case TileType.TILE_WALL:
-                                spriteBatch.Draw(temporaryTile, tile, Color.Violet);
-                                break;
+                            switch (dungeonGrid[i, j].Type)
+                            {
+                                case TileType.TILE_FLOOR:
+                                    spriteBatch.Draw(temporaryTile, tile, Color.Green);
+                                    break;
+                                case TileType.TILE_WALL:
+                                    spriteBatch.Draw(temporaryTile, tile, Color.Violet);
+                                    break;
+                            }
                         }
-                    }
-                    else if(dungeonGrid[i,j].NewlyFound)
-                    {
-                        float opacity = dungeonGrid[i, j].Opacity;
-                        switch (dungeonGrid[i, j].Type)
+                        else if (dungeonGrid[i, j].NewlyFound)
                         {
-                            case TileType.TILE_FLOOR:
-                                spriteBatch.Draw(temporaryTile, tile, Color.Green * opacity);
-                                break;
-                            case TileType.TILE_WALL:
-                                spriteBatch.Draw(temporaryTile, tile, Color.Violet * opacity);
-                                break;
-                        }
-                        dungeonGrid[i, j].Opacity += .21f;
-                        if(dungeonGrid[i,j].Opacity > 1)
-                        {
-                            dungeonGrid[i, j].NewlyFound = false;
-                            dungeonGrid[i, j].Found = true;
+                            float opacity = dungeonGrid[i, j].Opacity;
+                            switch (dungeonGrid[i, j].Type)
+                            {
+                                case TileType.TILE_FLOOR:
+                                    spriteBatch.Draw(temporaryTile, tile, Color.Green * opacity);
+                                    break;
+                                case TileType.TILE_WALL:
+                                    spriteBatch.Draw(temporaryTile, tile, Color.Violet * opacity);
+                                    break;
+                            }
+                            dungeonGrid[i, j].Opacity += .21f;
+                            if (dungeonGrid[i, j].Opacity > 1)
+                            {
+                                dungeonGrid[i, j].NewlyFound = false;
+                                dungeonGrid[i, j].Found = true;
+                            }
                         }
                     }
                 }

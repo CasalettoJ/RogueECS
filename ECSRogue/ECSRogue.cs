@@ -24,7 +24,7 @@ namespace ECSRogue
         private static readonly Vector2 _initialScale = new Vector2(2880, 1620);
         private static readonly Vector2 _initialSize = new Vector2(1024, 576);
         private KeyboardState prevKey;
-        //private SpriteFont debugText;
+        private SpriteFont debugText;
 
         public ECSRogue()
         {
@@ -47,6 +47,8 @@ namespace ECSRogue
             Window.AllowUserResizing = true;
             graphics.PreferredBackBufferWidth = (int)_initialSize.X;
             graphics.PreferredBackBufferHeight = (int)_initialSize.Y;
+            graphics.SynchronizeWithVerticalRetrace = false;
+            this.IsFixedTimeStep = false;
             //graphics.IsFullScreen = true;
             graphics.ApplyChanges();
 
@@ -69,7 +71,7 @@ namespace ECSRogue
             PlayingState firstState = new PlayingState(firstStateSpace, gameCamera, Content, graphics);
             stateStack.Push(firstState);
 
-            //debugText = Content.Load<SpriteFont>("Fonts/InfoText");
+            debugText = Content.Load<SpriteFont>("Fonts/InfoText");
         }
 
         /// <summary>
@@ -124,7 +126,7 @@ namespace ECSRogue
             //Draw UI
             spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             currentState.DrawUserInterface(spriteBatch, gameCamera);
-            //spriteBatch.DrawString(debugText, (1 / (float)gameTime.ElapsedGameTime.TotalSeconds).ToString(), gameCamera.Bounds.Center.ToVector2(), Color.Yellow);
+            spriteBatch.DrawString(debugText, (1 / (float)gameTime.ElapsedGameTime.TotalSeconds).ToString(), gameCamera.Bounds.Center.ToVector2(), Color.Yellow);
             spriteBatch.End();
             base.Draw(gameTime);
         }
@@ -136,6 +138,7 @@ namespace ECSRogue
             graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
             graphics.ApplyChanges();
             gameCamera.Bounds = graphics.GraphicsDevice.Viewport.Bounds;
+            gameCamera.Viewport = graphics.GraphicsDevice.Viewport;
         }
     }
 }

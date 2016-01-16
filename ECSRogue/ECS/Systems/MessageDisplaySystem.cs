@@ -33,6 +33,10 @@ namespace ECSRogue.ECS.Systems
                 }
                 foreach(Tuple<Color,string> message in spaceComponents.GameMessageComponents[id].GameMessages.Reverse<Tuple<Color,string>>().Skip(spaceComponents.GameMessageComponents[id].IndexBegin))
                 {
+                    if(opacity < 0)
+                    {
+                        break;
+                    }
                     opacity -= decrement;
                     spriteBatch.DrawString(spaceComponents.GameMessageComponents[id].Font, message.Item2, new Vector2(10,(int)10 + (messageNumber * messageSpacing)), message.Item1 * opacity);
                     messageNumber += 1;

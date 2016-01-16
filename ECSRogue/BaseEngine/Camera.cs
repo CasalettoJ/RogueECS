@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace ECSRogue.BaseEngine
                 return new Vector2(600, 600);
             }
         }
+        public Viewport Viewport;
 
         public Camera(Vector2 position, Vector2 origin, float rotation, Vector2 scale, GraphicsDeviceManager graphics)
         {
@@ -34,6 +36,7 @@ namespace ECSRogue.BaseEngine
             ResetScreenScale(graphics, scale);
             Position = position;
             Bounds = graphics.GraphicsDevice.Viewport.Bounds;
+            Viewport = graphics.GraphicsDevice.Viewport;
         }
 
         public Vector3 ResetScreenScale(GraphicsDeviceManager graphics, Vector2 screenScale)
@@ -41,6 +44,7 @@ namespace ECSRogue.BaseEngine
             var scaleX = (float)graphics.GraphicsDevice.Viewport.Width / screenScale.X;
             var scaleY = (float)graphics.GraphicsDevice.Viewport.Height / screenScale.Y;
             Scale = new Vector3(scaleX, scaleY, 1.0f);
+            Viewport = graphics.GraphicsDevice.Viewport;
             return Scale;
         }
 
@@ -71,6 +75,12 @@ namespace ECSRogue.BaseEngine
         public Vector2 WorldToScreen(Point point)
         {
             return Vector2.Transform(point.ToVector2(), this.GetMatrix());
+        }
+
+        public bool IsInView(Matrix matrix, Vector2 positionUpperBounds, Vector2 positionLowerBounds)
+        {
+            return this.Viewport.Bounds.Contains(Vector2.Transform(positionLowerBounds, matrix))
+                || this.Viewport.Bounds.Contains(Vector2.Transform(positionUpperBounds, matrix));
         }
 
         //public Rectangle GetVisibleArea(GraphicsDeviceManager graphics)
