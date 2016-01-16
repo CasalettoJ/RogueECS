@@ -66,14 +66,16 @@ namespace ECSRogue.BaseEngine.StateSpaces
             dungeonGrid[X, Y].Occupiable = true;
             if(stateComponents != null)
             {
-                stateSpaceComponents.GameplayInfoComponents[id] = stateComponents.GameplayInfo;
+                GameplayInfoComponent info = stateComponents.GameplayInfo;
+                info.FloorsReached += 1;
+                stateSpaceComponents.GameplayInfoComponents[id] = info;
                 stateSpaceComponents.SkillLevelsComponents[id] = stateComponents.PlayerSkillLevels;
             }
             else
             {
 
                 //Set GameplayInfo
-                stateSpaceComponents.GameplayInfoComponents[id] = new GameplayInfoComponent() { Kills = 0, StepsTaken = 0 };
+                stateSpaceComponents.GameplayInfoComponents[id] = new GameplayInfoComponent() { Kills = 0, StepsTaken = 0, FloorsReached = 0 };
                 //Set Skills Level
                 stateSpaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent()
                 {
@@ -114,14 +116,10 @@ namespace ECSRogue.BaseEngine.StateSpaces
             }
             IStateSpace nextStateSpace = this;
             #region Debug changing levels
-            if (Keyboard.GetState().IsKeyDown(Keys.Enter) && !prevKeyboardState.IsKeyDown(Keys.Enter))
+            if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && !prevKeyboardState.IsKeyDown(Keys.LeftShift))
             {
                 nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
                 LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && !prevKeyboardState.IsKeyDown(Keys.Escape))
-            {
-                nextStateSpace = null;
             }
             if (Mouse.GetState().RightButton == ButtonState.Pressed)
             {

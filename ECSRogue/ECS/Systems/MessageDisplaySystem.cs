@@ -56,6 +56,8 @@ namespace ECSRogue.ECS.Systems
                 List<string> statsToPrint = new List<string>();
                 GameplayInfoComponent gameplayInfo = spaceComponents.GameplayInfoComponents[id];
                 SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
+
+                statsToPrint.Add(string.Format("Floor {0}", gameplayInfo.FloorsReached));
                 statsToPrint.Add(string.Format("Steps: {0}", gameplayInfo.StepsTaken));
                 statsToPrint.Add(string.Format("Kills: {0}", gameplayInfo.Kills));
                 statsToPrint.Add("\n");

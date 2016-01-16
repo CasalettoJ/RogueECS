@@ -83,7 +83,7 @@ namespace ECSRogue.BaseEngine.States
                     optionSelection -= 1;
                 }
             }
-            if (keyState.IsKeyDown(Keys.Down) && !PrevKeyboardState.IsKeyDown(Keys.Down))
+            else if (keyState.IsKeyDown(Keys.Down) && !PrevKeyboardState.IsKeyDown(Keys.Down))
             {
                 optionSelection += 1;
                 if (optionSelection < 0)
@@ -100,7 +100,7 @@ namespace ECSRogue.BaseEngine.States
                 }
             }
 
-            if (keyState.IsKeyDown(Keys.Enter))
+            else if (keyState.IsKeyDown(Keys.Enter))
             {
                 switch (optionSelection)
                 {

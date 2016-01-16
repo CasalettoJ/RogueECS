@@ -52,6 +52,10 @@ namespace ECSRogue.BaseEngine.States
             {
                 return null;
             }
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && !PrevKeyboardState.IsKeyDown(Keys.Escape))
+            {
+                return new PauseState(camera, Content, Graphics, keyboardState: PrevKeyboardState);
+            }
 
             PrevKeyboardState = Keyboard.GetState();
             PrevMouseState = Mouse.GetState();
