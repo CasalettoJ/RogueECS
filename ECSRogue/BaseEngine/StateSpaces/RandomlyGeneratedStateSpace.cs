@@ -105,7 +105,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         #endregion
 
         #region Update Logic
-        public IStateSpace UpdateLevel(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, ref GameSettings gameSettings)
+        public IStateSpace UpdateSpace(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, ref GameSettings gameSettings)
         {
             if(stateSpaceComponents.EntitiesToDelete.Count > 0)
             {

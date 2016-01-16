@@ -16,19 +16,22 @@ namespace ECSRogue.BaseEngine.States
 {
     public class PauseState : IState
     {
+        #region State Management Property
+        public static bool LeaveSpace = false;
+        #endregion
+
         private enum Options
         {
             OPTIONS = 0,
             SAVE_TITLE = 1,
-            SAVE_QUIT = 2,
-            UNPAUSE = 3
+            UNPAUSE = 2
         }
         protected struct Option
         {
             public bool Enabled;
             public string Message;
         }
-        private const int optionsAmount = 4;
+        private const int optionsAmount = 3;
         private int optionSelection;
         private SpriteFont titleText;
         private SpriteFont optionText;
@@ -58,20 +61,29 @@ namespace ECSRogue.BaseEngine.States
             menuOptions = new Option[optionsAmount];
             Title = "GAME PAUSED";
             menuOptions[0] = new Option() { Enabled = true, Message = "OPTIONS" };
-            menuOptions[1] = new Option() { Enabled = false, Message = "SAVE AND RETURN TO TITLE" };
-            menuOptions[2] = new Option() { Enabled = false, Message = "SAVE AND QUIT" };
-            menuOptions[3] = new Option() { Enabled = true, Message = "UNPAUSE" };
+            menuOptions[1] = new Option() { Enabled = true, Message = "SAVE AND RETURN TO TITLE" };
+            menuOptions[2] = new Option() { Enabled = true, Message = "UNPAUSE" };
+        }
+
+        ~PauseState()
+        {
+            if (Content != null) { Content.Unload(); }
         }
 
         public IState UpdateContent(GameTime gameTime, Camera camera, ref GameSettings gameSettings)
         {
+            if (PauseState.LeaveSpace)
+            {
+                PauseState.LeaveSpace = false;
+                return null;
+            }
             IState nextState = this;
             KeyboardState keyState = Keyboard.GetState();
-            if (keyState.IsKeyDown(Keys.Escape) && !PrevKeyboardState.IsKeyDown(Keys.Escape))
+            if (keyState.IsKeyDown(Keys.Escape) && PrevKeyboardState.IsKeyUp(Keys.Escape))
             {
                 nextState = null;
             }
-            else if (keyState.IsKeyDown(Keys.Up) && !PrevKeyboardState.IsKeyDown(Keys.Up))
+            else if (keyState.IsKeyDown(Keys.Up) && PrevKeyboardState.IsKeyUp(Keys.Up))
             {
                 optionSelection -= 1;
                 if (optionSelection < 0)
@@ -87,7 +99,7 @@ namespace ECSRogue.BaseEngine.States
                     optionSelection -= 1;
                 }
             }
-            else if (keyState.IsKeyDown(Keys.Down) && !PrevKeyboardState.IsKeyDown(Keys.Down))
+            else if (keyState.IsKeyDown(Keys.Down) && PrevKeyboardState.IsKeyUp(Keys.Down))
             {
                 optionSelection += 1;
                 if (optionSelection < 0)
@@ -104,7 +116,7 @@ namespace ECSRogue.BaseEngine.States
                 }
             }
 
-            else if (keyState.IsKeyDown(Keys.Enter))
+            else if (keyState.IsKeyDown(Keys.Enter) && PrevKeyboardState.IsKeyUp(Keys.Enter))
             {
                 switch (optionSelection)
                 {
@@ -113,8 +125,8 @@ namespace ECSRogue.BaseEngine.States
                         nextState = new PlayingState(nextStateSpace, camera, Content, Graphics, keyboardState: PrevKeyboardState);
                         break;
                     case (int)Options.SAVE_TITLE:
-                        break;
-                    case (int)Options.SAVE_QUIT:
+                        PlayingState.LeaveSpace = true;
+                        nextState = null;
                         break;
                     case (int)Options.UNPAUSE:
                         nextState = null;

@@ -14,6 +14,10 @@ namespace ECSRogue.BaseEngine.States
 {
     public class PlayingState : IState
     {
+        #region State Management Property
+        public static bool LeaveSpace = false;
+        #endregion
+
         #region State Private Variables
         private ContentManager Content;
         private MouseState PrevMouseState;
@@ -42,8 +46,13 @@ namespace ECSRogue.BaseEngine.States
 
         public IState UpdateContent(GameTime gameTime, Camera camera, ref GameSettings gameSettings)
         {
+            if (PlayingState.LeaveSpace)
+            {
+                PlayingState.LeaveSpace = false;
+                return null;
+            }
             IStateSpace nextLevel = CurrentLevel;
-            nextLevel = CurrentLevel.UpdateLevel(gameTime, Content, Graphics, PrevKeyboardState, PrevMouseState, PrevGamepadState, camera, ref gameSettings);
+            nextLevel = CurrentLevel.UpdateSpace(gameTime, Content, Graphics, PrevKeyboardState, PrevMouseState, PrevGamepadState, camera, ref gameSettings);
             if (nextLevel != CurrentLevel && nextLevel != null)
             {
                 SetStateSpace(nextLevel, camera);
@@ -52,9 +61,9 @@ namespace ECSRogue.BaseEngine.States
             {
                 return null;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && !PrevKeyboardState.IsKeyDown(Keys.Escape))
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && PrevKeyboardState.IsKeyUp(Keys.Escape))
             {
-                return new PauseState(camera, Content, Graphics, keyboardState: PrevKeyboardState);
+                return new PauseState(camera, Content, Graphics, keyboardState: Keyboard.GetState());
             }
 
             PrevKeyboardState = Keyboard.GetState();

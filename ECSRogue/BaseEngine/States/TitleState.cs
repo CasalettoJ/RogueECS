@@ -16,6 +16,10 @@ namespace ECSRogue.BaseEngine.States
 {
     public class TitleState : IState
     {
+        #region State Management Property
+        public static bool LeaveSpace = false;
+        #endregion
+
         private enum Options
         {
             NEW_GAME = 0,
@@ -63,11 +67,21 @@ namespace ECSRogue.BaseEngine.States
             menuOptions[3] = new Option() { Enabled = true, Message = "QUIT GAME" };
         }
 
+        ~TitleState()
+        {
+            if (Content != null) { Content.Unload(); }
+        }
+
         public IState UpdateContent(GameTime gameTime, Camera camera, ref GameSettings gameSettings)
         {
+            if (TitleState.LeaveSpace)
+            {
+                TitleState.LeaveSpace = false;
+                return null;
+            }
             IState nextState = this;
             KeyboardState keyState = Keyboard.GetState();
-            if (keyState.IsKeyDown(Keys.Up) && !PrevKeyboardState.IsKeyDown(Keys.Up))
+            if (keyState.IsKeyDown(Keys.Up) && PrevKeyboardState.IsKeyUp(Keys.Up))
             {
                 optionSelection -= 1;
                 if (optionSelection < 0)
@@ -83,7 +97,7 @@ namespace ECSRogue.BaseEngine.States
                     optionSelection -= 1;
                 }
             }
-            else if (keyState.IsKeyDown(Keys.Down) && !PrevKeyboardState.IsKeyDown(Keys.Down))
+            else if (keyState.IsKeyDown(Keys.Down) && PrevKeyboardState.IsKeyUp(Keys.Down))
             {
                 optionSelection += 1;
                 if (optionSelection < 0)
@@ -100,13 +114,13 @@ namespace ECSRogue.BaseEngine.States
                 }
             }
 
-            else if (keyState.IsKeyDown(Keys.Enter))
+            else if (keyState.IsKeyDown(Keys.Enter) && PrevKeyboardState.IsKeyUp(Keys.Enter))
             {
                 switch (optionSelection)
                 {
                     case (int)Options.NEW_GAME:
                         RandomlyGeneratedStateSpace nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
-                        nextState = new PlayingState(nextStateSpace, camera, Content, Graphics, keyboardState: PrevKeyboardState);
+                        nextState = new PlayingState(nextStateSpace, camera, Content, Graphics, keyboardState: keyState);
                         break;
                     case (int)Options.LOAD_GAME:
                         break;
