@@ -1,4 +1,5 @@
 ﻿using ECSRogue.BaseEngine;
+using ECSRogue.BaseEngine.IO.Objects;
 using ECSRogue.ECS.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -78,11 +79,14 @@ namespace ECSRogue.ECS.Systems
             }
         }
 
-        public static void GenerateRandomGameMessage(StateSpaceComponents spaceComponents, string[] messageList, Color color)
+        public static void GenerateRandomGameMessage(StateSpaceComponents spaceComponents, string[] messageList, Color color, GameSettings gameSettings = null)
         {
-            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
+            if (gameSettings == null || !(!gameSettings.ShowNormalMessages && color == MessageColors.Normal))
             {
-                spaceComponents.GameMessageComponents[id].GameMessages.Add(new Tuple<Color,string>(color,messageList[spaceComponents.random.Next(0, messageList.Count())]));
+                foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
+                {
+                    spaceComponents.GameMessageComponents[id].GameMessages.Add(new Tuple<Color, string>(color, messageList[spaceComponents.random.Next(0, messageList.Count())]));
+                }
             }
         }
 

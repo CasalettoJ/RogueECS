@@ -12,6 +12,7 @@ using ECSRogue.ProceduralGeneration;
 using ECSRogue.ProceduralGeneration.Interfaces;
 using ECSRogue.ECS.Systems;
 using ECSRogue.ECS.Components;
+using ECSRogue.BaseEngine.IO.Objects;
 
 namespace ECSRogue.BaseEngine.StateSpaces
 {
@@ -102,7 +103,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         #endregion
 
         #region Update Logic
-        public IStateSpace UpdateLevel(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera)
+        public IStateSpace UpdateLevel(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, ref GameSettings gameSettings)
         {
             if(stateSpaceComponents.EntitiesToDelete.Count > 0)
             {
@@ -118,7 +119,11 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
                 LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
             }
-            if(Mouse.GetState().RightButton == ButtonState.Pressed)
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && !prevKeyboardState.IsKeyDown(Keys.Escape))
+            {
+                nextStateSpace = null;
+            }
+            if (Mouse.GetState().RightButton == ButtonState.Pressed)
             {
                 camera.Target = Vector2.Transform(Mouse.GetState().Position.ToVector2(),camera.GetInverseMatrix());
                 camera.AttachedToPlayer = false;
@@ -130,7 +135,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 MessageDisplaySystem.SetRandomGlobalMessage(stateSpaceComponents, new string[] { string.Empty });
             }
             #endregion
-            InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid);
+            InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
             TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
             UpdateCamera(camera, gameTime);
             MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);

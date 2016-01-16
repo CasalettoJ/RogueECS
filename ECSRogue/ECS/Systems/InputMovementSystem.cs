@@ -1,4 +1,5 @@
 ﻿using ECSRogue.BaseEngine;
+using ECSRogue.BaseEngine.IO.Objects;
 using ECSRogue.ECS.Components;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
@@ -13,7 +14,7 @@ namespace ECSRogue.ECS.Systems
     public static class InputMovementSystem
     {
         public static void HandleDungeonMovement(StateSpaceComponents spaceComponents, GraphicsDeviceManager graphics, GameTime gameTime,
-            KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, DungeonTile[,] dungeonGrid)
+            KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, DungeonTile[,] dungeonGrid, GameSettings gameSettings)
         {
             IEnumerable<Guid> movableEntities = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.InputMoveable) == ComponentMasks.InputMoveable).Select(x => x.Id);
             foreach(Guid id in movableEntities)
@@ -78,7 +79,7 @@ namespace ECSRogue.ECS.Systems
                 }
                 if(hitWall)
                 {
-                    MessageDisplaySystem.GenerateRandomGameMessage(spaceComponents, Messages.WallCollisionMessages, MessageColors.Normal);
+                    MessageDisplaySystem.GenerateRandomGameMessage(spaceComponents, Messages.WallCollisionMessages, MessageColors.Normal, gameSettings);
                 }
 
             }

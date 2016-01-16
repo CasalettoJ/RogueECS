@@ -1,5 +1,7 @@
 ﻿using ECSRogue.BaseEngine;
 using ECSRogue.BaseEngine.Interfaces;
+using ECSRogue.BaseEngine.IO;
+using ECSRogue.BaseEngine.IO.Objects;
 using ECSRogue.BaseEngine.States;
 using ECSRogue.BaseEngine.StateSpaces;
 using ECSRogue.ProceduralGeneration;
@@ -21,16 +23,16 @@ namespace ECSRogue
         private Stack<IState> stateStack;
         private IState currentState;
         private Camera gameCamera;
-        private static readonly Vector2 _initialScale = new Vector2(2880, 1620);
-        private static readonly Vector2 _initialSize = new Vector2(1024, 576);
         private KeyboardState prevKey;
         private SpriteFont debugText;
+        private GameSettings gameSettings;
 
         public ECSRogue()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             stateStack = new Stack<IState>();
+            gameSettings = new GameSettings();
         }
 
         /// <summary>
@@ -42,16 +44,7 @@ namespace ECSRogue
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
-            this.IsMouseVisible = true;
-            Window.AllowUserResizing = true;
-            graphics.PreferredBackBufferWidth = (int)_initialSize.X;
-            graphics.PreferredBackBufferHeight = (int)_initialSize.Y;
-            graphics.SynchronizeWithVerticalRetrace = false;
-            this.IsFixedTimeStep = false;
-            //graphics.IsFullScreen = true;
-            graphics.ApplyChanges();
-
+            FileIO.LoadGameSettings(ref gameSettings);
             this.Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
 
             base.Initialize();
@@ -66,9 +59,14 @@ namespace ECSRogue
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            gameCamera = new Camera(Vector2.Zero, Vector2.Zero, 0.0f, _initialScale, graphics);
-            RandomlyGeneratedStateSpace firstStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
-            PlayingState firstState = new PlayingState(firstStateSpace, gameCamera, Content, graphics);
+            gameCamera = new Camera(Vector2.Zero, Vector2.Zero, 0.0f, gameSettings.Scale, graphics);
+            this.IsMouseVisible = true;
+            Window.AllowUserResizing = true;
+            //graphics.IsFullScreen = true;
+            this.ResetGameSettings();
+            //RandomlyGeneratedStateSpace firstStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
+            //PlayingState firstState = new PlayingState(firstStateSpace, gameCamera, Content, graphics);
+            TitleState firstState = new TitleState(gameCamera, Content, graphics);
             stateStack.Push(firstState);
 
             debugText = Content.Load<SpriteFont>("Fonts/InfoText");
@@ -95,7 +93,7 @@ namespace ECSRogue
                 graphics.ToggleFullScreen();
             }
             currentState = stateStack.Peek();
-            IState nextState = currentState.UpdateContent(gameTime, gameCamera);
+            IState nextState = currentState.UpdateContent(gameTime, gameCamera, ref gameSettings);
             if (nextState != currentState && nextState != null)
             {
                 stateStack.Push(nextState);
@@ -109,6 +107,10 @@ namespace ECSRogue
                 Exit();
             }
             prevKey = Keyboard.GetState();
+            if(gameSettings.HasChanges)
+            {
+                ResetGameSettings();
+            }
             base.Update(gameTime);
         }
 
@@ -131,6 +133,18 @@ namespace ECSRogue
             base.Draw(gameTime);
         }
 
+        private void ResetGameSettings()
+        {
+            graphics.PreferredBackBufferWidth = (int)gameSettings.Resolution.X;
+            graphics.PreferredBackBufferHeight = (int)gameSettings.Resolution.Y;
+            graphics.SynchronizeWithVerticalRetrace = gameSettings.Vsync;
+            this.IsFixedTimeStep = gameSettings.Vsync;
+            graphics.ApplyChanges();
+            gameCamera.ResetScreenScale(graphics, gameSettings.Scale);
+            gameCamera.Bounds = graphics.GraphicsDevice.Viewport.Bounds;
+            gameCamera.Viewport = graphics.GraphicsDevice.Viewport;
+            gameSettings.HasChanges = false;
+        }
 
         void Window_ClientSizeChanged(object sender, EventArgs e)
         {

@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 using ECSRogue.ECS;
+using ECSRogue.BaseEngine.IO.Objects;
 
 namespace ECSRogue.BaseEngine.States
 {
@@ -39,10 +40,10 @@ namespace ECSRogue.BaseEngine.States
             if (Content != null) { Content.Unload(); }
         }
 
-        public IState UpdateContent(GameTime gameTime, Camera camera)
+        public IState UpdateContent(GameTime gameTime, Camera camera, ref GameSettings gameSettings)
         {
             IStateSpace nextLevel = CurrentLevel;
-            nextLevel = CurrentLevel.UpdateLevel(gameTime, Content, Graphics, PrevKeyboardState, PrevMouseState, PrevGamepadState, camera);
+            nextLevel = CurrentLevel.UpdateLevel(gameTime, Content, Graphics, PrevKeyboardState, PrevMouseState, PrevGamepadState, camera, ref gameSettings);
             if (nextLevel != CurrentLevel && nextLevel != null)
             {
                 SetStateSpace(nextLevel, camera);

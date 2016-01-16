@@ -30,3 +30,15 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/InfoText.spritefont
 
+#begin Fonts/TitleText.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/TitleText.spritefont
+
+#begin Fonts/OptionText.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/OptionText.spritefont
+

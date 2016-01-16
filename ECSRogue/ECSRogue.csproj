@@ -39,8 +39,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BaseEngine\Camera.cs" />
+    <Compile Include="BaseEngine\IO\FileNames.cs" />
     <Compile Include="BaseEngine\Interfaces\IStateSpace.cs" />
     <Compile Include="BaseEngine\Interfaces\IState.cs" />
+    <Compile Include="BaseEngine\IO\FileIO.cs" />
+    <Compile Include="BaseEngine\IO\Objects\GameSettings.cs" />
     <Compile Include="BaseEngine\Messages.cs" />
     <Compile Include="BaseEngine\StateSpaces\RandomlyGeneratedStateSpace.cs" />
     <Compile Include="BaseEngine\States\PauseState.cs" />
@@ -76,6 +79,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="OpenTK">
       <HintPath>$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\WindowsGL\OpenTK.dll</HintPath>
     </Reference>
@@ -92,6 +99,9 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <!-- Specify the search path explicitly so the ResolveAssemblyReferences task picks the right ones -->
   <Target Name="BeforeResolveReferences">
     <CreateProperty Value="$(MSBuildProgramFiles32)\MonoGame\v3.0\Assemblies\Windows;$(AssemblySearchPaths)">
