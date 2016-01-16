@@ -17,7 +17,7 @@ namespace ECSRogue.BaseEngine.States
     public class PauseState : IState
     {
         #region State Management Property
-        public static bool LeaveSpace = false;
+        private static IState previousState;
         #endregion
 
         private enum Options
@@ -47,7 +47,7 @@ namespace ECSRogue.BaseEngine.States
         private StateComponents StateComponents;
         #endregion
 
-        public PauseState(Camera camera, ContentManager content, GraphicsDeviceManager graphics, MouseState mouseState = new MouseState(), GamePadState gamePadState = new GamePadState(), KeyboardState keyboardState = new KeyboardState())
+        public PauseState(Camera camera, ContentManager content, GraphicsDeviceManager graphics, IState prevState, MouseState mouseState = new MouseState(), GamePadState gamePadState = new GamePadState(), KeyboardState keyboardState = new KeyboardState())
         {
             this.Content = new ContentManager(content.ServiceProvider, "Content");
             Graphics = graphics;
@@ -63,6 +63,7 @@ namespace ECSRogue.BaseEngine.States
             menuOptions[0] = new Option() { Enabled = true, Message = "OPTIONS" };
             menuOptions[1] = new Option() { Enabled = true, Message = "SAVE AND RETURN TO TITLE" };
             menuOptions[2] = new Option() { Enabled = true, Message = "UNPAUSE" };
+            previousState = prevState;
         }
 
         ~PauseState()
@@ -72,16 +73,12 @@ namespace ECSRogue.BaseEngine.States
 
         public IState UpdateContent(GameTime gameTime, Camera camera, ref GameSettings gameSettings)
         {
-            if (PauseState.LeaveSpace)
-            {
-                PauseState.LeaveSpace = false;
-                return null;
-            }
             IState nextState = this;
             KeyboardState keyState = Keyboard.GetState();
             if (keyState.IsKeyDown(Keys.Escape) && PrevKeyboardState.IsKeyUp(Keys.Escape))
             {
-                nextState = null;
+                nextState = previousState;
+                nextState.SetPrevInput(Keyboard.GetState(), Mouse.GetState(), GamePad.GetState(PlayerIndex.One));
             }
             else if (keyState.IsKeyDown(Keys.Up) && PrevKeyboardState.IsKeyUp(Keys.Up))
             {
@@ -122,14 +119,14 @@ namespace ECSRogue.BaseEngine.States
                 {
                     case (int)Options.OPTIONS:
                         RandomlyGeneratedStateSpace nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
-                        nextState = new PlayingState(nextStateSpace, camera, Content, Graphics, keyboardState: PrevKeyboardState);
+                        nextState = new PlayingState(nextStateSpace, camera, Content, Graphics, null, Mouse.GetState(), GamePad.GetState(PlayerIndex.One), keyState);
                         break;
                     case (int)Options.SAVE_TITLE:
-                        PlayingState.LeaveSpace = true;
-                        nextState = null;
+                        nextState = new TitleState(camera, Content, Graphics, Mouse.GetState(), GamePad.GetState(PlayerIndex.One), keyState);
                         break;
                     case (int)Options.UNPAUSE:
-                        nextState = null;
+                        nextState = previousState;
+                        nextState.SetPrevInput(Keyboard.GetState(), Mouse.GetState(), GamePad.GetState(PlayerIndex.One));
                         break;
                 }
             }
@@ -163,6 +160,13 @@ namespace ECSRogue.BaseEngine.States
         public void SetStateSpace(IStateSpace stateSpace, Camera camera)
         {
             //Nothing here.
+        }
+
+        public void SetPrevInput(KeyboardState prevKey, MouseState prevMouse, GamePadState prevPad)
+        {
+            PrevGamepadState = prevPad;
+            PrevKeyboardState = prevKey;
+            PrevMouseState = prevMouse;
         }
     }
 }

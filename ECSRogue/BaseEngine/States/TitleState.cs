@@ -17,7 +17,7 @@ namespace ECSRogue.BaseEngine.States
     public class TitleState : IState
     {
         #region State Management Property
-        public static bool LeaveSpace = false;
+        private static IState previousState;
         #endregion
 
         private enum Options
@@ -65,6 +65,7 @@ namespace ECSRogue.BaseEngine.States
             menuOptions[1] = new Option() { Enabled = false, Message = "CONTINUE" };
             menuOptions[2] = new Option() { Enabled = false, Message = "OPTIONS" };
             menuOptions[3] = new Option() { Enabled = true, Message = "QUIT GAME" };
+            previousState = null;
         }
 
         ~TitleState()
@@ -74,11 +75,6 @@ namespace ECSRogue.BaseEngine.States
 
         public IState UpdateContent(GameTime gameTime, Camera camera, ref GameSettings gameSettings)
         {
-            if (TitleState.LeaveSpace)
-            {
-                TitleState.LeaveSpace = false;
-                return null;
-            }
             IState nextState = this;
             KeyboardState keyState = Keyboard.GetState();
             if (keyState.IsKeyDown(Keys.Up) && PrevKeyboardState.IsKeyUp(Keys.Up))
@@ -120,14 +116,14 @@ namespace ECSRogue.BaseEngine.States
                 {
                     case (int)Options.NEW_GAME:
                         RandomlyGeneratedStateSpace nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
-                        nextState = new PlayingState(nextStateSpace, camera, Content, Graphics, keyboardState: keyState);
+                        nextState = new PlayingState(nextStateSpace, camera, Content, Graphics, this, keyboardState: keyState);
                         break;
                     case (int)Options.LOAD_GAME:
                         break;
                     case (int)Options.OPTIONS:
                         break;
                     case (int)Options.QUIT_GAME:
-                        nextState = null;
+                        nextState = previousState;
                         break;
                 }
             }
@@ -161,6 +157,13 @@ namespace ECSRogue.BaseEngine.States
         public void SetStateSpace(IStateSpace stateSpace, Camera camera)
         {
             //Nothing here.
+        }
+
+        public void SetPrevInput(KeyboardState prevKey, MouseState prevMouse, GamePadState prevPad)
+        {
+            PrevGamepadState = prevPad;
+            PrevKeyboardState = prevKey;
+            PrevMouseState = prevMouse;
         }
     }
 }

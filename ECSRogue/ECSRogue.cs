@@ -20,7 +20,6 @@ namespace ECSRogue
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        private Stack<IState> stateStack;
         private IState currentState;
         private Camera gameCamera;
         private KeyboardState prevKey;
@@ -31,7 +30,6 @@ namespace ECSRogue
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            stateStack = new Stack<IState>();
             gameSettings = new GameSettings();
         }
 
@@ -66,8 +64,7 @@ namespace ECSRogue
             this.ResetGameSettings();
             //RandomlyGeneratedStateSpace firstStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
             //PlayingState firstState = new PlayingState(firstStateSpace, gameCamera, Content, graphics);
-            TitleState firstState = new TitleState(gameCamera, Content, graphics);
-            stateStack.Push(firstState);
+            currentState = new TitleState(gameCamera, Content, graphics);
 
             debugText = Content.Load<SpriteFont>("Fonts/InfoText");
         }
@@ -88,25 +85,12 @@ namespace ECSRogue
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if(Keyboard.GetState().IsKeyDown(Keys.F) && !prevKey.IsKeyDown(Keys.F))
-            {
-                graphics.ToggleFullScreen();
-            }
-            currentState = stateStack.Peek();
-            IState nextState = currentState.UpdateContent(gameTime, gameCamera, ref gameSettings);
-            if (nextState != currentState && nextState != null)
-            {
-                stateStack.Push(nextState);
-            }
-            else if (nextState == null)
-            {
-                stateStack.Pop();
-            }
-            if (stateStack.Count == 0)
+            currentState = currentState.UpdateContent(gameTime, gameCamera, ref gameSettings);
+            prevKey = Keyboard.GetState();
+            if(currentState == null)
             {
                 Exit();
             }
-            prevKey = Keyboard.GetState();
             if(gameSettings.HasChanges)
             {
                 ResetGameSettings();
