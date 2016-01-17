@@ -70,7 +70,6 @@ namespace ECSRogue.ECS.Systems
                                     spriteBatch.Draw(spriteSheet, tile, wall, colorInfo.WallInRange * opacity);
                                     break;
                             }
-                            dungeonGrid[i, j].Opacity += .21f;
                             if (dungeonGrid[i, j].Opacity > 1)
                             {
                                 dungeonGrid[i, j].NewlyFound = false;
