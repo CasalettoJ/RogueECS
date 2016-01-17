@@ -9,7 +9,7 @@ namespace ECSRogue.ECS.Components
 {
     public struct DisplayComponent
     {
-        public Texture2D Texture; //Maybe be replaced with a rectangle of where on the sprite sheet the texture should come from.
+        public Rectangle SpriteSource;
         public Color Color;
     }
 }

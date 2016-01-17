@@ -43,6 +43,7 @@
     <Compile Include="BaseEngine\Interfaces\IStateSpace.cs" />
     <Compile Include="BaseEngine\Interfaces\IState.cs" />
     <Compile Include="BaseEngine\IO\FileIO.cs" />
+    <Compile Include="BaseEngine\IO\Objects\DungeonInfo.cs" />
     <Compile Include="BaseEngine\IO\Objects\GameSettings.cs" />
     <Compile Include="BaseEngine\Messages.cs" />
     <Compile Include="BaseEngine\StateSpaces\RandomlyGeneratedStateSpace.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="ECS\Systems\TileRevealSystem.cs" />
     <Compile Include="ProceduralGeneration\CaveArenaGeneration.cs" />
     <Compile Include="ProceduralGeneration\CaveGeneration.cs" />
+    <Compile Include="ProceduralGeneration\DungeonColorInfo.cs" />
     <Compile Include="ProceduralGeneration\DungeonTile.cs" />
     <Compile Include="ProceduralGeneration\Interfaces\IGenerationAlgorithm.cs" />
     <Compile Include="ProceduralGeneration\RuinsArenaGeneration.cs" />

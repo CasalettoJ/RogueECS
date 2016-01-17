@@ -13,23 +13,18 @@ namespace ECSRogue.ECS.Systems
 {
     public static class MessageDisplaySystem
     {
-        public static void WriteMessages(StateSpaceComponents spaceComponents, SpriteBatch spriteBatch, Camera camera)
+        public static void WriteMessages(StateSpaceComponents spaceComponents, SpriteBatch spriteBatch, Camera camera, SpriteFont font)
         {
             float opacity = 1.15f;
             float decrement = .15f;
             int messageNumber = 0;
             int messageSpacing = 20;
-            SpriteFont font = null;
             //Draw message log
             foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
             {
-                if(font == null)
-                {
-                    font = spaceComponents.GameMessageComponents[id].Font;
-                }
                 if(spaceComponents.GameMessageComponents[id].IndexBegin > 0)
                 {
-                    spriteBatch.DrawString(spaceComponents.GameMessageComponents[id].Font, Messages.ScrollingMessages, new Vector2(10, (int)10 + (messageNumber * messageSpacing)), Color.MediumVioletRed);
+                    spriteBatch.DrawString(font, Messages.ScrollingMessages, new Vector2(10, (int)10 + (messageNumber * messageSpacing)), Color.MediumVioletRed);
                     messageNumber += 1;
                 }
                 foreach(Tuple<Color,string> message in spaceComponents.GameMessageComponents[id].GameMessages.Reverse<Tuple<Color,string>>().Skip(spaceComponents.GameMessageComponents[id].IndexBegin))
@@ -39,14 +34,14 @@ namespace ECSRogue.ECS.Systems
                         break;
                     }
                     opacity -= decrement;
-                    spriteBatch.DrawString(spaceComponents.GameMessageComponents[id].Font, message.Item2, new Vector2(10,(int)10 + (messageNumber * messageSpacing)), message.Item1 * opacity);
+                    spriteBatch.DrawString(font, message.Item2, new Vector2(10,(int)10 + (messageNumber * messageSpacing)), message.Item1 * opacity);
                     messageNumber += 1;
                 }
                 while (spaceComponents.GameMessageComponents[id].GameMessages.Count > spaceComponents.GameMessageComponents[id].MaxMessages)
                 {
                     spaceComponents.GameMessageComponents[id].GameMessages.RemoveAt(0);
                 }
-                spriteBatch.DrawString(spaceComponents.GameMessageComponents[id].Font, spaceComponents.GameMessageComponents[id].GlobalMessage, new Vector2(10, camera.Bounds.Height - messageSpacing), spaceComponents.GameMessageComponents[id].GlobalColor);
+                spriteBatch.DrawString(font, spaceComponents.GameMessageComponents[id].GlobalMessage, new Vector2(10, camera.Bounds.Height - messageSpacing), spaceComponents.GameMessageComponents[id].GlobalColor);
             }
 
             messageNumber = 0;

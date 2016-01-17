@@ -24,29 +24,47 @@ namespace ECSRogue.BaseEngine.StateSpaces
         #endregion
 
         #region Dungeon Environment Variables
-        private Texture2D player;
+        private Texture2D sprites;
         private SpriteFont messageFont;
         private Vector2 dungeonDimensions;
         private DungeonTile[,] dungeonGrid = null;
-        private IGenerationAlgorithm dungeonAlgorithm;
+        private int cellSize;
+        private Texture2D dungeonSprites;
+        private string dungeonSpriteFile;
+        private DungeonColorInfo dungeonColorInfo;
         #endregion
 
         public RandomlyGeneratedStateSpace(IGenerationAlgorithm dungeonGeneration, int worldMin, int worldMax)
         {
             stateSpaceComponents = new StateSpaceComponents();
-            dungeonAlgorithm = dungeonGeneration;
             dungeonDimensions = dungeonGeneration.GenerateDungeon(ref dungeonGrid, worldMin, worldMax, stateSpaceComponents.random);
+            cellSize = dungeonGeneration.GetCellsize();
+            dungeonSpriteFile = dungeonGeneration.GetDungeonSpritesheetFileName();
+            dungeonColorInfo = dungeonGeneration.GetColorInfo();
+        }
+
+        public RandomlyGeneratedStateSpace(DungeonInfo data)
+        {
+            stateSpaceComponents = data.stateSpaceComponents;
+            dungeonSpriteFile = data.dungeonSpriteFile;
+            dungeonGrid = data.dungeonGrid;
+            cellSize = data.cellSize;
+            dungeonColorInfo = data.dungeonColorInfo;
+            dungeonDimensions = data.dungeonDimensions;
         }
 
         #region Load Logic
-        public void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera, StateComponents stateComponents)
+        public void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera, StateComponents stateComponents, bool createEntities = true)
         {
             this.stateComponents = stateComponents;
-            player = content.Load<Texture2D>("Sprites/Ball");
+            sprites = content.Load<Texture2D>("Sprites/sprites");
+            dungeonSprites = content.Load<Texture2D>(dungeonSpriteFile);
             messageFont = content.Load<SpriteFont>("Fonts/InfoText");
-            dungeonAlgorithm.LoadDungeonContent(content);
-            CreatePlayer();
-            CreateMessageLog();
+            if (createEntities)
+            {
+                CreatePlayer();
+                CreateMessageLog();
+            }
             camera.AttachedToPlayer = true;
         }
 
@@ -89,7 +107,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 };
             }
             //Set Display
-            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.Red, Texture = player };
+            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.Red, SpriteSource = new Rectangle(2 * cellSize, 6 * cellSize, cellSize, cellSize) };
             //Set Sightradius
             stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 12 };
         }
@@ -98,7 +116,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         {
             Guid id = stateSpaceComponents.CreateEntity();
             stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = Component.COMPONENT_GAMEMESSAGE;
-            stateSpaceComponents.GameMessageComponents[id] = new GameMessageComponent() { GlobalColor = Color.White, Font = messageFont, GlobalMessage = string.Empty,
+            stateSpaceComponents.GameMessageComponents[id] = new GameMessageComponent() { GlobalColor = Color.White, GlobalMessage = string.Empty,
                  MaxMessages = 100, IndexBegin = 0, GameMessages = new List<Tuple<Color,string>>()};
             MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.CaveEntranceMessages, MessageColors.SpecialAction);
         }
@@ -148,8 +166,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 Entity playerId = stateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
                 if(playerId != null)
                 {
-                    camera.Target = new Vector2((int)stateSpaceComponents.PositionComponents[playerId.Id].Position.X * dungeonAlgorithm.GetCellsize() + stateSpaceComponents.DisplayComponents[playerId.Id].Texture.Bounds.Center.X,
-                    (int)stateSpaceComponents.PositionComponents[playerId.Id].Position.Y * dungeonAlgorithm.GetCellsize() + stateSpaceComponents.DisplayComponents[playerId.Id].Texture.Bounds.Center.Y);
+                    camera.Target = new Vector2((int)stateSpaceComponents.PositionComponents[playerId.Id].Position.X * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Width/2,
+                    (int)stateSpaceComponents.PositionComponents[playerId.Id].Position.Y * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Height/2);
                 }
             }
             if (Vector2.Distance(camera.Position, camera.Target) > 0)
@@ -158,6 +176,10 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 Vector2 direction = Vector2.Normalize(camera.Target - camera.Position);
                 float velocity = distance * 2.5f;
                 camera.Position += direction * velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (distance < 2.5)
+                {
+                    camera.Position = camera.Target;
+                }
             }
         }
         #endregion
@@ -165,13 +187,29 @@ namespace ECSRogue.BaseEngine.StateSpaces
         #region Draw Logic
         public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
         {
-            dungeonAlgorithm.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions);
-            DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, dungeonAlgorithm.GetCellsize());
+            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo);
+            DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize);
         }
 
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
         {
-            MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera);
+            MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont);
+        }
+        #endregion
+
+        #region Save Logic
+        public DungeonInfo GetSaveData()
+        {
+            return new DungeonInfo()
+            {
+                cellSize = this.cellSize,
+                dungeonColorInfo = this.dungeonColorInfo,
+                dungeonDimensions = this.dungeonDimensions,
+                dungeonGrid = this.dungeonGrid,
+                stateComponents = this.stateComponents,
+                dungeonSpriteFile = this.dungeonSpriteFile,
+                stateSpaceComponents = this.stateSpaceComponents
+            };
         }
         #endregion
     }

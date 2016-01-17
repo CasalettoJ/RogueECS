@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Input;
 using ECSRogue.ECS;
 using ECSRogue.BaseEngine.StateSpaces;
 using ECSRogue.ProceduralGeneration;
+using ECSRogue.BaseEngine.IO;
 
 namespace ECSRogue.BaseEngine.States
 {
@@ -46,6 +47,7 @@ namespace ECSRogue.BaseEngine.States
         private KeyboardState PrevKeyboardState;
         private GraphicsDeviceManager Graphics;
         private StateComponents StateComponents;
+        private DungeonInfo DungeonInfo = null;
         #endregion
 
         public TitleState(Camera camera, ContentManager content, GraphicsDeviceManager graphics, MouseState mouseState = new MouseState(), GamePadState gamePadState = new GamePadState(), KeyboardState keyboardState = new KeyboardState())
@@ -66,6 +68,11 @@ namespace ECSRogue.BaseEngine.States
             menuOptions[2] = new Option() { Enabled = false, Message = "OPTIONS" };
             menuOptions[3] = new Option() { Enabled = true, Message = "QUIT GAME" };
             previousState = null;
+            FileIO.LoadDungeonData(ref DungeonInfo);
+            if (DungeonInfo != null)
+            {
+                menuOptions[1].Enabled = true;
+            }
         }
 
         ~TitleState()
@@ -119,6 +126,8 @@ namespace ECSRogue.BaseEngine.States
                         nextState = new PlayingState(nextStateSpace, camera, Content, Graphics, this, keyboardState: keyState);
                         break;
                     case (int)Options.LOAD_GAME:
+                        RandomlyGeneratedStateSpace nextSpace = new RandomlyGeneratedStateSpace(DungeonInfo);
+                        nextState = new PlayingState(nextSpace, camera, Content, Graphics, saveInfo: DungeonInfo);
                         break;
                     case (int)Options.OPTIONS:
                         break;
@@ -154,7 +163,7 @@ namespace ECSRogue.BaseEngine.States
             }
         }
 
-        public void SetStateSpace(IStateSpace stateSpace, Camera camera)
+        public void SetStateSpace(IStateSpace stateSpace, Camera camera, bool createEntities = true)
         {
             //Nothing here.
         }

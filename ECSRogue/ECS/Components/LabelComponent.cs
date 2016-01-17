@@ -10,7 +10,6 @@ namespace ECSRogue.ECS.Components
     public struct LabelComponent
     {
         public string Text;
-        public SpriteFont SpriteFont;
         public Color Color;
     }
 }

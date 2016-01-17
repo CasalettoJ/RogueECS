@@ -7,8 +7,20 @@ namespace ECSRogue.BaseEngine.IO
 {
     public static class FileNames
     {
-        public const string GameSettings = @"Settings/Config.json";
-        public const string DefaultGameSettings = @"Settings/DefaultConfig.json";
+        #region Game Settings
         public const string SettingsDirectory = @"Settings/";
+        public const string GameSettings = SettingsDirectory + "Config.json";
+        public const string DefaultGameSettings = SettingsDirectory + "DefaultConfig.json";
+        #endregion
+
+        #region Dungeon Data
+        public const string DungeonDirectory = @"Saves/";
+        public const string DungeonSaveFile = DungeonDirectory + "Dungeon.sav";
+        #endregion
+
+        #region Game Data
+        public const string GameDataDirectory = @"Saves/";
+        public const string GameDataFile = GameDataDirectory + "Statistics.sav";
+        #endregion
     }
 }

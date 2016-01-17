@@ -13,10 +13,11 @@ namespace ECSRogue.BaseEngine.Interfaces
 {
     public interface IStateSpace
     {
-        void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera, StateComponents stateComponents);
+        void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera, StateComponents stateComponents, bool createEntities = true);
         IStateSpace UpdateSpace(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, 
             GamePadState prevGamepadState, Camera camera, ref GameSettings gameSettings);
         void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera);
         void DrawUserInterface(SpriteBatch spriteBatch, Camera camera);
+        DungeonInfo GetSaveData();
     }
 }

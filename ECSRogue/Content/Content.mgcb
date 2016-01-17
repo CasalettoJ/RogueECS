@@ -42,3 +42,14 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/OptionText.spritefont
 
+#begin Sprites/sprites.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:TextureFormat=Color
+/build:Sprites/sprites.png
+

@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Input;
 using ECSRogue.ECS;
 using ECSRogue.BaseEngine.StateSpaces;
 using ECSRogue.ProceduralGeneration;
+using ECSRogue.BaseEngine.IO;
 
 namespace ECSRogue.BaseEngine.States
 {
@@ -122,6 +123,7 @@ namespace ECSRogue.BaseEngine.States
                         nextState = new PlayingState(nextStateSpace, camera, Content, Graphics, null, Mouse.GetState(), GamePad.GetState(PlayerIndex.One), keyState);
                         break;
                     case (int)Options.SAVE_TITLE:
+                        FileIO.SaveDungeonData(((PlayingState)previousState).GetSaveData());
                         nextState = new TitleState(camera, Content, Graphics, Mouse.GetState(), GamePad.GetState(PlayerIndex.One), keyState);
                         break;
                     case (int)Options.UNPAUSE:
@@ -157,7 +159,7 @@ namespace ECSRogue.BaseEngine.States
             }
         }
 
-        public void SetStateSpace(IStateSpace stateSpace, Camera camera)
+        public void SetStateSpace(IStateSpace stateSpace, Camera camera, bool createEntities = true)
         {
             //Nothing here.
         }

@@ -28,15 +28,16 @@ namespace ECSRogue.BaseEngine.States
         private StateComponents StateComponents;
         #endregion
 
-        public PlayingState(IStateSpace space, Camera camera, ContentManager content, GraphicsDeviceManager graphics, IState prevState = null, MouseState mouseState = new MouseState(), GamePadState gamePadState = new GamePadState(), KeyboardState keyboardState = new KeyboardState())
+        public PlayingState(IStateSpace space, Camera camera, ContentManager content, GraphicsDeviceManager graphics, 
+            IState prevState = null, MouseState mouseState = new MouseState(), GamePadState gamePadState = new GamePadState(), KeyboardState keyboardState = new KeyboardState(), DungeonInfo saveInfo = null)
         {
             this.Content = new ContentManager(content.ServiceProvider, "Content");
             Graphics = graphics;
             PrevMouseState = mouseState;
             PrevGamepadState = gamePadState;
             PrevKeyboardState = keyboardState;
-            StateComponents = new StateComponents();
-            SetStateSpace(space, camera);
+            StateComponents = saveInfo == null ? new StateComponents() : saveInfo.stateComponents;
+            SetStateSpace(space, camera, saveInfo == null);
             previousState = prevState;
         }
 
@@ -73,14 +74,14 @@ namespace ECSRogue.BaseEngine.States
             CurrentLevel.DrawLevel(spriteBatch, Graphics, camera);
         }
 
-        public void SetStateSpace(IStateSpace stateSpace, Camera camera)
+        public void SetStateSpace(IStateSpace stateSpace, Camera camera, bool createEntities = true)
         {
             if (Content != null && stateSpace != null)
             {
                 Content.Unload();
 
                 CurrentLevel = stateSpace;
-                stateSpace.LoadLevel(Content, Graphics, camera, StateComponents);
+                stateSpace.LoadLevel(Content, Graphics, camera, StateComponents, createEntities);
             }
         }
 
@@ -94,6 +95,11 @@ namespace ECSRogue.BaseEngine.States
             PrevGamepadState = prevPad;
             PrevKeyboardState = prevKey;
             PrevMouseState = prevMouse;
+        }
+
+        public DungeonInfo GetSaveData()
+        {
+            return CurrentLevel.GetSaveData();
         }
     }
 }
