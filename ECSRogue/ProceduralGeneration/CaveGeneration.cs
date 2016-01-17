@@ -14,7 +14,7 @@ namespace ECSRogue.ProceduralGeneration
 {
     public class CaveGeneration : IGenerationAlgorithm
     {
-        private const int cellSize = 16;
+        private const int cellSize = 32;
 
         public int GetCellsize()
         {
@@ -340,7 +340,7 @@ namespace ECSRogue.ProceduralGeneration
 
         public string GetDungeonSpritesheetFileName()
         {
-            return "Sprites/sprites";
+            return "Sprites/anonsheet";
         }
         
         public void GenerateDungeonEntities(StateSpaceComponents spaceComponents)

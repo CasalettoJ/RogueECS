@@ -57,7 +57,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         public void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera, StateComponents stateComponents, bool createEntities = true)
         {
             this.stateComponents = stateComponents;
-            sprites = content.Load<Texture2D>("Sprites/sprites");
+            sprites = content.Load<Texture2D>("Sprites/anonsheet");
             dungeonSprites = content.Load<Texture2D>(dungeonSpriteFile);
             messageFont = content.Load<SpriteFont>("Fonts/InfoText");
             if (createEntities)
@@ -107,7 +107,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 };
             }
             //Set Display
-            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.Red, SpriteSource = new Rectangle(2 * cellSize, 6 * cellSize, cellSize, cellSize) };
+            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.White, SpriteSource = new Rectangle(2 * cellSize, 0 * cellSize, cellSize, cellSize) };
             //Set Sightradius
             stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 12 };
         }

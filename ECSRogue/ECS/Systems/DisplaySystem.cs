@@ -29,8 +29,8 @@ namespace ECSRogue.ECS.Systems
                 for (int j = 0; j < (int)dungeonDimensions.Y; j++)
                 {
                     Vector2 tile = new Vector2((int)i * cellSize, (int)j * cellSize);
-                    Rectangle floor = new Rectangle(7 * cellSize, 26 * cellSize, cellSize, cellSize);
-                    Rectangle wall = new Rectangle(2 * cellSize, 26 * cellSize, cellSize, cellSize);
+                    Rectangle floor = new Rectangle(1 * cellSize, 0 * cellSize, cellSize, cellSize); //Need to be moved eventually
+                    Rectangle wall = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize); //Need to be moved eventually
 
                     if (camera.IsInView(cameraMatrix, new Vector2(i * cellSize + cellSize, j * cellSize + cellSize), new Vector2(i * cellSize, j * cellSize))) // check if in view
                     {
