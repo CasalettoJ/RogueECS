@@ -23,11 +23,12 @@ namespace ECSRogue.BaseEngine.StateSpaces
         {
             RESOLUTION = 0,
             GRAPHICS_SCALE = 1,
-            VSYNC = 2,
-            MESSAGE_FILTER = 3,
-            SAVE_CHANGES = 4,
-            RESTORE_DEFAULTS = 5,
-            CANCEL = 6
+            BORDERLESS = 2,
+            VSYNC = 3,
+            MESSAGE_FILTER = 4,
+            SAVE_CHANGES = 5,
+            RESTORE_DEFAULTS = 6,
+            CANCEL = 7
         }
         private struct Option
         {
@@ -36,7 +37,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             public int Selection;
         }
 
-        private const int optionsAmount = 7;
+        private const int optionsAmount = 8;
         private int optionSelection;
         private SpriteFont titleText;
         private SpriteFont optionText;
@@ -77,17 +78,26 @@ namespace ECSRogue.BaseEngine.StateSpaces
             //Scale Options
             menuOptions[(int)Options.GRAPHICS_SCALE] = new Option() { Message = "GRAPHICS SCALE: ", OptionsCollection = new List<object>(), Selection = 0 };
             //Set to current scale after populating scale resolutions
-            foreach (DisplayMode display in GraphicsAdapter.DefaultAdapter.SupportedDisplayModes)
-            {
-                Vector2 scale = new Vector2(display.Width, display.Height);
-                if (!menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Contains(scale) && scale.X > 900)
-                {
-                    menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(scale);
-                }
-            }
+            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(.25f);
+            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(.5f);
+            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(.75f);
+            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(1f);
+            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(1.25f);
+            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(1.5f);
+            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(2f);
+            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(2.25f);
+            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(2.5f);
+            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(4f);
             menuOptions[(int)Options.GRAPHICS_SCALE].Selection =
-                menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.FindIndex(x => (Vector2)x == gameSettings.Scale) > 0 ?
-                menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.FindIndex(x => (Vector2)x == gameSettings.Scale) : 0;
+                menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.FindIndex(x => Convert.ToDouble(x) == (double)gameSettings.Scale) > 0 ?
+                menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.FindIndex(x => Convert.ToDouble(x) == (double)gameSettings.Scale) : 0;
+
+            //Borderless Option
+            menuOptions[(int)Options.BORDERLESS] = new Option() { Message = "WINDOW BORDERLESS: ", OptionsCollection = new List<object>(), Selection = 0 };
+            //Set to current borderless option
+            menuOptions[(int)Options.BORDERLESS].OptionsCollection.Add(true);
+            menuOptions[(int)Options.BORDERLESS].OptionsCollection.Add(false);
+            menuOptions[(int)Options.BORDERLESS].Selection = menuOptions[(int)Options.BORDERLESS].OptionsCollection.FindIndex(x => (bool)x == gameSettings.Borderless);
 
             //Vsync Option
             menuOptions[(int)Options.VSYNC] = new Option() { Message = "VSYNC: ", OptionsCollection = new List<object>(), Selection = 0 };
@@ -177,7 +187,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 {
                     case (int)Options.SAVE_CHANGES:
                         gameSettings.Resolution = (Vector2)menuOptions[(int)Options.RESOLUTION].OptionsCollection[menuOptions[(int)Options.RESOLUTION].Selection];
-                        gameSettings.Scale = (Vector2)menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection[menuOptions[(int)Options.GRAPHICS_SCALE].Selection];
+                        gameSettings.Scale = (float)menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection[menuOptions[(int)Options.GRAPHICS_SCALE].Selection];
+                        gameSettings.Borderless = (bool)menuOptions[(int)Options.BORDERLESS].OptionsCollection[menuOptions[(int)Options.BORDERLESS].Selection];
                         gameSettings.ShowNormalMessages = (bool)menuOptions[(int)Options.MESSAGE_FILTER].OptionsCollection[menuOptions[(int)Options.MESSAGE_FILTER].Selection];
                         gameSettings.Vsync = (bool)menuOptions[(int)Options.VSYNC].OptionsCollection[menuOptions[(int)Options.VSYNC].Selection];
                         FileIO.SaveGameSettings(ref gameSettings);

@@ -65,7 +65,7 @@ namespace ECSRogue.BaseEngine.IO
             GameSettings defaultSettings = new GameSettings()
             {
                 HasChanges = false,
-                Scale = new Vector2(1024, 768),
+                Scale = 1,
                 Resolution = new Vector2(1024, 768),
                 ShowNormalMessages = true
             };

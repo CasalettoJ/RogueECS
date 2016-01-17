@@ -10,7 +10,7 @@ namespace ECSRogue.BaseEngine
     public class Camera
     {
         public float Rotation;
-        public Vector3 Scale;
+        public float Scale;
         public Vector2 Position;
         public Rectangle Bounds;
         public Vector2 Target;
@@ -24,29 +24,29 @@ namespace ECSRogue.BaseEngine
         }
         public Viewport Viewport;
 
-        public Camera(Vector2 position, Vector2 origin, float rotation, Vector2 scale, GraphicsDeviceManager graphics)
+        public Camera(Vector2 position, Vector2 origin, float rotation, float scale, GraphicsDeviceManager graphics)
         {
             ResetCamera(position, origin, rotation, scale, graphics);
             AttachedToPlayer = false;
         }
 
-        public void ResetCamera(Vector2 position, Vector2 origin, float rotation, Vector2 scale, GraphicsDeviceManager graphics)
+        public void ResetCamera(Vector2 position, Vector2 origin, float rotation, float scale, GraphicsDeviceManager graphics)
         {
             Rotation = rotation;
-            ResetScreenScale(graphics, scale);
+            Scale = scale;
             Position = position;
             Bounds = graphics.GraphicsDevice.Viewport.Bounds;
             Viewport = graphics.GraphicsDevice.Viewport;
         }
 
-        public Vector3 ResetScreenScale(GraphicsDeviceManager graphics, Vector2 screenScale)
-        {
-            var scaleX = (float)graphics.GraphicsDevice.Viewport.Width / screenScale.X;
-            var scaleY = (float)graphics.GraphicsDevice.Viewport.Height / screenScale.Y;
-            Scale = new Vector3(scaleX, scaleY, 1.0f);
-            Viewport = graphics.GraphicsDevice.Viewport;
-            return Scale;
-        }
+        //public Vector3 ResetScreenScale(GraphicsDeviceManager graphics, Vector2 screenScale)
+        //{
+        //    var scaleX = (float)graphics.GraphicsDevice.Viewport.Width / screenScale.X;
+        //    var scaleY = (float)graphics.GraphicsDevice.Viewport.Height / screenScale.Y;
+        //    Scale = new Vector3(scaleX, scaleY, 1.0f);
+        //    Viewport = graphics.GraphicsDevice.Viewport;
+        //    return Scale;
+        //}
 
         public Matrix GetMatrix()
         {

@@ -9,9 +9,10 @@ namespace ECSRogue.BaseEngine.IO.Objects
     public class GameSettings
     {
         public Vector2 Resolution;
-        public Vector2 Scale;
+        public float Scale;
         public bool Vsync;
         public bool ShowNormalMessages;
+        public bool Borderless;
         public bool HasChanges;
     }
 }

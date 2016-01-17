@@ -58,6 +58,7 @@ namespace ECSRogue
             
             gameCamera = new Camera(Vector2.Zero, Vector2.Zero, 0.0f, gameSettings.Scale, graphics);
             this.IsMouseVisible = true;
+            this.Window.IsBorderless = gameSettings.Borderless;
             Window.AllowUserResizing = false;
 
             this.ResetGameSettings();
@@ -121,11 +122,12 @@ namespace ECSRogue
             graphics.SynchronizeWithVerticalRetrace = gameSettings.Vsync;
             this.IsFixedTimeStep = gameSettings.Vsync;
             graphics.ApplyChanges();
-            gameCamera.ResetScreenScale(graphics, gameSettings.Scale);
+            gameCamera.Scale = gameSettings.Scale;
             gameCamera.Bounds = graphics.GraphicsDevice.Viewport.Bounds;
             gameCamera.Viewport = graphics.GraphicsDevice.Viewport;
             gameSettings.HasChanges = false;
-            this.Window.Position = new Point(0, 0);
+            this.Window.Position = new Point((int)graphics.GraphicsDevice.DisplayMode.Width/2 - (int)gameSettings.Resolution.X/2, (int)graphics.GraphicsDevice.DisplayMode.Height / 2 - (int)gameSettings.Resolution.Y / 2);
+            this.Window.IsBorderless = gameSettings.Borderless;
         }
 
         void Window_ClientSizeChanged(object sender, EventArgs e)

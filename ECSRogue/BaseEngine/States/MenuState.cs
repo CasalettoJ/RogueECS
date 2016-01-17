@@ -44,11 +44,6 @@ namespace ECSRogue.BaseEngine.States
             previousState = prevState;
         }
 
-        ~MenuState()
-        {
-            if (Content != null) { Content.Unload(); }
-        }
-
         public IState UpdateContent(GameTime gameTime, Camera camera, ref GameSettings gameSettings)
         {
             IStateSpace nextLevel = CurrentStateSpace;
@@ -60,6 +55,10 @@ namespace ECSRogue.BaseEngine.States
             if (nextLevel == null || (Keyboard.GetState().IsKeyDown(Keys.Escape) && PrevKeyboardState.IsKeyUp(Keys.Escape)))
             {
                 previousState.SetPrevInput(Keyboard.GetState(), Mouse.GetState(), GamePad.GetState(PlayerIndex.One));
+                if(previousState.GetType().Name == "TitleState")
+                {
+                    return new TitleState(camera, Content, Graphics, keyboardState: Keyboard.GetState()); //Fixes bug about title not rendering when you go back for some reason..
+                }
                 return previousState;
             }
             PrevKeyboardState = Keyboard.GetState();
