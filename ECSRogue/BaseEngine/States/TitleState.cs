@@ -65,7 +65,7 @@ namespace ECSRogue.BaseEngine.States
             Title = "PLACEHOLDER TITLE";
             menuOptions[0] = new Option() { Enabled = true, Message = "NEW GAME" };
             menuOptions[1] = new Option() { Enabled = false, Message = "CONTINUE" };
-            menuOptions[2] = new Option() { Enabled = false, Message = "OPTIONS" };
+            menuOptions[2] = new Option() { Enabled = true, Message = "OPTIONS" };
             menuOptions[3] = new Option() { Enabled = true, Message = "QUIT GAME" };
             previousState = null;
             FileIO.LoadDungeonData(ref DungeonInfo);
@@ -130,6 +130,8 @@ namespace ECSRogue.BaseEngine.States
                         nextState = new PlayingState(nextSpace, camera, Content, Graphics, saveInfo: DungeonInfo);
                         break;
                     case (int)Options.OPTIONS:
+                        GameSettingsMenuStateSpace nextMenu = new GameSettingsMenuStateSpace(ref gameSettings);
+                        nextState = new MenuState(nextMenu, camera, Content, Graphics, this, keyboardState: keyState);
                         break;
                     case (int)Options.QUIT_GAME:
                         nextState = previousState;

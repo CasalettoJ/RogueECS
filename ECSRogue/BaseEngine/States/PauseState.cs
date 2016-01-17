@@ -119,8 +119,8 @@ namespace ECSRogue.BaseEngine.States
                 switch (optionSelection)
                 {
                     case (int)Options.OPTIONS:
-                        RandomlyGeneratedStateSpace nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
-                        nextState = new PlayingState(nextStateSpace, camera, Content, Graphics, null, Mouse.GetState(), GamePad.GetState(PlayerIndex.One), keyState);
+                        GameSettingsMenuStateSpace nextStateSpace = new GameSettingsMenuStateSpace(ref gameSettings);
+                        nextState = new MenuState(nextStateSpace, camera, Content, Graphics, this, keyboardState: Keyboard.GetState());
                         break;
                     case (int)Options.SAVE_TITLE:
                         FileIO.SaveDungeonData(((PlayingState)previousState).GetSaveData());

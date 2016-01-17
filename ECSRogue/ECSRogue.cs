@@ -30,7 +30,6 @@ namespace ECSRogue
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            gameSettings = new GameSettings();
         }
 
         /// <summary>
@@ -56,14 +55,12 @@ namespace ECSRogue
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            
             gameCamera = new Camera(Vector2.Zero, Vector2.Zero, 0.0f, gameSettings.Scale, graphics);
             this.IsMouseVisible = true;
-            Window.AllowUserResizing = true;
-            //graphics.IsFullScreen = true;
+            Window.AllowUserResizing = false;
+
             this.ResetGameSettings();
-            //RandomlyGeneratedStateSpace firstStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
-            //PlayingState firstState = new PlayingState(firstStateSpace, gameCamera, Content, graphics);
             currentState = new TitleState(gameCamera, Content, graphics);
 
             debugText = Content.Load<SpriteFont>("Fonts/InfoText");
@@ -128,15 +125,12 @@ namespace ECSRogue
             gameCamera.Bounds = graphics.GraphicsDevice.Viewport.Bounds;
             gameCamera.Viewport = graphics.GraphicsDevice.Viewport;
             gameSettings.HasChanges = false;
+            this.Window.Position = new Point(0, 0);
         }
 
         void Window_ClientSizeChanged(object sender, EventArgs e)
         {
-            graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
-            graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
-            graphics.ApplyChanges();
-            gameCamera.Bounds = graphics.GraphicsDevice.Viewport.Bounds;
-            gameCamera.Viewport = graphics.GraphicsDevice.Viewport;
+            this.ResetGameSettings();
         }
     }
 }

@@ -65,8 +65,8 @@ namespace ECSRogue.BaseEngine.IO
             GameSettings defaultSettings = new GameSettings()
             {
                 HasChanges = false,
-                Scale = new Vector2(2880, 1620),
-                Resolution = new Vector2(1024, 576),
+                Scale = new Vector2(1024, 768),
+                Resolution = new Vector2(1024, 768),
                 ShowNormalMessages = true
             };
             string defaultSettingsJson = JsonConvert.SerializeObject(defaultSettings);
