@@ -3,16 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ECSRogue.BaseEngine.IO.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 using ECSRogue.ECS;
-using ECSRogue.BaseEngine.IO.Objects;
+using ECSRogue.BaseEngine.StateSpaces;
+using ECSRogue.ProceduralGeneration;
+using ECSRogue.BaseEngine.IO;
 
 namespace ECSRogue.BaseEngine.States
 {
-    public class PlayingState : IState
+    public class MenuState : IState
     {
         #region State Management Property
         private static IState previousState;
@@ -28,7 +31,7 @@ namespace ECSRogue.BaseEngine.States
         private StateComponents StateComponents;
         #endregion
 
-        public PlayingState(IStateSpace space, Camera camera, ContentManager content, GraphicsDeviceManager graphics, 
+        public MenuState(IStateSpace space, Camera camera, ContentManager content, GraphicsDeviceManager graphics,
             IState prevState = null, MouseState mouseState = new MouseState(), GamePadState gamePadState = new GamePadState(), KeyboardState keyboardState = new KeyboardState(), DungeonInfo saveInfo = null)
         {
             this.Content = new ContentManager(content.ServiceProvider, "Content");
@@ -41,11 +44,6 @@ namespace ECSRogue.BaseEngine.States
             previousState = prevState;
         }
 
-        ~PlayingState()
-        {
-            if (Content != null) { Content.Unload(); }
-        }
-
         public IState UpdateContent(GameTime gameTime, Camera camera, ref GameSettings gameSettings)
         {
             IStateSpace nextLevel = CurrentStateSpace;
@@ -54,15 +52,15 @@ namespace ECSRogue.BaseEngine.States
             {
                 SetStateSpace(nextLevel, camera);
             }
-            if (nextLevel == null)
+            if (nextLevel == null || (Keyboard.GetState().IsKeyDown(Keys.Escape) && PrevKeyboardState.IsKeyUp(Keys.Escape)))
             {
+                previousState.SetPrevInput(Keyboard.GetState(), Mouse.GetState(), GamePad.GetState(PlayerIndex.One));
+                if(previousState.GetType().Name == "TitleState")
+                {
+                    return new TitleState(camera, Content, Graphics, keyboardState: Keyboard.GetState()); //Fixes bug about title not rendering when you go back for some reason..
+                }
                 return previousState;
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape) && PrevKeyboardState.IsKeyUp(Keys.Escape))
-            {
-                return new PauseState(camera, Content, Graphics, this, keyboardState: Keyboard.GetState());
-            }
-
             PrevKeyboardState = Keyboard.GetState();
             PrevMouseState = Mouse.GetState();
             PrevGamepadState = GamePad.GetState(PlayerIndex.One);
@@ -74,17 +72,6 @@ namespace ECSRogue.BaseEngine.States
             CurrentStateSpace.DrawLevel(spriteBatch, Graphics, camera);
         }
 
-        public void SetStateSpace(IStateSpace stateSpace, Camera camera, bool createEntities = true)
-        {
-            if (Content != null && stateSpace != null)
-            {
-                Content.Unload();
-
-                CurrentStateSpace = stateSpace;
-                stateSpace.LoadLevel(Content, Graphics, camera, StateComponents, createEntities);
-            }
-        }
-
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
         {
             CurrentStateSpace.DrawUserInterface(spriteBatch, camera);
@@ -92,14 +79,18 @@ namespace ECSRogue.BaseEngine.States
 
         public void SetPrevInput(KeyboardState prevKey, MouseState prevMouse, GamePadState prevPad)
         {
-            PrevGamepadState = prevPad;
-            PrevKeyboardState = prevKey;
-            PrevMouseState = prevMouse;
+            //Nothing here.
         }
 
-        public DungeonInfo GetSaveData()
+        public void SetStateSpace(IStateSpace stateSpace, Camera camera, bool createEntities = true)
         {
-            return CurrentStateSpace.GetSaveData();
+            if (Content != null && stateSpace != null)
+            {
+                Content.Unload();
+
+                CurrentStateSpace = stateSpace;
+                stateSpace.LoadLevel(Content, Graphics, camera, StateComponents);
+            }
         }
     }
 }

@@ -1,11 +1,14 @@
 ﻿using ECSRogue.BaseEngine;
 using ECSRogue.BaseEngine.Interfaces;
+using ECSRogue.BaseEngine.IO;
+using ECSRogue.BaseEngine.IO.Objects;
 using ECSRogue.BaseEngine.States;
 using ECSRogue.BaseEngine.StateSpaces;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
 
 namespace ECSRogue
@@ -17,17 +20,16 @@ namespace ECSRogue
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        private Stack<IState> stateStack;
         private IState currentState;
         private Camera gameCamera;
-        private static readonly Vector2 _initialScale = new Vector2(1920, 1080);
-        private static readonly Vector2 _initialSize = new Vector2(1024, 576);
+        private KeyboardState prevKey;
+        private SpriteFont debugText;
+        private GameSettings gameSettings;
 
         public ECSRogue()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            stateStack = new Stack<IState>();
         }
 
         /// <summary>
@@ -39,14 +41,9 @@ namespace ECSRogue
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            FileIO.LoadGameSettings(ref gameSettings);
+            this.Window.ClientSizeChanged += new EventHandler<EventArgs>(Window_ClientSizeChanged);
 
-            this.IsMouseVisible = true;
-            Window.AllowUserResizing = true;
-            graphics.PreferredBackBufferWidth = (int)_initialSize.X;
-            graphics.PreferredBackBufferHeight = (int)_initialSize.Y;
-            graphics.ApplyChanges();
-            
-            gameCamera = new Camera(Vector2.Zero, Vector2.Zero, 0.0f, _initialScale, graphics);
             base.Initialize();
         }
 
@@ -58,9 +55,16 @@ namespace ECSRogue
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            RandomlyGeneratedStateSpace firstStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
-            PlayingState firstState = new PlayingState(firstStateSpace, gameCamera, Content, graphics);
-            stateStack.Push(firstState);
+            
+            gameCamera = new Camera(Vector2.Zero, Vector2.Zero, 0.0f, gameSettings.Scale, graphics);
+            this.IsMouseVisible = true;
+            this.Window.IsBorderless = gameSettings.Borderless;
+            Window.AllowUserResizing = false;
+
+            this.ResetGameSettings();
+            currentState = new TitleState(gameCamera, Content, graphics);
+
+            debugText = Content.Load<SpriteFont>("Fonts/InfoText");
         }
 
         /// <summary>
@@ -79,19 +83,15 @@ namespace ECSRogue
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            currentState = stateStack.Peek();
-            IState nextState = currentState.UpdateContent(gameTime, gameCamera);
-            if (nextState != currentState && nextState != null)
-            {
-                stateStack.Push(nextState);
-            }
-            else if (nextState == null)
-            {
-                stateStack.Pop();
-            }
-            if (stateStack.Count == 0)
+            currentState = currentState.UpdateContent(gameTime, gameCamera, ref gameSettings);
+            prevKey = Keyboard.GetState();
+            if(currentState == null)
             {
                 Exit();
+            }
+            if(gameSettings.HasChanges)
+            {
+                ResetGameSettings();
             }
             base.Update(gameTime);
         }
@@ -103,10 +103,36 @@ namespace ECSRogue
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin(transformMatrix: gameCamera.GetMatrix());
+            //Draw entities
+            spriteBatch.Begin(transformMatrix: gameCamera.GetMatrix(), samplerState: SamplerState.PointClamp);
             currentState.DrawContent(spriteBatch, gameCamera);
             spriteBatch.End();
+            //Draw UI
+            spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            currentState.DrawUserInterface(spriteBatch, gameCamera);
+            //spriteBatch.DrawString(debugText, (1 / (float)gameTime.ElapsedGameTime.TotalSeconds).ToString(), gameCamera.Bounds.Center.ToVector2(), Color.Yellow);
+            spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+        private void ResetGameSettings()
+        {
+            graphics.PreferredBackBufferWidth = (int)gameSettings.Resolution.X;
+            graphics.PreferredBackBufferHeight = (int)gameSettings.Resolution.Y;
+            graphics.SynchronizeWithVerticalRetrace = gameSettings.Vsync;
+            this.IsFixedTimeStep = gameSettings.Vsync;
+            graphics.ApplyChanges();
+            gameCamera.Scale = gameSettings.Scale;
+            gameCamera.Bounds = graphics.GraphicsDevice.Viewport.Bounds;
+            gameCamera.Viewport = graphics.GraphicsDevice.Viewport;
+            gameSettings.HasChanges = false;
+            this.Window.Position = new Point((int)graphics.GraphicsDevice.DisplayMode.Width/2 - (int)gameSettings.Resolution.X/2, (int)graphics.GraphicsDevice.DisplayMode.Height / 2 - (int)gameSettings.Resolution.Y / 2);
+            this.Window.IsBorderless = gameSettings.Borderless;
+        }
+
+        void Window_ClientSizeChanged(object sender, EventArgs e)
+        {
+            this.ResetGameSettings();
         }
     }
 }

@@ -8,17 +8,28 @@ using ECSRogue.BaseEngine;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using ECSRogue.ECS;
+using ECSRogue.ECS.Systems;
 
 namespace ECSRogue.ProceduralGeneration
 {
     public class CaveGeneration : IGenerationAlgorithm
     {
-        private Texture2D temporaryTile;
-        private const int cellSize = 40;
+        private const int cellSize = 32;
 
         public int GetCellsize()
         {
             return cellSize;
+        }
+
+        public DungeonColorInfo GetColorInfo()
+        {
+            return new DungeonColorInfo()
+            {
+                Floor = Color.DarkGreen,
+                Wall = Color.DarkViolet,
+                FloorInRange = Color.Green,
+                WallInRange = Color.Violet
+            };
         }
 
         public Vector2 GenerateDungeon(ref DungeonTile[,] dungeonGrid, int worldMin, int worldMax, Random random)
@@ -327,63 +338,9 @@ namespace ECSRogue.ProceduralGeneration
             return new Vector2(worldI, worldJ);
         }
 
-        public void LoadDungeonContent(ContentManager content)
+        public string GetDungeonSpritesheetFileName()
         {
-            temporaryTile = content.Load<Texture2D>("Sprites/Ball");
-        }
-
-        public void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions)
-        {
-            for(int i = 0; i < (int)dungeonDimensions.X; i++)
-            {
-                for(int j = 0; j < (int)dungeonDimensions.Y; j++)
-                {
-                    Rectangle tile = new Rectangle((int)i * cellSize, (int)j * cellSize, cellSize, cellSize);
-                    if (dungeonGrid[i, j].Found && !dungeonGrid[i,j].InRange)
-                    {
-                        switch (dungeonGrid[i, j].Type)
-                        {
-                            case TileType.TILE_FLOOR:
-                                spriteBatch.Draw(temporaryTile, tile, Color.DarkGreen);
-                                break;
-                            case TileType.TILE_WALL:
-                                spriteBatch.Draw(temporaryTile, tile, Color.DarkViolet);
-                                break;
-                        }
-                    }
-                    else if(dungeonGrid[i,j].InRange && !dungeonGrid[i,j].NewlyFound)
-                    {
-                        switch (dungeonGrid[i, j].Type)
-                        {
-                            case TileType.TILE_FLOOR:
-                                spriteBatch.Draw(temporaryTile, tile, Color.Green);
-                                break;
-                            case TileType.TILE_WALL:
-                                spriteBatch.Draw(temporaryTile, tile, Color.Violet);
-                                break;
-                        }
-                    }
-                    else if(dungeonGrid[i,j].NewlyFound)
-                    {
-                        float opacity = dungeonGrid[i, j].Opacity;
-                        switch (dungeonGrid[i, j].Type)
-                        {
-                            case TileType.TILE_FLOOR:
-                                spriteBatch.Draw(temporaryTile, tile, Color.Green * opacity);
-                                break;
-                            case TileType.TILE_WALL:
-                                spriteBatch.Draw(temporaryTile, tile, Color.Violet * opacity);
-                                break;
-                        }
-                        dungeonGrid[i, j].Opacity += .21f;
-                        if(dungeonGrid[i,j].Opacity > 1)
-                        {
-                            dungeonGrid[i, j].NewlyFound = false;
-                            dungeonGrid[i, j].Found = true;
-                        }
-                    }
-                }
-            }
+            return "Sprites/anonsheet";
         }
         
         public void GenerateDungeonEntities(StateSpaceComponents spaceComponents)

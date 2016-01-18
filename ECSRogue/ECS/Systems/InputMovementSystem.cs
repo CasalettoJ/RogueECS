@@ -1,4 +1,5 @@
 ﻿using ECSRogue.BaseEngine;
+using ECSRogue.BaseEngine.IO.Objects;
 using ECSRogue.ECS.Components;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
@@ -13,88 +14,74 @@ namespace ECSRogue.ECS.Systems
     public static class InputMovementSystem
     {
         public static void HandleDungeonMovement(StateSpaceComponents spaceComponents, GraphicsDeviceManager graphics, GameTime gameTime,
-            KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, DungeonTile[,] dungeonGrid)
+            KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, DungeonTile[,] dungeonGrid, GameSettings gameSettings)
         {
             IEnumerable<Guid> movableEntities = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.InputMoveable) == ComponentMasks.InputMoveable).Select(x => x.Id);
             foreach(Guid id in movableEntities)
             {
+                bool hitWall = false;
+                bool movement = false;
                 KeyboardState keyState = Keyboard.GetState();
+                PositionComponent pos = spaceComponents.PositionComponents[id];
+                GameplayInfoComponent gameInfo = spaceComponents.GameplayInfoComponents[id];
                 if (keyState.IsKeyDown(Keys.NumPad8) && !prevKeyboardState.IsKeyDown(Keys.NumPad8))
                 {
-                    PositionComponent pos = spaceComponents.PositionComponents[id];
                     pos.Position.Y -= 1;
-                    if (dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Type == TileType.TILE_FLOOR)
-                    {
-                        spaceComponents.PositionComponents[id] = pos;
-                    }
+                    movement = true;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad2) && !prevKeyboardState.IsKeyDown(Keys.NumPad2))
+                else if (keyState.IsKeyDown(Keys.NumPad2) && !prevKeyboardState.IsKeyDown(Keys.NumPad2))
                 {
-                    PositionComponent pos = spaceComponents.PositionComponents[id];
                     pos.Position.Y += 1;
-                    if (dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Type == TileType.TILE_FLOOR)
-                    {
-                        spaceComponents.PositionComponents[id] = pos;
-                    }
+                    movement = true;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad6) && !prevKeyboardState.IsKeyDown(Keys.NumPad6))
+                else if (keyState.IsKeyDown(Keys.NumPad6) && !prevKeyboardState.IsKeyDown(Keys.NumPad6))
                 {
-                    PositionComponent pos = spaceComponents.PositionComponents[id];
                     pos.Position.X += 1;
-                    if (dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Type == TileType.TILE_FLOOR)
-                    {
-                        spaceComponents.PositionComponents[id] = pos;
-                    }
+                    movement = true;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad4) && !prevKeyboardState.IsKeyDown(Keys.NumPad4))
+                else if (keyState.IsKeyDown(Keys.NumPad4) && !prevKeyboardState.IsKeyDown(Keys.NumPad4))
                 {
-                    PositionComponent pos = spaceComponents.PositionComponents[id];
                     pos.Position.X -= 1;
-                    if (dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Type == TileType.TILE_FLOOR)
-                    {
-                        spaceComponents.PositionComponents[id] = pos;
-                    }
+                    movement = true;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad7) && !prevKeyboardState.IsKeyDown(Keys.NumPad7))
+                else if (keyState.IsKeyDown(Keys.NumPad7) && !prevKeyboardState.IsKeyDown(Keys.NumPad7))
                 {
-                    PositionComponent pos = spaceComponents.PositionComponents[id];
                     pos.Position.X -= 1;
                     pos.Position.Y -= 1;
-                    if (dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Type == TileType.TILE_FLOOR)
-                    {
-                        spaceComponents.PositionComponents[id] = pos;
-                    }
+                    movement = true;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad9) && !prevKeyboardState.IsKeyDown(Keys.NumPad9))
+                else if (keyState.IsKeyDown(Keys.NumPad9) && !prevKeyboardState.IsKeyDown(Keys.NumPad9))
                 {
-                    PositionComponent pos = spaceComponents.PositionComponents[id];
                     pos.Position.X += 1;
                     pos.Position.Y -= 1;
-                    if (dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Type == TileType.TILE_FLOOR)
-                    {
-                        spaceComponents.PositionComponents[id] = pos;
-                    }
+                    movement = true;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad1) && !prevKeyboardState.IsKeyDown(Keys.NumPad1))
+                else if (keyState.IsKeyDown(Keys.NumPad1) && !prevKeyboardState.IsKeyDown(Keys.NumPad1))
                 {
-                    PositionComponent pos = spaceComponents.PositionComponents[id];
                     pos.Position.X -= 1;
                     pos.Position.Y += 1;
-                    if (dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Type == TileType.TILE_FLOOR)
-                    {
-                        spaceComponents.PositionComponents[id] = pos;
-                    }
+                    movement = true;
                 }
-                if (keyState.IsKeyDown(Keys.NumPad3) && !prevKeyboardState.IsKeyDown(Keys.NumPad3))
+                else if (keyState.IsKeyDown(Keys.NumPad3) && !prevKeyboardState.IsKeyDown(Keys.NumPad3))
                 {
-                    PositionComponent pos = spaceComponents.PositionComponents[id];
                     pos.Position.X += 1;
                     pos.Position.Y += 1;
-                    if (dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Type == TileType.TILE_FLOOR)
-                    {
-                        spaceComponents.PositionComponents[id] = pos;
-                    }
+                    movement = true;
                 }
+
+                hitWall = !dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Occupiable;
+                if (!hitWall && movement)
+                {
+                    //Check collisions.  If no collisions, move into spot.
+                    spaceComponents.PositionComponents[id] = pos;
+                    gameInfo.StepsTaken += 1;
+                    spaceComponents.GameplayInfoComponents[id] = gameInfo;
+                }
+                if(hitWall)
+                {
+                    MessageDisplaySystem.GenerateRandomGameMessage(spaceComponents, Messages.WallCollisionMessages, MessageColors.Normal, gameSettings);
+                }
+
             }
         }
     }

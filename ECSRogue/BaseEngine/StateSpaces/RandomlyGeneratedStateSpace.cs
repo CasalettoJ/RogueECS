@@ -12,6 +12,7 @@ using ECSRogue.ProceduralGeneration;
 using ECSRogue.ProceduralGeneration.Interfaces;
 using ECSRogue.ECS.Systems;
 using ECSRogue.ECS.Components;
+using ECSRogue.BaseEngine.IO.Objects;
 
 namespace ECSRogue.BaseEngine.StateSpaces
 {
@@ -19,29 +20,51 @@ namespace ECSRogue.BaseEngine.StateSpaces
     {
         #region Components
         private StateSpaceComponents stateSpaceComponents;
+        private StateComponents stateComponents;
         #endregion
 
         #region Dungeon Environment Variables
-        private Texture2D player;
+        private Texture2D sprites;
+        private SpriteFont messageFont;
         private Vector2 dungeonDimensions;
         private DungeonTile[,] dungeonGrid = null;
-        private Random random = new Random();
-        private IGenerationAlgorithm dungeonAlgorithm;
+        private int cellSize;
+        private Texture2D dungeonSprites;
+        private string dungeonSpriteFile;
+        private DungeonColorInfo dungeonColorInfo;
         #endregion
 
         public RandomlyGeneratedStateSpace(IGenerationAlgorithm dungeonGeneration, int worldMin, int worldMax)
         {
             stateSpaceComponents = new StateSpaceComponents();
-            dungeonAlgorithm = dungeonGeneration;
-            dungeonDimensions = dungeonGeneration.GenerateDungeon(ref dungeonGrid, worldMin, worldMax, random);
+            dungeonDimensions = dungeonGeneration.GenerateDungeon(ref dungeonGrid, worldMin, worldMax, stateSpaceComponents.random);
+            cellSize = dungeonGeneration.GetCellsize();
+            dungeonSpriteFile = dungeonGeneration.GetDungeonSpritesheetFileName();
+            dungeonColorInfo = dungeonGeneration.GetColorInfo();
+        }
+
+        public RandomlyGeneratedStateSpace(DungeonInfo data)
+        {
+            stateSpaceComponents = data.stateSpaceComponents;
+            dungeonSpriteFile = data.dungeonSpriteFile;
+            dungeonGrid = data.dungeonGrid;
+            cellSize = data.cellSize;
+            dungeonColorInfo = data.dungeonColorInfo;
+            dungeonDimensions = data.dungeonDimensions;
         }
 
         #region Load Logic
-        public void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera)
+        public void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera, StateComponents stateComponents, bool createEntities = true)
         {
-            player = content.Load<Texture2D>("Sprites/Ball");
-            dungeonAlgorithm.LoadDungeonContent(content);
-            CreatePlayer();
+            this.stateComponents = stateComponents;
+            sprites = content.Load<Texture2D>("Sprites/anonsheet");
+            dungeonSprites = content.Load<Texture2D>(dungeonSpriteFile);
+            messageFont = content.Load<SpriteFont>("Fonts/InfoText");
+            if (createEntities)
+            {
+                CreatePlayer();
+                CreateMessageLog();
+            }
             camera.AttachedToPlayer = true;
         }
 
@@ -54,21 +77,53 @@ namespace ECSRogue.BaseEngine.StateSpaces
             int Y = 0;
             do
             {
-                X = random.Next(0, (int)dungeonDimensions.X);
-                Y = random.Next(0, (int)dungeonDimensions.Y);
+                X = stateSpaceComponents.random.Next(0, (int)dungeonDimensions.X);
+                Y = stateSpaceComponents.random.Next(0, (int)dungeonDimensions.Y);
             } while (dungeonGrid[X, Y].Type != TileType.TILE_FLOOR);
             stateSpaceComponents.PositionComponents[id] = new PositionComponent() { Position = new Vector2(X, Y) };
-            //Set Health
-            stateSpaceComponents.HealthComponents[id] = new HealthComponent() { CurrentHealth = 50, MaxHealth = 100, MinHealth = 0 };
+            dungeonGrid[X, Y].Occupiable = true;
+            if(stateComponents != null)
+            {
+                GameplayInfoComponent info = stateComponents.GameplayInfo;
+                info.FloorsReached += 1;
+                stateSpaceComponents.GameplayInfoComponents[id] = info;
+                stateSpaceComponents.SkillLevelsComponents[id] = stateComponents.PlayerSkillLevels;
+            }
+            else
+            {
+
+                //Set GameplayInfo
+                stateSpaceComponents.GameplayInfoComponents[id] = new GameplayInfoComponent() { Kills = 0, StepsTaken = 0, FloorsReached = 0 };
+                //Set Skills Level
+                stateSpaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent()
+                {
+                    CurrentHealth = 100,
+                    Health = 100,
+                    MagicAttack = 10,
+                    MagicDefense = 3,
+                    PhysicalAttack = 20,
+                    PhysicalDefense = 10,
+                    Wealth = 100
+                };
+            }
             //Set Display
-            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.Red, Texture = player };
+            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.White, SpriteSource = new Rectangle(2 * cellSize, 0 * cellSize, cellSize, cellSize) };
             //Set Sightradius
             stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 12 };
+        }
+
+        private void CreateMessageLog()
+        {
+            Guid id = stateSpaceComponents.CreateEntity();
+            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = Component.COMPONENT_GAMEMESSAGE;
+            stateSpaceComponents.GameMessageComponents[id] = new GameMessageComponent() { GlobalColor = Color.White, GlobalMessage = string.Empty,
+                 MaxMessages = 100, IndexBegin = 0, GameMessages = new List<Tuple<Color,string>>()};
+            MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.CaveEntranceMessages, MessageColors.SpecialAction);
         }
         #endregion
 
         #region Update Logic
-        public IStateSpace UpdateLevel(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera)
+        public IStateSpace UpdateSpace(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, ref GameSettings gameSettings)
         {
             if(stateSpaceComponents.EntitiesToDelete.Count > 0)
             {
@@ -79,23 +134,28 @@ namespace ECSRogue.BaseEngine.StateSpaces
             }
             IStateSpace nextStateSpace = this;
             #region Debug changing levels
-            if (Keyboard.GetState().IsKeyDown(Keys.Enter) && !prevKeyboardState.IsKeyDown(Keys.Enter))
+            if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && !prevKeyboardState.IsKeyDown(Keys.LeftShift))
             {
                 nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
+                LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
             }
-            if(Mouse.GetState().RightButton == ButtonState.Pressed)
+            if (Mouse.GetState().RightButton == ButtonState.Pressed)
             {
                 camera.Target = Vector2.Transform(Mouse.GetState().Position.ToVector2(),camera.GetInverseMatrix());
                 camera.AttachedToPlayer = false;
+                MessageDisplaySystem.SetRandomGlobalMessage(stateSpaceComponents, Messages.CameraDetatchedMessage);
             }
             if (Keyboard.GetState().IsKeyDown(Keys.R))
             {
                 camera.AttachedToPlayer = true;
+                MessageDisplaySystem.SetRandomGlobalMessage(stateSpaceComponents, new string[] { string.Empty });
             }
             #endregion
-            InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid);
-            TileRevealSystem.RevealTiles(dungeonGrid, dungeonDimensions, stateSpaceComponents);
+            InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
+            TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
+            TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime);
             UpdateCamera(camera, gameTime);
+            MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
             stateSpaceComponents.EntitiesToDelete.Clear();
             return nextStateSpace;
         }
@@ -107,8 +167,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 Entity playerId = stateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
                 if(playerId != null)
                 {
-                    camera.Target = new Vector2((int)stateSpaceComponents.PositionComponents[playerId.Id].Position.X * dungeonAlgorithm.GetCellsize() + stateSpaceComponents.DisplayComponents[playerId.Id].Texture.Bounds.Center.X,
-                    (int)stateSpaceComponents.PositionComponents[playerId.Id].Position.Y * dungeonAlgorithm.GetCellsize() + stateSpaceComponents.DisplayComponents[playerId.Id].Texture.Bounds.Center.Y);
+                    camera.Target = new Vector2((int)stateSpaceComponents.PositionComponents[playerId.Id].Position.X * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Width/2,
+                    (int)stateSpaceComponents.PositionComponents[playerId.Id].Position.Y * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Height/2);
                 }
             }
             if (Vector2.Distance(camera.Position, camera.Target) > 0)
@@ -116,7 +176,11 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 float distance = Vector2.Distance(camera.Position, camera.Target);
                 Vector2 direction = Vector2.Normalize(camera.Target - camera.Position);
                 float velocity = distance * 2.5f;
-                camera.Position += direction * velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                camera.Position += direction * velocity * (camera.Scale >= 1 ? camera.Scale : 1) * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (distance < 2.5)
+                {
+                    camera.Position = camera.Target;
+                }
             }
         }
         #endregion
@@ -124,8 +188,29 @@ namespace ECSRogue.BaseEngine.StateSpaces
         #region Draw Logic
         public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
         {
-            dungeonAlgorithm.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions);
-            DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, dungeonAlgorithm.GetCellsize());
+            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo);
+            DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize);
+        }
+
+        public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
+        {
+            MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont);
+        }
+        #endregion
+
+        #region Save Logic
+        public DungeonInfo GetSaveData()
+        {
+            return new DungeonInfo()
+            {
+                cellSize = this.cellSize,
+                dungeonColorInfo = this.dungeonColorInfo,
+                dungeonDimensions = this.dungeonDimensions,
+                dungeonGrid = this.dungeonGrid,
+                stateComponents = this.stateComponents,
+                dungeonSpriteFile = this.dungeonSpriteFile,
+                stateSpaceComponents = this.stateSpaceComponents
+            };
         }
         #endregion
     }

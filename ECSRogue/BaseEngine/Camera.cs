@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace ECSRogue.BaseEngine
     public class Camera
     {
         public float Rotation;
-        public Vector3 Scale;
+        public float Scale;
         public Vector2 Position;
         public Rectangle Bounds;
         public Vector2 Target;
@@ -21,28 +22,31 @@ namespace ECSRogue.BaseEngine
                 return new Vector2(600, 600);
             }
         }
+        public Viewport Viewport;
 
-        public Camera(Vector2 position, Vector2 origin, float rotation, Vector2 scale, GraphicsDeviceManager graphics)
+        public Camera(Vector2 position, Vector2 origin, float rotation, float scale, GraphicsDeviceManager graphics)
         {
             ResetCamera(position, origin, rotation, scale, graphics);
             AttachedToPlayer = false;
         }
 
-        public void ResetCamera(Vector2 position, Vector2 origin, float rotation, Vector2 scale, GraphicsDeviceManager graphics)
+        public void ResetCamera(Vector2 position, Vector2 origin, float rotation, float scale, GraphicsDeviceManager graphics)
         {
             Rotation = rotation;
-            ResetScreenScale(graphics, scale);
+            Scale = scale;
             Position = position;
             Bounds = graphics.GraphicsDevice.Viewport.Bounds;
+            Viewport = graphics.GraphicsDevice.Viewport;
         }
 
-        public Vector3 ResetScreenScale(GraphicsDeviceManager graphics, Vector2 screenScale)
-        {
-            var scaleX = (float)graphics.GraphicsDevice.Viewport.Width / screenScale.X;
-            var scaleY = (float)graphics.GraphicsDevice.Viewport.Height / screenScale.Y;
-            Scale = new Vector3(scaleX, scaleY, 1.0f);
-            return Scale;
-        }
+        //public Vector3 ResetScreenScale(GraphicsDeviceManager graphics, Vector2 screenScale)
+        //{
+        //    var scaleX = (float)graphics.GraphicsDevice.Viewport.Width / screenScale.X;
+        //    var scaleY = (float)graphics.GraphicsDevice.Viewport.Height / screenScale.Y;
+        //    Scale = new Vector3(scaleX, scaleY, 1.0f);
+        //    Viewport = graphics.GraphicsDevice.Viewport;
+        //    return Scale;
+        //}
 
         public Matrix GetMatrix()
         {
@@ -63,21 +67,21 @@ namespace ECSRogue.BaseEngine
                     Matrix.CreateTranslation(new Vector3((int)(Bounds.Width * 0.5f), (int)(Bounds.Height * 0.5f), 0)));
         }
 
-        //public Rectangle GetVisibleArea(GraphicsDeviceManager graphics)
-        //{
-        //    var inverseViewMatrix = GetMatrix();
-        //        var tl = Vector2.Transform(Vector2.Zero, inverseViewMatrix);
-        //        var tr = Vector2.Transform(new Vector2(Bounds.X, 0), inverseViewMatrix);
-        //        var bl = Vector2.Transform(new Vector2(0, Bounds.Y), inverseViewMatrix);
-        //        var br = Vector2.Transform(new Vector2(Bounds.X, Bounds.Y), inverseViewMatrix);
-        //        var min = new Vector2(
-        //            MathHelper.Min(tl.X, MathHelper.Min(tr.X, MathHelper.Min(bl.X, br.X))),
-        //            MathHelper.Min(tl.Y, MathHelper.Min(tr.Y, MathHelper.Min(bl.Y, br.Y))));
-        //        var max = new Vector2(
-        //            MathHelper.Max(tl.X, MathHelper.Max(tr.X, MathHelper.Max(bl.X, br.X))),
-        //            MathHelper.Max(tl.Y, MathHelper.Max(tr.Y, MathHelper.Max(bl.Y, br.Y))));
-        //        return new Rectangle((int)min.X, (int)min.Y, (int)(max.X - min.X), (int)(max.Y - min.Y));
-        //}
+        public Vector2 ScreenToWorld(Point point)
+        {
+            return Vector2.Transform(point.ToVector2(), this.GetInverseMatrix());
+        }
+
+        public Vector2 WorldToScreen(Point point)
+        {
+            return Vector2.Transform(point.ToVector2(), this.GetMatrix());
+        }
+
+        public bool IsInView(Matrix matrix, Vector2 positionUpperBounds, Vector2 positionLowerBounds)
+        {
+            return this.Viewport.Bounds.Contains(Vector2.Transform(positionLowerBounds, matrix))
+                || this.Viewport.Bounds.Contains(Vector2.Transform(positionUpperBounds, matrix));
+        }
 
     }
 }

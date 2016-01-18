@@ -5,10 +5,7 @@ using System.Text;
 
 namespace ECSRogue.ECS.Components
 {
-    public class HealthComponent
+    public struct AIComponent
     {
-        public double MaxHealth;
-        public double CurrentHealth;
-        public double MinHealth;
     }
 }
