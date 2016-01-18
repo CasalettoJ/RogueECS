@@ -176,7 +176,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 float distance = Vector2.Distance(camera.Position, camera.Target);
                 Vector2 direction = Vector2.Normalize(camera.Target - camera.Position);
                 float velocity = distance * 2.5f;
-                camera.Position += direction * velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                camera.Position += direction * velocity * (camera.Scale >= 1 ? camera.Scale : 1) * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if (distance < 2.5)
                 {
                     camera.Position = camera.Target;
