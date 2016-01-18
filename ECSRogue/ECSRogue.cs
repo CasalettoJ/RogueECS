@@ -122,9 +122,7 @@ namespace ECSRogue
             graphics.SynchronizeWithVerticalRetrace = gameSettings.Vsync;
             this.IsFixedTimeStep = gameSettings.Vsync;
             graphics.ApplyChanges();
-            gameCamera.Scale = gameSettings.Scale;
-            gameCamera.Bounds = graphics.GraphicsDevice.Viewport.Bounds;
-            gameCamera.Viewport = graphics.GraphicsDevice.Viewport;
+            gameCamera.ResetCamera(gameCamera.Position, Vector2.Zero, 0f, gameSettings.Scale, graphics);
             gameSettings.HasChanges = false;
             this.Window.Position = new Point((int)graphics.GraphicsDevice.DisplayMode.Width/2 - (int)gameSettings.Resolution.X/2, (int)graphics.GraphicsDevice.DisplayMode.Height / 2 - (int)gameSettings.Resolution.Y / 2);
             this.Window.IsBorderless = gameSettings.Borderless;

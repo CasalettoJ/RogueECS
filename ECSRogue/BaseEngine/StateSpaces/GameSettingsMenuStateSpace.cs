@@ -218,18 +218,18 @@ namespace ECSRogue.BaseEngine.StateSpaces
             int messageCount = 0;
             int messageSpacing = 50;
             Vector2 titleLength = titleText.MeasureString(Title);
-            spriteBatch.DrawString(titleText, Title, new Vector2((camera.Viewport.Width / 2) - titleLength.X / 2, messageSpacing), Color.Goldenrod);
+            spriteBatch.DrawString(titleText, Title, new Vector2((camera.FullViewport.Width / 2) - titleLength.X / 2, messageSpacing), Color.Goldenrod);
             foreach (Option option in menuOptions)
             {
                 int stringLength = (int)optionText.MeasureString(option.Message).X;
                 if(option.OptionsCollection != null)
                 {
-                    spriteBatch.DrawString(optionText, option.Message + option.OptionsCollection[option.Selection].ToString(), new Vector2((camera.Viewport.Width / 2) - titleLength.X / 2, (camera.Viewport.Height / 3) + (messageCount * messageSpacing)),
+                    spriteBatch.DrawString(optionText, option.Message + option.OptionsCollection[option.Selection].ToString(), new Vector2((camera.FullViewport.Width / 2) - titleLength.X / 2, (camera.FullViewport.Height / 3) + (messageCount * messageSpacing)),
                         messageCount == optionSelection ? Color.MediumPurple : Color.Goldenrod);
                 }
                 else
                 {
-                    spriteBatch.DrawString(optionText, option.Message, new Vector2((camera.Viewport.Width / 2) - titleLength.X / 2, (camera.Viewport.Height / 3) + (messageCount * messageSpacing)),
+                    spriteBatch.DrawString(optionText, option.Message, new Vector2((camera.FullViewport.Width / 2) - titleLength.X / 2, (camera.FullViewport.Height / 3) + (messageCount * messageSpacing)),
                         messageCount == optionSelection ? Color.MediumPurple : Color.Goldenrod);
                 }
                 messageCount += 1;

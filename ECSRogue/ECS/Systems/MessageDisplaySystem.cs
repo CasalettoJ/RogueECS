@@ -16,7 +16,7 @@ namespace ECSRogue.ECS.Systems
         public static void WriteMessages(StateSpaceComponents spaceComponents, SpriteBatch spriteBatch, Camera camera, SpriteFont font)
         {
             float opacity = 1.15f;
-            float decrement = .15f;
+            float decrement = .12f;
             int messageNumber = 0;
             int messageSpacing = 20;
             //Draw message log
@@ -24,7 +24,7 @@ namespace ECSRogue.ECS.Systems
             {
                 if(spaceComponents.GameMessageComponents[id].IndexBegin > 0)
                 {
-                    spriteBatch.DrawString(font, Messages.ScrollingMessages, new Vector2(10, (int)10 + (messageNumber * messageSpacing)), Color.MediumVioletRed);
+                    spriteBatch.DrawString(font, Messages.ScrollingMessages, new Vector2(10, (int)camera.DungeonUIViewport.Y + 10 + (messageNumber * messageSpacing)), Color.MediumVioletRed);
                     messageNumber += 1;
                 }
                 foreach(Tuple<Color,string> message in spaceComponents.GameMessageComponents[id].GameMessages.Reverse<Tuple<Color,string>>().Skip(spaceComponents.GameMessageComponents[id].IndexBegin))
@@ -34,14 +34,14 @@ namespace ECSRogue.ECS.Systems
                         break;
                     }
                     opacity -= decrement;
-                    spriteBatch.DrawString(font, message.Item2, new Vector2(10,(int)10 + (messageNumber * messageSpacing)), message.Item1 * opacity);
+                    spriteBatch.DrawString(font, message.Item2, new Vector2(10, (int)camera.DungeonUIViewport.Y + 10 + (messageNumber * messageSpacing)), message.Item1 * opacity);
                     messageNumber += 1;
                 }
                 while (spaceComponents.GameMessageComponents[id].GameMessages.Count > spaceComponents.GameMessageComponents[id].MaxMessages)
                 {
                     spaceComponents.GameMessageComponents[id].GameMessages.RemoveAt(0);
                 }
-                spriteBatch.DrawString(font, spaceComponents.GameMessageComponents[id].GlobalMessage, new Vector2(10, camera.Bounds.Height - messageSpacing), spaceComponents.GameMessageComponents[id].GlobalColor);
+                spriteBatch.DrawString(font, spaceComponents.GameMessageComponents[id].GlobalMessage, new Vector2(camera.DungeonUIViewport.Y, camera.Bounds.Height - messageSpacing), spaceComponents.GameMessageComponents[id].GlobalColor);
             }
 
             messageNumber = 0;
@@ -69,7 +69,7 @@ namespace ECSRogue.ECS.Systems
                     foreach (string stat in statsToPrint)
                     {
                         Vector2 messageSize = font.MeasureString(stat);
-                        spriteBatch.DrawString(font, stat, new Vector2(camera.Bounds.Width - messageSize.X - 10, 10 + (messageSpacing * messageNumber)), MessageColors.SpecialAction);
+                        spriteBatch.DrawString(font, stat, new Vector2(camera.Bounds.Width - messageSize.X - 10, camera.DungeonUIViewport.Y + (messageSpacing * messageNumber)), MessageColors.SpecialAction);
                         messageNumber += 1;
                     }
                 }

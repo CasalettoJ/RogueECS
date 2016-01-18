@@ -32,7 +32,11 @@ namespace ECSRogue.ECS.Systems
                     Rectangle floor = new Rectangle(1 * cellSize, 0 * cellSize, cellSize, cellSize); //Need to be moved eventually
                     Rectangle wall = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize); //Need to be moved eventually
 
-                    if (camera.IsInView(cameraMatrix, new Vector2(i * cellSize + cellSize, j * cellSize + cellSize), new Vector2(i * cellSize, j * cellSize))) // check if in view
+                    Vector2 bottomRight = Vector2.Transform(new Vector2(i * cellSize + cellSize, j * cellSize + cellSize), cameraMatrix);
+                    Vector2 topLeft = Vector2.Transform(new Vector2(i * cellSize, j * cellSize), cameraMatrix);
+                    Rectangle camerBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
+
+                    if (camera.IsInView(cameraMatrix, camerBounds)) // check if in view
                     {
                         if (dungeonGrid[i, j].Found && !dungeonGrid[i, j].InRange)
                         {

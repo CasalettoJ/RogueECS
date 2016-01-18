@@ -30,6 +30,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         private DungeonTile[,] dungeonGrid = null;
         private int cellSize;
         private Texture2D dungeonSprites;
+        private Texture2D UI;
         private string dungeonSpriteFile;
         private DungeonColorInfo dungeonColorInfo;
         #endregion
@@ -60,6 +61,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             sprites = content.Load<Texture2D>("Sprites/anonsheet");
             dungeonSprites = content.Load<Texture2D>(dungeonSpriteFile);
             messageFont = content.Load<SpriteFont>("Fonts/InfoText");
+            UI = content.Load<Texture2D>("Sprites/ball");
             if (createEntities)
             {
                 CreatePlayer();
@@ -133,24 +135,27 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 }
             }
             IStateSpace nextStateSpace = this;
-            #region Debug changing levels
-            if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && !prevKeyboardState.IsKeyDown(Keys.LeftShift))
-            {
-                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
-                LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
-            }
             if (Mouse.GetState().RightButton == ButtonState.Pressed)
             {
-                camera.Target = Vector2.Transform(Mouse.GetState().Position.ToVector2(),camera.GetInverseMatrix());
+                camera.Target = Vector2.Transform(Mouse.GetState().Position.ToVector2(), camera.GetInverseMatrix());
                 camera.AttachedToPlayer = false;
                 MessageDisplaySystem.SetRandomGlobalMessage(stateSpaceComponents, Messages.CameraDetatchedMessage);
             }
+
             if (Keyboard.GetState().IsKeyDown(Keys.R))
             {
                 camera.AttachedToPlayer = true;
                 MessageDisplaySystem.SetRandomGlobalMessage(stateSpaceComponents, new string[] { string.Empty });
             }
+
+            #region Debug changing levels
+            if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && prevKeyboardState.IsKeyUp(Keys.LeftShift))
+            {
+                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
+                LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
+            }
             #endregion
+
             InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
             TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
             TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime);
@@ -194,6 +199,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
         {
+            spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue);
             MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont);
         }
         #endregion

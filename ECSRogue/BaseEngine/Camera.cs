@@ -22,7 +22,9 @@ namespace ECSRogue.BaseEngine
                 return new Vector2(600, 600);
             }
         }
-        public Viewport Viewport;
+        public Viewport DungeonViewport;
+        public Viewport FullViewport;
+        public Viewport DungeonUIViewport;
 
         public Camera(Vector2 position, Vector2 origin, float rotation, float scale, GraphicsDeviceManager graphics)
         {
@@ -35,8 +37,15 @@ namespace ECSRogue.BaseEngine
             Rotation = rotation;
             Scale = scale;
             Position = position;
-            Bounds = graphics.GraphicsDevice.Viewport.Bounds;
-            Viewport = graphics.GraphicsDevice.Viewport;
+            FullViewport = graphics.GraphicsDevice.Viewport;
+
+            DungeonViewport = FullViewport;
+            DungeonViewport.Height -= 200;
+            Bounds = DungeonViewport.Bounds;
+
+            DungeonUIViewport = FullViewport;
+            DungeonUIViewport.Height = 200;
+            DungeonUIViewport.Y = DungeonViewport.Height;
         }
 
         //public Vector3 ResetScreenScale(GraphicsDeviceManager graphics, Vector2 screenScale)
@@ -77,10 +86,11 @@ namespace ECSRogue.BaseEngine
             return Vector2.Transform(point.ToVector2(), this.GetMatrix());
         }
 
-        public bool IsInView(Matrix matrix, Vector2 positionUpperBounds, Vector2 positionLowerBounds)
+        public bool IsInView(Matrix matrix, Rectangle item)
         {
-            return this.Viewport.Bounds.Contains(Vector2.Transform(positionLowerBounds, matrix))
-                || this.Viewport.Bounds.Contains(Vector2.Transform(positionUpperBounds, matrix));
+            //return this.DungeonViewport.Bounds.Contains(Vector2.Transform(positionLowerBounds, matrix))
+            //    || this.DungeonViewport.Bounds.Contains(Vector2.Transform(positionUpperBounds, matrix));
+            return !Rectangle.Intersect(this.DungeonViewport.Bounds, item).IsEmpty;
         }
 
     }

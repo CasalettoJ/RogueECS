@@ -157,11 +157,11 @@ namespace ECSRogue.BaseEngine.States
             int messageCount = 0;
             int messageSpacing = 50;
             Vector2 titleLength = titleText.MeasureString(Title);
-            spriteBatch.DrawString(titleText, Title, new Vector2(((int)(camera.Viewport.Width / 2) - (int)(titleLength.X / 2)), messageSpacing), Color.Goldenrod);
+            spriteBatch.DrawString(titleText, Title, new Vector2(((int)(camera.FullViewport.Width / 2) - (int)(titleLength.X / 2)), messageSpacing), Color.Goldenrod);
             foreach (Option option in menuOptions)
             {
                 int stringLength = (int)optionText.MeasureString(option.Message).X;
-                spriteBatch.DrawString(optionText, option.Message, new Vector2((int)((camera.Viewport.Width / 2) - stringLength / 2), (int)((camera.Viewport.Height / 2) + (messageCount * messageSpacing))),
+                spriteBatch.DrawString(optionText, option.Message, new Vector2((int)((camera.FullViewport.Width / 2) - stringLength / 2), (int)((camera.FullViewport.Height / 2) + (messageCount * messageSpacing))),
                     option.Enabled ? messageCount == optionSelection ? Color.MediumPurple : Color.Goldenrod : Color.Gray);
                 messageCount += 1;
             }
