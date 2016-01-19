@@ -133,6 +133,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 {
                     stateSpaceComponents.DestroyEntity(entity);
                 }
+                stateSpaceComponents.EntitiesToDelete.Clear();
             }
             IStateSpace nextStateSpace = this;
             if (Mouse.GetState().RightButton == ButtonState.Pressed)
@@ -165,7 +166,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime);
             UpdateCamera(camera, gameTime);
             MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
-            stateSpaceComponents.EntitiesToDelete.Clear();
+            MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
+            MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
             return nextStateSpace;
         }
 
@@ -230,17 +232,19 @@ namespace ECSRogue.BaseEngine.StateSpaces
         public void CreateDamageEntity(Camera camera)
         {
             Guid id = stateSpaceComponents.CreateEntity();
-            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.DrawableLabel;
+            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.DrawableLabel | ComponentMasks.MovingEntity;
             stateSpaceComponents.PositionComponents[id] = new PositionComponent() { Position = Vector2.Transform(Mouse.GetState().Position.ToVector2(), camera.GetInverseMatrix()) };
             stateSpaceComponents.LabelComponents[id] = new LabelComponent()
             {
-                Color = Color.Red,
+                Color = Color.LightSalmon,
                 Origin = Vector2.Zero,
                 Rotation = 0f,
-                Scale = 1f,
+                Scale = 1.75f,
                 SpriteEffect = SpriteEffects.None,
-                Text = "-Damage!!"
+                Text = "-72"
             };
+            stateSpaceComponents.VelocityComponents[id] = new VelocityComponent() { Velocity = new Vector2(stateSpaceComponents.random.Next(200,300), stateSpaceComponents.random.Next(200,300)) };
+            stateSpaceComponents.TargetPositionComponents[id] = new TargetPositionComponent() { DestroyWhenReached = true, TargetPosition = new Vector2(stateSpaceComponents.PositionComponents[id].Position.X+ stateSpaceComponents.random.Next(-200,200), stateSpaceComponents.PositionComponents[id].Position.Y - 200) };
         }
         #endregion
     }

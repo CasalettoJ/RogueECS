@@ -21,7 +21,8 @@ namespace ECSRogue.ECS
         COMPONENT_GAMEPLAY_INFO = 1 << 9,
         COMPONENT_SKILL_LEVELS = 1 << 10,
         COMPONENT_AI = 1 << 11,
-        COMPONENT_TARGET_POSITION = 1 << 12
+        COMPONENT_TARGET_POSITION = 1 << 12,
+        COMPONENT_DIRECTION = 1 << 13
     }
 
 
@@ -37,11 +38,12 @@ namespace ECSRogue.ECS
         public const Component InputMoveable = Component.COMPONENT_POSITION | Component.COMPONENT_INPUTMOVEMENT;
 
         public const Component Drawable = Component.COMPONENT_DISPLAY | Component.COMPONENT_POSITION;
-        public const Component DrawableLabel = Component.COMPONENT_LABEL | Component.COMPONENT_POSITION; //Not Implemented
+        public const Component DrawableLabel = Component.COMPONENT_LABEL | Component.COMPONENT_POSITION; 
 
         public const Component Animated = Component.COMPONENT_DISPLAY | Component.COMPONENT_POSITION | Component.COMPONENT_ANIMATION; //Not implemented
 
         public const Component MovingEntity = Component.COMPONENT_POSITION | Component.COMPONENT_VELOCITY | Component.COMPONENT_TARGET_POSITION; //Not Implemented
+        public const Component IndefiniteMovingEntity = Component.COMPONENT_POSITION | Component.COMPONENT_VELOCITY | Component.COMPONENT_DIRECTION; //Not Implemented
     }
 
     public class StateComponents
@@ -64,6 +66,7 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, GameplayInfoComponent> GameplayInfoComponents { get; private set; }
         public Dictionary<Guid, SkillLevelsComponent> SkillLevelsComponents { get; private set; }
         public Dictionary<Guid, TargetPositionComponent> TargetPositionComponents { get; private set; }
+        public Dictionary<Guid, DirectionComponent> DirectionComponents { get; private set; }
         public Random random { get; private set; }
 
         public StateSpaceComponents()
@@ -80,6 +83,7 @@ namespace ECSRogue.ECS
             GameplayInfoComponents = new Dictionary<Guid, GameplayInfoComponent>();
             SkillLevelsComponents = new Dictionary<Guid, SkillLevelsComponent>();
             TargetPositionComponents = new Dictionary<Guid, TargetPositionComponent>();
+            DirectionComponents = new Dictionary<Guid, DirectionComponent>();
             random = new Random();
         }
 
@@ -106,6 +110,7 @@ namespace ECSRogue.ECS
                 GameplayInfoComponents.Remove(id);
                 SkillLevelsComponents.Remove(id);
                 TargetPositionComponents.Remove(id);
+                DirectionComponents.Remove(id);
             }
         }
     }

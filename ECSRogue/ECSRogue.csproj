@@ -55,6 +55,7 @@
     <Compile Include="ECS\Components.cs" />
     <Compile Include="ECS\Components\AIComponent.cs" />
     <Compile Include="ECS\Components\AnimationComponent.cs" />
+    <Compile Include="ECS\Components\DirectionComponent.cs" />
     <Compile Include="ECS\Components\DisplayComponent.cs" />
     <Compile Include="ECS\Components\GameMessageComponent.cs" />
     <Compile Include="ECS\Components\GameplayInfoComponent.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="ECS\Systems\LabelDisplaySystem.cs" />
     <Compile Include="ECS\Systems\LevelChangeSystem.cs" />
     <Compile Include="ECS\Systems\MessageDisplaySystem.cs" />
+    <Compile Include="ECS\Systems\MovementSystem.cs" />
     <Compile Include="ECS\Systems\TileRevealSystem.cs" />
     <Compile Include="ProceduralGeneration\CaveArenaGeneration.cs" />
     <Compile Include="ProceduralGeneration\CaveGeneration.cs" />
