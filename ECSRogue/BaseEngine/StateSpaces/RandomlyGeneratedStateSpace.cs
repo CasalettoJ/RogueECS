@@ -111,7 +111,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             //Set Display
             stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.White, SpriteSource = new Rectangle(2 * cellSize, 0 * cellSize, cellSize, cellSize) };
             //Set Sightradius
-            stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 12 };
+            stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 8 };
         }
 
         private void CreateMessageLog()
