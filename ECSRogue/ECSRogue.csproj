@@ -62,6 +62,7 @@
     <Compile Include="ECS\Components\PositionComponent.cs" />
     <Compile Include="ECS\Components\SightRadiusComponent.cs" />
     <Compile Include="ECS\Components\SkillLevelsComponent.cs" />
+    <Compile Include="ECS\Components\TargetPositionComponent.cs" />
     <Compile Include="ECS\Components\VelocityComponent.cs" />
     <Compile Include="ECS\Entity.cs" />
     <Compile Include="ECSRogue.cs" />

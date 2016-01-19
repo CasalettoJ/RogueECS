@@ -1,4 +1,5 @@
 ﻿using ECSRogue.BaseEngine;
+using ECSRogue.ECS.Components;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,11 +14,21 @@ namespace ECSRogue.ECS.Systems
     {
         public static void DrawDungeonEntities(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D spriteSheet, int cellSize)
         {
+            Matrix cameraMatrix = camera.GetMatrix();
             IEnumerable<Guid> drawableEntities = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Drawable) == ComponentMasks.Drawable).Select(x => x.Id);
             foreach(Guid id in drawableEntities)
             {
+                DisplayComponent display = spaceComponents.DisplayComponents[id];
                 Vector2 position = new Vector2(spaceComponents.PositionComponents[id].Position.X * cellSize, spaceComponents.PositionComponents[id].Position.Y * cellSize);
-                spriteBatch.Draw(spriteSheet, position, spaceComponents.DisplayComponents[id].SpriteSource, spaceComponents.DisplayComponents[id].Color);
+
+                Vector2 bottomRight = Vector2.Transform(new Vector2((position.X) + cellSize, (position.Y) + cellSize), cameraMatrix);
+                Vector2 topLeft = Vector2.Transform(new Vector2(position.X, position.Y), cameraMatrix);
+                Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
+
+                if(camera.IsInView(cameraMatrix, cameraBounds))
+                {
+                    spriteBatch.Draw(spriteSheet, position, display.SpriteSource, display.Color, display.Rotation, display.Origin, display.Scale, display.SpriteEffect, 0f);
+                }
             }
         }
 
@@ -32,11 +43,11 @@ namespace ECSRogue.ECS.Systems
                     Rectangle floor = new Rectangle(1 * cellSize, 0 * cellSize, cellSize, cellSize); //Need to be moved eventually
                     Rectangle wall = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize); //Need to be moved eventually
 
-                    Vector2 bottomRight = Vector2.Transform(new Vector2(i * cellSize + cellSize, j * cellSize + cellSize), cameraMatrix);
+                    Vector2 bottomRight = Vector2.Transform(new Vector2((i * cellSize) + cellSize, (j * cellSize) + cellSize), cameraMatrix);
                     Vector2 topLeft = Vector2.Transform(new Vector2(i * cellSize, j * cellSize), cameraMatrix);
-                    Rectangle camerBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
+                    Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
 
-                    if (camera.IsInView(cameraMatrix, camerBounds)) // check if in view
+                    if (camera.IsInView(cameraMatrix, cameraBounds)) // check if in view
                     {
                         if (dungeonGrid[i, j].Found && !dungeonGrid[i, j].InRange)
                         {

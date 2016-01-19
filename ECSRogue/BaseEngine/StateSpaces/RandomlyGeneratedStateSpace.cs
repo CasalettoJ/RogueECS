@@ -109,7 +109,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 };
             }
             //Set Display
-            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.White, SpriteSource = new Rectangle(2 * cellSize, 0 * cellSize, cellSize, cellSize) };
+            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.White, SpriteSource = new Rectangle(2 * cellSize, 0 * cellSize, cellSize, cellSize), Origin = Vector2.Zero, SpriteEffect = SpriteEffects.None, Scale = 1f, Rotation = 0f };
             //Set Sightradius
             stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 8 };
         }
@@ -148,11 +148,15 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 MessageDisplaySystem.SetRandomGlobalMessage(stateSpaceComponents, new string[] { string.Empty });
             }
 
-            #region Debug changing levels
+            #region Debug
             if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && prevKeyboardState.IsKeyUp(Keys.LeftShift))
             {
                 nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
                 LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
+            }
+            if (Keyboard.GetState().IsKeyDown(Keys.C) && prevKeyboardState.IsKeyUp(Keys.C))
+            {
+                CreateDamageEntity(camera);
             }
             #endregion
 
@@ -195,6 +199,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         {
             DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo);
             DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize);
+            LabelDisplaySystem.DrawString(spriteBatch, stateSpaceComponents, messageFont, camera);
         }
 
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
@@ -216,6 +221,25 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 stateComponents = this.stateComponents,
                 dungeonSpriteFile = this.dungeonSpriteFile,
                 stateSpaceComponents = this.stateSpaceComponents
+            };
+        }
+        #endregion
+
+
+        #region Debugging
+        public void CreateDamageEntity(Camera camera)
+        {
+            Guid id = stateSpaceComponents.CreateEntity();
+            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.DrawableLabel;
+            stateSpaceComponents.PositionComponents[id] = new PositionComponent() { Position = Vector2.Transform(Mouse.GetState().Position.ToVector2(), camera.GetInverseMatrix()) };
+            stateSpaceComponents.LabelComponents[id] = new LabelComponent()
+            {
+                Color = Color.Red,
+                Origin = Vector2.Zero,
+                Rotation = 0f,
+                Scale = 1f,
+                SpriteEffect = SpriteEffects.None,
+                Text = "-Damage!!"
             };
         }
         #endregion
