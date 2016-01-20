@@ -22,7 +22,8 @@ namespace ECSRogue.ECS
         COMPONENT_SKILL_LEVELS = 1 << 10,
         COMPONENT_AI = 1 << 11,
         COMPONENT_TARGET_POSITION = 1 << 12,
-        COMPONENT_DIRECTION = 1 << 13
+        COMPONENT_DIRECTION = 1 << 13,
+        COMPONENT_TIME_TO_LIVE = 1  << 14
     }
 
 
@@ -42,8 +43,8 @@ namespace ECSRogue.ECS
 
         public const Component Animated = Component.COMPONENT_DISPLAY | Component.COMPONENT_POSITION | Component.COMPONENT_ANIMATION; //Not implemented
 
-        public const Component MovingEntity = Component.COMPONENT_POSITION | Component.COMPONENT_VELOCITY | Component.COMPONENT_TARGET_POSITION; //Not Implemented
-        public const Component IndefiniteMovingEntity = Component.COMPONENT_POSITION | Component.COMPONENT_VELOCITY | Component.COMPONENT_DIRECTION; //Not Implemented
+        public const Component MovingEntity = Component.COMPONENT_POSITION | Component.COMPONENT_VELOCITY | Component.COMPONENT_TARGET_POSITION; 
+        public const Component IndefiniteMovingEntity = Component.COMPONENT_POSITION | Component.COMPONENT_VELOCITY | Component.COMPONENT_DIRECTION; 
     }
 
     public class StateComponents
@@ -67,6 +68,7 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, SkillLevelsComponent> SkillLevelsComponents { get; private set; }
         public Dictionary<Guid, TargetPositionComponent> TargetPositionComponents { get; private set; }
         public Dictionary<Guid, DirectionComponent> DirectionComponents { get; private set; }
+        public Dictionary<Guid, TimeToLiveComponent> TimeToLiveComponents { get; private set; }
         public Random random { get; private set; }
 
         public StateSpaceComponents()
@@ -84,6 +86,7 @@ namespace ECSRogue.ECS
             SkillLevelsComponents = new Dictionary<Guid, SkillLevelsComponent>();
             TargetPositionComponents = new Dictionary<Guid, TargetPositionComponent>();
             DirectionComponents = new Dictionary<Guid, DirectionComponent>();
+            TimeToLiveComponents = new Dictionary<Guid, TimeToLiveComponent>();
             random = new Random();
         }
 
@@ -111,6 +114,7 @@ namespace ECSRogue.ECS
                 SkillLevelsComponents.Remove(id);
                 TargetPositionComponents.Remove(id);
                 DirectionComponents.Remove(id);
+                TimeToLiveComponents.Remove(id);
             }
         }
     }

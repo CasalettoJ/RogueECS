@@ -64,10 +64,12 @@
     <Compile Include="ECS\Components\SightRadiusComponent.cs" />
     <Compile Include="ECS\Components\SkillLevelsComponent.cs" />
     <Compile Include="ECS\Components\TargetPositionComponent.cs" />
+    <Compile Include="ECS\Components\TimeToLiveComponent.cs" />
     <Compile Include="ECS\Components\VelocityComponent.cs" />
     <Compile Include="ECS\Entity.cs" />
     <Compile Include="ECSRogue.cs" />
     <Compile Include="ECS\Systems\AnimationSystem.cs" />
+    <Compile Include="ECS\Systems\DestructionSystem.cs" />
     <Compile Include="ECS\Systems\DisplaySystem.cs" />
     <Compile Include="ECS\Systems\InputMovementSystem.cs" />
     <Compile Include="ECS\Systems\LabelDisplaySystem.cs" />

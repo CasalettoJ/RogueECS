@@ -155,16 +155,13 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
                 LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
             }
-            if (Keyboard.GetState().IsKeyDown(Keys.C) && prevKeyboardState.IsKeyUp(Keys.C))
-            {
-                CreateDamageEntity(camera);
-            }
             #endregion
 
             InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
             TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
             TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime);
             UpdateCamera(camera, gameTime);
+            DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
             MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
             MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
             MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
@@ -229,23 +226,23 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
 
         #region Debugging
-        public void CreateDamageEntity(Camera camera)
-        {
-            Guid id = stateSpaceComponents.CreateEntity();
-            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.DrawableLabel | ComponentMasks.MovingEntity;
-            stateSpaceComponents.PositionComponents[id] = new PositionComponent() { Position = Vector2.Transform(Mouse.GetState().Position.ToVector2(), camera.GetInverseMatrix()) };
-            stateSpaceComponents.LabelComponents[id] = new LabelComponent()
-            {
-                Color = Color.LightSalmon,
-                Origin = Vector2.Zero,
-                Rotation = 0f,
-                Scale = 1.75f,
-                SpriteEffect = SpriteEffects.None,
-                Text = "-72"
-            };
-            stateSpaceComponents.VelocityComponents[id] = new VelocityComponent() { Velocity = new Vector2(stateSpaceComponents.random.Next(200,300), stateSpaceComponents.random.Next(200,300)) };
-            stateSpaceComponents.TargetPositionComponents[id] = new TargetPositionComponent() { DestroyWhenReached = true, TargetPosition = new Vector2(stateSpaceComponents.PositionComponents[id].Position.X+ stateSpaceComponents.random.Next(-200,200), stateSpaceComponents.PositionComponents[id].Position.Y - 200) };
-        }
+        //public void CreateDamageEntity(Camera camera)
+        //{
+        //    Guid id = stateSpaceComponents.CreateEntity();
+        //    stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.DrawableLabel | ComponentMasks.MovingEntity;
+        //    stateSpaceComponents.PositionComponents[id] = new PositionComponent() { Position = Vector2.Transform(Mouse.GetState().Position.ToVector2(), camera.GetInverseMatrix()) };
+        //    stateSpaceComponents.LabelComponents[id] = new LabelComponent()
+        //    {
+        //        Color = Color.LightSalmon,
+        //        Origin = Vector2.Zero,
+        //        Rotation = 0f,
+        //        Scale = 1.75f,
+        //        SpriteEffect = SpriteEffects.None,
+        //        Text = "-72"
+        //    };
+        //    stateSpaceComponents.VelocityComponents[id] = new VelocityComponent() { Velocity = new Vector2(stateSpaceComponents.random.Next(200,300), stateSpaceComponents.random.Next(200,300)) };
+        //    stateSpaceComponents.TargetPositionComponents[id] = new TargetPositionComponent() { DestroyWhenReached = true, TargetPosition = new Vector2(stateSpaceComponents.PositionComponents[id].Position.X+ stateSpaceComponents.random.Next(-200,200), stateSpaceComponents.PositionComponents[id].Position.Y - 200) };
+        //}
         #endregion
     }
 }
