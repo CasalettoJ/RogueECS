@@ -110,11 +110,11 @@ namespace ECSRogue.ECS.Systems
                 {
                     messageComponent.IndexBegin = messageComponent.GameMessages.Count - 1;
                 }
-                else if (currentKey.IsKeyDown(Keys.Up) && !prevKey.IsKeyDown(Keys.Up) && messageComponent.IndexBegin < messageComponent.GameMessages.Count - 1)
+                else if (currentKey.IsKeyDown(Keys.Down) && !prevKey.IsKeyDown(Keys.Down) && messageComponent.IndexBegin < messageComponent.GameMessages.Count - 1)
                 {
                     messageComponent.IndexBegin += 1;
                 }
-                else if (currentKey.IsKeyDown(Keys.Down) && !prevKey.IsKeyDown(Keys.Down) && messageComponent.IndexBegin > 0)
+                else if (currentKey.IsKeyDown(Keys.Up) && !prevKey.IsKeyDown(Keys.Up) && messageComponent.IndexBegin > 0)
                 {
                     messageComponent.IndexBegin -= 1;
                 }
