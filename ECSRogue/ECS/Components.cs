@@ -32,7 +32,7 @@ namespace ECSRogue.ECS
     public struct ComponentMasks
     {
         public const Component Player = Component.COMPONENT_POSITION | Component.COMPONENT_DISPLAY | Component.COMPONENT_SIGHTRADIUS 
-            | Component.COMPONENT_INPUTMOVEMENT | Component.COMPONENT_GAMEPLAY_INFO | Component.COMPONENT_SKILL_LEVELS;
+            | Component.COMPONENT_GAMEPLAY_INFO | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_PLAYER;
 
         public const Component Enemy = Component.COMPONENT_POSITION | Component.COMPONENT_DISPLAY | Component.COMPONENT_SIGHTRADIUS 
             | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_AI;

@@ -22,15 +22,13 @@ namespace ECSRogue.ECS.Systems
                 initialY = y0 = (int)position.Y;
 
                 //Reset Range
-                for (int i = 0; i < dungeonDimensions.X; i++)
-                {
-                    for (int j = 0; j < dungeonDimensions.Y; j++)
-                    {
-                        DungeonTile newTile = dungeonGrid[i, j];
-                        newTile.InRange = false;
-                        dungeonGrid[i, j] = newTile;
-                    }
-                }
+                //for (int i = 0; i < dungeonDimensions.X; i++)
+                //{
+                //    for (int j = 0; j < dungeonDimensions.Y; j++)
+                //    {
+                //        dungeonGrid[i, j].InRange = false;
+                //    }
+                //}
                 List<Vector2> visionRange = new List<Vector2>();
                 /*
                              Shared
@@ -224,25 +222,25 @@ namespace ECSRogue.ECS.Systems
             }
         }
 
-        public static void IncreaseTileOpacity(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, GameTime gameTime)
-        {
-            for (int i = 0; i < dungeonDimensions.X; i++)
-            {
-                for (int j = 0; j < dungeonDimensions.Y; j++)
-                {
-                    if(dungeonGrid[i,j].NewlyFound)
-                    {
-                        if(dungeonGrid[i,j].Occupiable)
-                        {
-                            dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 8;
-                        }
-                        else
-                        {
-                            dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 6;
-                        }
-                    }
-                }
-            }
-        }
+        //public static void IncreaseTileOpacity(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, GameTime gameTime)
+        //{
+        //    for (int i = 0; i < dungeonDimensions.X; i++)
+        //    {
+        //        for (int j = 0; j < dungeonDimensions.Y; j++)
+        //        {
+        //            if(dungeonGrid[i,j].NewlyFound)
+        //            {
+        //                if(dungeonGrid[i,j].Occupiable)
+        //                {
+        //                    dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 8;
+        //                }
+        //                else
+        //                {
+        //                    dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 6;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
     }
 }

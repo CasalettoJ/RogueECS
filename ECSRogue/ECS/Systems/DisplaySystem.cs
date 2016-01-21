@@ -32,7 +32,7 @@ namespace ECSRogue.ECS.Systems
             }
         }
 
-        public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo)
+        public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo, GameTime gameTime)
         {
             Matrix cameraMatrix = camera.GetMatrix();
             for (int i = 0; i < (int)dungeonDimensions.X; i++)
@@ -85,6 +85,14 @@ namespace ECSRogue.ECS.Systems
                                     spriteBatch.Draw(spriteSheet, tile, wall, colorInfo.WallInRange * opacity);
                                     break;
                             }
+                            if (dungeonGrid[i, j].Occupiable)
+                            {
+                                dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 8;
+                            }
+                            else
+                            {
+                                dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 6;
+                            }
                             if (dungeonGrid[i, j].Opacity > 1)
                             {
                                 dungeonGrid[i, j].NewlyFound = false;
@@ -92,8 +100,13 @@ namespace ECSRogue.ECS.Systems
                             }
                         }
                     }
+
+
+                    dungeonGrid[i, j].InRange = false;
                 }
             }
+
+
         }
     }
 }

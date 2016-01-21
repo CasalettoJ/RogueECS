@@ -67,9 +67,9 @@ namespace ECSRogue.BaseEngine.States
             return this;
         }
 
-        public void DrawContent(SpriteBatch spriteBatch, Camera camera)
+        public void DrawContent(SpriteBatch spriteBatch, Camera camera, GameTime gameTime)
         {
-            CurrentStateSpace.DrawLevel(spriteBatch, Graphics, camera);
+            CurrentStateSpace.DrawLevel(spriteBatch, Graphics, camera, gameTime);
         }
 
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
