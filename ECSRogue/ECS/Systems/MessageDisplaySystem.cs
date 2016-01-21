@@ -41,7 +41,7 @@ namespace ECSRogue.ECS.Systems
                 {
                     spaceComponents.GameMessageComponents[id].GameMessages.RemoveAt(0);
                 }
-                spriteBatch.DrawString(font, spaceComponents.GameMessageComponents[id].GlobalMessage, new Vector2(camera.DungeonUIViewport.Y, camera.Bounds.Height - messageSpacing), spaceComponents.GameMessageComponents[id].GlobalColor);
+                spriteBatch.DrawString(font, spaceComponents.GameMessageComponents[id].GlobalMessage, new Vector2(10, camera.Bounds.Height - messageSpacing), spaceComponents.GameMessageComponents[id].GlobalColor);
             }
 
             messageNumber = 0;

@@ -23,7 +23,8 @@ namespace ECSRogue.ECS
         COMPONENT_AI = 1 << 11,
         COMPONENT_TARGET_POSITION = 1 << 12,
         COMPONENT_DIRECTION = 1 << 13,
-        COMPONENT_TIME_TO_LIVE = 1  << 14
+        COMPONENT_TIME_TO_LIVE = 1  << 14,
+        COMPONENT_PLAYER = 1 << 15
     }
 
 

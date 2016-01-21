@@ -110,7 +110,7 @@ namespace ECSRogue
             //Draw UI
             spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             currentState.DrawUserInterface(spriteBatch, gameCamera);
-            //spriteBatch.DrawString(debugText, (1 / (float)gameTime.ElapsedGameTime.TotalSeconds).ToString(), gameCamera.Bounds.Center.ToVector2(), Color.Yellow);
+            spriteBatch.DrawString(debugText, (1 / (float)gameTime.ElapsedGameTime.TotalSeconds).ToString(), gameCamera.Bounds.Center.ToVector2(), Color.Yellow);
             spriteBatch.End();
             base.Draw(gameTime);
         }
