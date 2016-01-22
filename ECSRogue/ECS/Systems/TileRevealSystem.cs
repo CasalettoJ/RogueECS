@@ -238,7 +238,7 @@ namespace ECSRogue.ECS.Systems
                             }
                             else
                             {
-                                dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 7;
+                                dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 6;
                             }
                         }
                     }
