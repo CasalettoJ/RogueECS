@@ -38,10 +38,12 @@ namespace ECSRogue.BaseEngine.StateSpaces
         public RandomlyGeneratedStateSpace(IGenerationAlgorithm dungeonGeneration, int worldMin, int worldMax)
         {
             stateSpaceComponents = new StateSpaceComponents();
-            dungeonDimensions = dungeonGeneration.GenerateDungeon(ref dungeonGrid, worldMin, worldMax, stateSpaceComponents.random);
+            List<Vector2> freeTiles = new List<Vector2>();
+            dungeonDimensions = dungeonGeneration.GenerateDungeon(ref dungeonGrid, worldMin, worldMax, stateSpaceComponents.random, freeTiles);
             cellSize = dungeonGeneration.GetCellsize();
             dungeonSpriteFile = dungeonGeneration.GetDungeonSpritesheetFileName();
             dungeonColorInfo = dungeonGeneration.GetColorInfo();
+            dungeonGeneration.GenerateDungeonEntities(stateSpaceComponents, dungeonGrid, dungeonDimensions, cellSize, freeTiles);
         }
 
         public RandomlyGeneratedStateSpace(DungeonInfo data)
@@ -66,6 +68,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             {
                 CreatePlayer();
                 CreateMessageLog();
+                
             }
             camera.AttachedToPlayer = true;
         }
@@ -112,6 +115,9 @@ namespace ECSRogue.BaseEngine.StateSpaces
             stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.White, SpriteSource = new Rectangle(2 * cellSize, 0 * cellSize, cellSize, cellSize), Origin = Vector2.Zero, SpriteEffect = SpriteEffects.None, Scale = 1f, Rotation = 0f };
             //Set Sightradius
             stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 8 };
+            //Set first turn
+            stateSpaceComponents.PlayerComponent = new PlayerComponent() { PlayerJustLoaded = true };
+
         }
 
         private void CreateMessageLog()
@@ -159,12 +165,18 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
             InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
             TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
-            //TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime);
+            TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
             UpdateCamera(camera, gameTime);
             DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
             MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
             MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
             MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
+            if(!stateSpaceComponents.PlayerComponent.PlayerJustLoaded)
+            {
+                PlayerComponent player = stateSpaceComponents.PlayerComponent;
+                player.PlayerJustLoaded = false;
+                stateSpaceComponents.PlayerComponent = player;
+            }
             return nextStateSpace;
         }
 
@@ -194,10 +206,10 @@ namespace ECSRogue.BaseEngine.StateSpaces
         #endregion
 
         #region Draw Logic
-        public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera, GameTime gameTime)
+        public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
         {
-            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo, gameTime);
-            DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize);
+            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo);
+            DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize, dungeonGrid);
             LabelDisplaySystem.DrawString(spriteBatch, stateSpaceComponents, messageFont, camera);
         }
 

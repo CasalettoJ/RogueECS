@@ -12,7 +12,7 @@ namespace ECSRogue.ECS.Systems
 {
     public static class DisplaySystem
     {
-        public static void DrawDungeonEntities(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D spriteSheet, int cellSize)
+        public static void DrawDungeonEntities(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D spriteSheet, int cellSize, DungeonTile[,] dungeonGrid)
         {
             Matrix cameraMatrix = camera.GetMatrix();
             IEnumerable<Guid> drawableEntities = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Drawable) == ComponentMasks.Drawable).Select(x => x.Id);
@@ -20,19 +20,21 @@ namespace ECSRogue.ECS.Systems
             {
                 DisplayComponent display = spaceComponents.DisplayComponents[id];
                 Vector2 position = new Vector2(spaceComponents.PositionComponents[id].Position.X * cellSize, spaceComponents.PositionComponents[id].Position.Y * cellSize);
-
-                Vector2 bottomRight = Vector2.Transform(new Vector2((position.X) + cellSize, (position.Y) + cellSize), cameraMatrix);
-                Vector2 topLeft = Vector2.Transform(new Vector2(position.X, position.Y), cameraMatrix);
-                Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
-
-                if(camera.IsInView(cameraMatrix, cameraBounds))
+                if(dungeonGrid[(int)spaceComponents.PositionComponents[id].Position.X, (int)spaceComponents.PositionComponents[id].Position.Y].Found)
                 {
-                    spriteBatch.Draw(spriteSheet, position, display.SpriteSource, display.Color, display.Rotation, display.Origin, display.Scale, display.SpriteEffect, 0f);
+                    Vector2 bottomRight = Vector2.Transform(new Vector2((position.X) + cellSize, (position.Y) + cellSize), cameraMatrix);
+                    Vector2 topLeft = Vector2.Transform(new Vector2(position.X, position.Y), cameraMatrix);
+                    Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
+
+                    if (camera.IsInView(cameraMatrix, cameraBounds))
+                    {
+                        spriteBatch.Draw(spriteSheet, position, display.SpriteSource, display.Color, display.Rotation, display.Origin, display.Scale, display.SpriteEffect, 0f);
+                    }
                 }
             }
         }
 
-        public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo, GameTime gameTime)
+        public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo)
         {
             Matrix cameraMatrix = camera.GetMatrix();
             for (int i = 0; i < (int)dungeonDimensions.X; i++)
@@ -85,14 +87,6 @@ namespace ECSRogue.ECS.Systems
                                     spriteBatch.Draw(spriteSheet, tile, wall, colorInfo.WallInRange * opacity);
                                     break;
                             }
-                            if (dungeonGrid[i, j].Occupiable)
-                            {
-                                dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 8;
-                            }
-                            else
-                            {
-                                dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 6;
-                            }
                             if (dungeonGrid[i, j].Opacity > 1)
                             {
                                 dungeonGrid[i, j].NewlyFound = false;
@@ -101,8 +95,7 @@ namespace ECSRogue.ECS.Systems
                         }
                     }
 
-
-                    dungeonGrid[i, j].InRange = false;
+                   
                 }
             }
 

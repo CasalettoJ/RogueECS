@@ -147,7 +147,7 @@ namespace ECSRogue.BaseEngine.States
             return nextState;
         }
 
-        public void DrawContent(SpriteBatch spriteBatch, Camera camera, GameTime gameTime)
+        public void DrawContent(SpriteBatch spriteBatch, Camera camera)
         {
             //Ain't nothing here
         }

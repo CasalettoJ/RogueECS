@@ -208,7 +208,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             return nextSpace;
         }
 
-        public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera, GameTime gameTime)
+        public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
         {
             //Nothing here
         }

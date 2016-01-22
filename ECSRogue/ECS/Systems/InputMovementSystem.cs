@@ -76,6 +76,9 @@ namespace ECSRogue.ECS.Systems
                     spaceComponents.PositionComponents[id] = pos;
                     gameInfo.StepsTaken += 1;
                     spaceComponents.GameplayInfoComponents[id] = gameInfo;
+                    PlayerComponent player = spaceComponents.PlayerComponent;
+                    player.PlayerTookTurn = true;
+                    spaceComponents.PlayerComponent = player;
                 }
                 if(hitWall)
                 {

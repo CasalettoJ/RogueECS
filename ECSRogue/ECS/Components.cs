@@ -70,6 +70,7 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, TargetPositionComponent> TargetPositionComponents { get; private set; }
         public Dictionary<Guid, DirectionComponent> DirectionComponents { get; private set; }
         public Dictionary<Guid, TimeToLiveComponent> TimeToLiveComponents { get; private set; }
+        public PlayerComponent PlayerComponent { get; set; }
         public Random random { get; private set; }
 
         public StateSpaceComponents()
@@ -88,6 +89,7 @@ namespace ECSRogue.ECS
             TargetPositionComponents = new Dictionary<Guid, TargetPositionComponent>();
             DirectionComponents = new Dictionary<Guid, DirectionComponent>();
             TimeToLiveComponents = new Dictionary<Guid, TimeToLiveComponent>();
+            PlayerComponent = new PlayerComponent();
             random = new Random();
         }
 

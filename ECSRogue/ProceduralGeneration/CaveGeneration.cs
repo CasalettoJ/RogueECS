@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using ECSRogue.ECS;
 using ECSRogue.ECS.Systems;
+using ECSRogue.ECS.Components;
 
 namespace ECSRogue.ProceduralGeneration
 {
@@ -32,7 +33,7 @@ namespace ECSRogue.ProceduralGeneration
             };
         }
 
-        public Vector2 GenerateDungeon(ref DungeonTile[,] dungeonGrid, int worldMin, int worldMax, Random random)
+        public Vector2 GenerateDungeon(ref DungeonTile[,] dungeonGrid, int worldMin, int worldMax, Random random, List<Vector2> freeTiles)
         {
             int worldI = random.Next(worldMin, worldMax);
             int worldJ = random.Next(worldMin, worldMax);
@@ -335,6 +336,18 @@ namespace ECSRogue.ProceduralGeneration
                 }
             }
 
+            for(int i = 0; i < worldI; i++)
+            {
+                for(int j = 0; j < worldJ; j++)
+                {
+                    if(dungeonGrid[i,j].Type == TileType.TILE_FLOOR)
+                    {
+                        dungeonGrid[i, j].Occupiable = true;
+                        freeTiles.Add(new Vector2(i, j));
+                    }
+                }
+            }
+
             return new Vector2(worldI, worldJ);
         }
 
@@ -343,9 +356,31 @@ namespace ECSRogue.ProceduralGeneration
             return "Sprites/anonsheet";
         }
         
-        public void GenerateDungeonEntities(StateSpaceComponents spaceComponents)
+        public void GenerateDungeonEntities(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellsize, List<Vector2> freeTiles)
         {
-            throw new NotImplementedException();
+            //Generate Monsters
+            int numberOfMonsters = spaceComponents.random.Next(25, freeTiles.Count);
+            for(int i = 0; i < numberOfMonsters; i++)
+            {
+                Guid id = spaceComponents.CreateEntity();
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Enemy;
+
+                int tileIndex = spaceComponents.random.Next(0, freeTiles.Count);
+                spaceComponents.PositionComponents[id] = new PositionComponent() { Position = freeTiles[tileIndex] };
+                freeTiles.RemoveAt(tileIndex);
+                spaceComponents.DisplayComponents[id] = new DisplayComponent()
+                {
+                    Color = Color.Red,
+                    Origin = Vector2.Zero,
+                    Rotation = 0f,
+                    Scale = 1f,
+                    SpriteEffect = SpriteEffects.None,
+                    SpriteSource = new Rectangle(2 * cellSize, 0 * cellSize, cellSize, cellSize)
+                };
+                spaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 5 };
+                spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 100, Health = 100, MagicAttack = 0, MagicDefense = 0, PhysicalAttack = 5, PhysicalDefense = 5, Wealth = 25 };
+                //AIComponenthere
+            }
         }
 
         private void FloodFill(int x, int y, int worldI, int worldJ, ref DungeonTile[,] dungeonGrid)
