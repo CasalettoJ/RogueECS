@@ -20,36 +20,33 @@ namespace ECSRogue.ECS.Systems
             int messageNumber = 0;
             int messageSpacing = 20;
             //Draw message log
-            foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
+            if(spaceComponents.GameMessageComponent.IndexBegin > 0)
             {
-                if(spaceComponents.GameMessageComponents[id].IndexBegin > 0)
-                {
-                    spriteBatch.DrawString(font, Messages.ScrollingMessages, new Vector2(10, (int)camera.DungeonUIViewport.Y + 10 + (messageNumber * messageSpacing)), Color.MediumVioletRed);
-                    messageNumber += 1;
-                }
-                foreach(Tuple<Color,string> message in spaceComponents.GameMessageComponents[id].GameMessages.Reverse<Tuple<Color,string>>().Skip(spaceComponents.GameMessageComponents[id].IndexBegin))
-                {
-                    if(opacity < 0)
-                    {
-                        break;
-                    }
-                    opacity -= decrement;
-                    spriteBatch.DrawString(font, message.Item2, new Vector2(10, (int)camera.DungeonUIViewport.Y + 10 + (messageNumber * messageSpacing)), message.Item1 * opacity);
-                    messageNumber += 1;
-                }
-                while (spaceComponents.GameMessageComponents[id].GameMessages.Count > spaceComponents.GameMessageComponents[id].MaxMessages)
-                {
-                    spaceComponents.GameMessageComponents[id].GameMessages.RemoveAt(0);
-                }
-                spriteBatch.DrawString(font, spaceComponents.GameMessageComponents[id].GlobalMessage, new Vector2(10, camera.Bounds.Height - messageSpacing), spaceComponents.GameMessageComponents[id].GlobalColor);
+                spriteBatch.DrawString(font, Messages.ScrollingMessages, new Vector2(10, (int)camera.DungeonUIViewport.Y + 10 + (messageNumber * messageSpacing)), Color.MediumVioletRed);
+                messageNumber += 1;
             }
+            foreach(Tuple<Color,string> message in spaceComponents.GameMessageComponent.GameMessages.Reverse<Tuple<Color,string>>().Skip(spaceComponents.GameMessageComponent.IndexBegin))
+            {
+                if(opacity < 0)
+                {
+                    break;
+                }
+                opacity -= decrement;
+                spriteBatch.DrawString(font, message.Item2, new Vector2(10, (int)camera.DungeonUIViewport.Y + 10 + (messageNumber * messageSpacing)), message.Item1 * opacity);
+                messageNumber += 1;
+            }
+            while (spaceComponents.GameMessageComponent.GameMessages.Count > spaceComponents.GameMessageComponent.MaxMessages)
+            {
+                spaceComponents.GameMessageComponent.GameMessages.RemoveAt(0);
+            }
+            spriteBatch.DrawString(font, spaceComponents.GameMessageComponent.GlobalMessage, new Vector2(10, camera.Bounds.Height - messageSpacing), spaceComponents.GameMessageComponent.GlobalColor);
 
             messageNumber = 0;
             //Draw statistics
             foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).Select(x => x.Id))
             {
                 List<string> statsToPrint = new List<string>();
-                GameplayInfoComponent gameplayInfo = spaceComponents.GameplayInfoComponents[id];
+                GameplayInfoComponent gameplayInfo = spaceComponents.GameplayInfoComponent;
                 SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
 
                 statsToPrint.Add(string.Format("Floor {0}", gameplayInfo.FloorsReached));
@@ -82,44 +79,38 @@ namespace ECSRogue.ECS.Systems
             {
                 foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
                 {
-                    spaceComponents.GameMessageComponents[id].GameMessages.Add(new Tuple<Color, string>(color, messageList[spaceComponents.random.Next(0, messageList.Count())]));
+                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(color, messageList[spaceComponents.random.Next(0, messageList.Count())]));
                 }
             }
         }
 
         public static void SetRandomGlobalMessage(StateSpaceComponents spaceComponents, string[] messageList)
         {
-            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
-            {
-                GameMessageComponent newMessage = spaceComponents.GameMessageComponents[id];
-                newMessage.GlobalMessage = messageList[spaceComponents.random.Next(0, messageList.Count())];
-                spaceComponents.GameMessageComponents[id] = newMessage;
-            }
+            GameMessageComponent newMessage = spaceComponents.GameMessageComponent;
+            newMessage.GlobalMessage = messageList[spaceComponents.random.Next(0, messageList.Count())];
+            spaceComponents.GameMessageComponent = newMessage;
         }
 
         public static void ScrollMessage(KeyboardState prevKey, KeyboardState currentKey, StateSpaceComponents spaceComponents)
         {
-            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
+            GameMessageComponent messageComponent = spaceComponents.GameMessageComponent;
+            if (currentKey.IsKeyDown(Keys.PageUp) && !prevKey.IsKeyDown(Keys.PageUp))
             {
-                GameMessageComponent messageComponent = spaceComponents.GameMessageComponents[id];
-                if (currentKey.IsKeyDown(Keys.PageUp) && !prevKey.IsKeyDown(Keys.PageUp))
-                {
-                    messageComponent.IndexBegin = 0;
-                }
-                else if (currentKey.IsKeyDown(Keys.PageDown) && !prevKey.IsKeyDown(Keys.PageDown))
-                {
-                    messageComponent.IndexBegin = messageComponent.GameMessages.Count - 1;
-                }
-                else if (currentKey.IsKeyDown(Keys.Down) && !prevKey.IsKeyDown(Keys.Down) && messageComponent.IndexBegin < messageComponent.GameMessages.Count - 1)
-                {
-                    messageComponent.IndexBegin += 1;
-                }
-                else if (currentKey.IsKeyDown(Keys.Up) && !prevKey.IsKeyDown(Keys.Up) && messageComponent.IndexBegin > 0)
-                {
-                    messageComponent.IndexBegin -= 1;
-                }
-                spaceComponents.GameMessageComponents[id] = messageComponent;
+                messageComponent.IndexBegin = 0;
             }
+            else if (currentKey.IsKeyDown(Keys.PageDown) && !prevKey.IsKeyDown(Keys.PageDown))
+            {
+                messageComponent.IndexBegin = messageComponent.GameMessages.Count - 1;
+            }
+            else if (currentKey.IsKeyDown(Keys.Down) && !prevKey.IsKeyDown(Keys.Down) && messageComponent.IndexBegin < messageComponent.GameMessages.Count - 1)
+            {
+                messageComponent.IndexBegin += 1;
+            }
+            else if (currentKey.IsKeyDown(Keys.Up) && !prevKey.IsKeyDown(Keys.Up) && messageComponent.IndexBegin > 0)
+            {
+                messageComponent.IndexBegin -= 1;
+            }
+            spaceComponents.GameMessageComponent = messageComponent;
         }
     }
 }

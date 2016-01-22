@@ -31,5 +31,22 @@ namespace ECSRogue.BaseEngine
         };
 
         public static readonly string ScrollingMessages = "[Scrolling Log: \'PageUp\': Top, \'PageDown\': Bottom, \'Arrows\': Scroll]";
+
+        public static readonly string[] MeleeAttack =
+        {
+            "You swing at the {0}",
+            "You apply your fury to the {0}'s face",
+            "You attempt brute force against {0}",
+            "You use your walking attack fearlessly at {0}"
+        };
+
+        public static readonly string[] DamageDealt =
+        {
+            " and hit it for {0} damage.",
+            " and deal {0} damage to the poor thing.",
+            " and it cries out, having taken {0} damage.",
+            " and it seems {0} health weaker...",
+            " dealing {0} damage to it!"
+        };
     }
 }

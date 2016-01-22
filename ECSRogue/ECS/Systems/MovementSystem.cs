@@ -14,8 +14,10 @@ namespace ECSRogue.ECS.Systems
             foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.MovingEntity) == ComponentMasks.MovingEntity).Select(x => x.Id))
             {
                 PositionComponent position = spaceComponents.PositionComponents[id];
-                Vector2 Direction = Vector2.Normalize(spaceComponents.TargetPositionComponents[id].TargetPosition - position.Position);
-                float distance = Math.Abs(Vector2.Distance(position.Position, spaceComponents.TargetPositionComponents[id].TargetPosition));
+                TargetPositionComponent target = spaceComponents.TargetPositionComponents[id];
+
+                Vector2 Direction = Vector2.Normalize(target.TargetPosition - position.Position);
+                float distance = Math.Abs(Vector2.Distance(position.Position, target.TargetPosition));
                 if (distance > 10)
                 {
                     position.Position += Direction * spaceComponents.VelocityComponents[id].Velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;

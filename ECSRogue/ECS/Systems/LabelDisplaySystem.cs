@@ -26,7 +26,7 @@ namespace ECSRogue.ECS.Systems
 
                 if (camera.IsInView(cameraMatrix, cameraBounds))
                 {
-                    spriteBatch.DrawString(font, label.Text, spaceComponents.PositionComponents[id].Position,
+                    spriteBatch.DrawString(font, label.Text, position,
                         label.Color, label.Rotation, label.Origin, label.Scale, label.SpriteEffect, 0f);
                 }
             }

@@ -23,7 +23,7 @@ namespace ECSRogue.ECS.Systems
                 bool movement = false;
                 KeyboardState keyState = Keyboard.GetState();
                 PositionComponent pos = spaceComponents.PositionComponents[id];
-                GameplayInfoComponent gameInfo = spaceComponents.GameplayInfoComponents[id];
+                GameplayInfoComponent gameInfo = spaceComponents.GameplayInfoComponent;
                 if (keyState.IsKeyDown(Keys.NumPad8) && !prevKeyboardState.IsKeyDown(Keys.NumPad8))
                 {
                     pos.Position.Y -= 1;
@@ -73,9 +73,11 @@ namespace ECSRogue.ECS.Systems
                 if (!hitWall && movement)
                 {
                     //Check collisions.  If no collisions, move into spot.
-                    spaceComponents.PositionComponents[id] = pos;
-                    gameInfo.StepsTaken += 1;
-                    spaceComponents.GameplayInfoComponents[id] = gameInfo;
+                    if(CollisionSystem.TryToMove(spaceComponents, dungeonGrid, pos, id))
+                    {
+                        gameInfo.StepsTaken += 1;
+                        spaceComponents.GameplayInfoComponent = gameInfo;
+                    }
                     PlayerComponent player = spaceComponents.PlayerComponent;
                     player.PlayerTookTurn = true;
                     spaceComponents.PlayerComponent = player;

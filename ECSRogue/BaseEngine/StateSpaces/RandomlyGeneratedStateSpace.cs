@@ -91,14 +91,14 @@ namespace ECSRogue.BaseEngine.StateSpaces
             {
                 GameplayInfoComponent info = stateComponents.GameplayInfo;
                 info.FloorsReached += 1;
-                stateSpaceComponents.GameplayInfoComponents[id] = info;
+                stateSpaceComponents.GameplayInfoComponent = info;
                 stateSpaceComponents.SkillLevelsComponents[id] = stateComponents.PlayerSkillLevels;
             }
             else
             {
 
                 //Set GameplayInfo
-                stateSpaceComponents.GameplayInfoComponents[id] = new GameplayInfoComponent() { Kills = 0, StepsTaken = 0, FloorsReached = 0 };
+                stateSpaceComponents.GameplayInfoComponent = new GameplayInfoComponent() { Kills = 0, StepsTaken = 0, FloorsReached = 0 };
                 //Set Skills Level
                 stateSpaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent()
                 {
@@ -117,6 +117,10 @@ namespace ECSRogue.BaseEngine.StateSpaces
             stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 8 };
             //Set first turn
             stateSpaceComponents.PlayerComponent = new PlayerComponent() { PlayerJustLoaded = true };
+            //Collision information
+            stateSpaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = true };
+            //Set name of player
+            stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "You" };
 
         }
 
@@ -124,7 +128,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         {
             Guid id = stateSpaceComponents.CreateEntity();
             stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = Component.COMPONENT_GAMEMESSAGE;
-            stateSpaceComponents.GameMessageComponents[id] = new GameMessageComponent() { GlobalColor = Color.White, GlobalMessage = string.Empty,
+            stateSpaceComponents.GameMessageComponent = new GameMessageComponent() { GlobalColor = Color.White, GlobalMessage = string.Empty,
                  MaxMessages = 100, IndexBegin = 0, GameMessages = new List<Tuple<Color,string>>()};
             MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.CaveEntranceMessages, MessageColors.SpecialAction);
         }
@@ -171,12 +175,15 @@ namespace ECSRogue.BaseEngine.StateSpaces
             MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
             MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
             MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
+            CombatSystem.HandleMeleeCombat(stateSpaceComponents, cellSize);
             if(!stateSpaceComponents.PlayerComponent.PlayerJustLoaded)
             {
                 PlayerComponent player = stateSpaceComponents.PlayerComponent;
                 player.PlayerJustLoaded = false;
                 stateSpaceComponents.PlayerComponent = player;
             }
+            CollisionSystem.ResetCollision(stateSpaceComponents);
+            stateSpaceComponents.InvokeDelayedActions();
             return nextStateSpace;
         }
 

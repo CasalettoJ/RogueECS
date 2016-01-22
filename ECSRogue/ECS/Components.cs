@@ -24,7 +24,9 @@ namespace ECSRogue.ECS
         COMPONENT_TARGET_POSITION = 1 << 12,
         COMPONENT_DIRECTION = 1 << 13,
         COMPONENT_TIME_TO_LIVE = 1  << 14,
-        COMPONENT_PLAYER = 1 << 15
+        COMPONENT_PLAYER = 1 << 15,
+        COMPONENT_COLLISION = 1 << 16,
+        COMPONENT_NAME = 1 << 17
     }
 
 
@@ -32,10 +34,10 @@ namespace ECSRogue.ECS
     public struct ComponentMasks
     {
         public const Component Player = Component.COMPONENT_POSITION | Component.COMPONENT_DISPLAY | Component.COMPONENT_SIGHTRADIUS 
-            | Component.COMPONENT_GAMEPLAY_INFO | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_PLAYER;
+            | Component.COMPONENT_GAMEPLAY_INFO | Component.COMPONENT_SKILL_LEVELS |  Component.COMPONENT_COLLISION | Component.COMPONENT_NAME | Component.COMPONENT_PLAYER;
 
-        public const Component Enemy = Component.COMPONENT_POSITION | Component.COMPONENT_DISPLAY | Component.COMPONENT_SIGHTRADIUS 
-            | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_AI;
+        public const Component NPC = Component.COMPONENT_POSITION | Component.COMPONENT_DISPLAY | Component.COMPONENT_SIGHTRADIUS 
+            | Component.COMPONENT_SKILL_LEVELS |   Component.COMPONENT_NAME | Component.COMPONENT_COLLISION | Component.COMPONENT_AI;
 
         public const Component InputMoveable = Component.COMPONENT_POSITION | Component.COMPONENT_INPUTMOVEMENT;
 
@@ -43,6 +45,7 @@ namespace ECSRogue.ECS
         public const Component DrawableLabel = Component.COMPONENT_LABEL | Component.COMPONENT_POSITION; 
 
         public const Component Animated = Component.COMPONENT_DISPLAY | Component.COMPONENT_POSITION | Component.COMPONENT_ANIMATION; //Not implemented
+        public const Component Collidable = Component.COMPONENT_POSITION | Component.COMPONENT_COLLISION; // Not Implemented
 
         public const Component MovingEntity = Component.COMPONENT_POSITION | Component.COMPONENT_VELOCITY | Component.COMPONENT_TARGET_POSITION; 
         public const Component IndefiniteMovingEntity = Component.COMPONENT_POSITION | Component.COMPONENT_VELOCITY | Component.COMPONENT_DIRECTION; 
@@ -64,13 +67,16 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, AnimationComponent> AnimationComponents { get; private set; }
         public Dictionary<Guid, SightRadiusComponent> SightRadiusComponents { get; private set; }
         public Dictionary<Guid, LabelComponent> LabelComponents { get; private set; }
-        public Dictionary<Guid, GameMessageComponent> GameMessageComponents { get; private set; }
-        public Dictionary<Guid, GameplayInfoComponent> GameplayInfoComponents { get; private set; }
         public Dictionary<Guid, SkillLevelsComponent> SkillLevelsComponents { get; private set; }
         public Dictionary<Guid, TargetPositionComponent> TargetPositionComponents { get; private set; }
         public Dictionary<Guid, DirectionComponent> DirectionComponents { get; private set; }
         public Dictionary<Guid, TimeToLiveComponent> TimeToLiveComponents { get; private set; }
+        public Dictionary<Guid, CollisionComponent> CollisionComponents { get; private set; }
+        public Dictionary<Guid, NameComponent> NameComponents { get; private set; }
+        public List<Action> DelayedActions { get; private set; }
         public PlayerComponent PlayerComponent { get; set; }
+        public GameMessageComponent GameMessageComponent { get; set; }
+        public GameplayInfoComponent GameplayInfoComponent { get; set; }
         public Random random { get; private set; }
 
         public StateSpaceComponents()
@@ -83,13 +89,16 @@ namespace ECSRogue.ECS
             AnimationComponents = new Dictionary<Guid, AnimationComponent>();
             LabelComponents = new Dictionary<Guid, LabelComponent>();
             SightRadiusComponents = new Dictionary<Guid, SightRadiusComponent>();
-            GameMessageComponents = new Dictionary<Guid, GameMessageComponent>();
-            GameplayInfoComponents = new Dictionary<Guid, GameplayInfoComponent>();
             SkillLevelsComponents = new Dictionary<Guid, SkillLevelsComponent>();
             TargetPositionComponents = new Dictionary<Guid, TargetPositionComponent>();
             DirectionComponents = new Dictionary<Guid, DirectionComponent>();
             TimeToLiveComponents = new Dictionary<Guid, TimeToLiveComponent>();
+            CollisionComponents = new Dictionary<Guid, CollisionComponent>();
+            NameComponents = new Dictionary<Guid, NameComponent>();
             PlayerComponent = new PlayerComponent();
+            GameMessageComponent = new GameMessageComponent();
+            GameplayInfoComponent = new GameplayInfoComponent();
+            DelayedActions = new List<Action>();
             random = new Random();
         }
 
@@ -112,13 +121,22 @@ namespace ECSRogue.ECS
                 AnimationComponents.Remove(id);
                 SightRadiusComponents.Remove(id);
                 LabelComponents.Remove(id);
-                GameMessageComponents.Remove(id);
-                GameplayInfoComponents.Remove(id);
                 SkillLevelsComponents.Remove(id);
                 TargetPositionComponents.Remove(id);
                 DirectionComponents.Remove(id);
                 TimeToLiveComponents.Remove(id);
+                CollisionComponents.Remove(id);
+                NameComponents.Remove(id);
             }
+        }
+
+        public void InvokeDelayedActions()
+        {
+            foreach(Action action in this.DelayedActions)
+            {
+                action();
+            }
+            this.DelayedActions = new List<Action>();
         }
     }
 }

@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 using ECSRogue.ECS;
 using ECSRogue.BaseEngine.IO.Objects;
+using ECSRogue.ECS.Components;
 
 namespace ECSRogue.BaseEngine.States
 {
@@ -36,7 +37,8 @@ namespace ECSRogue.BaseEngine.States
             PrevMouseState = mouseState;
             PrevGamepadState = gamePadState;
             PrevKeyboardState = keyboardState;
-            StateComponents = saveInfo == null ? new StateComponents() : saveInfo.stateComponents;
+            SkillLevelsComponent newPlayerStats = new SkillLevelsComponent() { CurrentHealth = 100, Health = 100, MagicAttack = 10, MagicDefense = 5, PhysicalAttack = 21, PhysicalDefense = 15, Wealth = 0 };
+            StateComponents = saveInfo == null ? new StateComponents() { PlayerSkillLevels = newPlayerStats } : saveInfo.stateComponents;
             SetStateSpace(space, camera, saveInfo == null);
             previousState = prevState;
         }

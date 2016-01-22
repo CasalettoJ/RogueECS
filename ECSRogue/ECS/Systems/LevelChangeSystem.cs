@@ -12,7 +12,7 @@ namespace ECSRogue.ECS.Systems
         {
             Guid id = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).Select(x => x.Id).First();
             SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
-            GameplayInfoComponent gameInfo = spaceComponents.GameplayInfoComponents[id];
+            GameplayInfoComponent gameInfo = spaceComponents.GameplayInfoComponent;
             stateComponents.GameplayInfo = gameInfo;
             stateComponents.PlayerSkillLevels = skills;
         }
