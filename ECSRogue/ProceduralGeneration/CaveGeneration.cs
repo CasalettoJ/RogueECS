@@ -353,13 +353,13 @@ namespace ECSRogue.ProceduralGeneration
 
         public string GetDungeonSpritesheetFileName()
         {
-            return "Sprites/anonsheet";
+            return "Sprites/Ball";
         }
         
         public void GenerateDungeonEntities(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellsize, List<Vector2> freeTiles)
         {
             //Generate Monsters
-            int numberOfMonsters = spaceComponents.random.Next(25, freeTiles.Count);
+            int numberOfMonsters = spaceComponents.random.Next(1, 25);
             for(int i = 0; i < numberOfMonsters; i++)
             {
                 Guid id = spaceComponents.CreateEntity();
@@ -375,7 +375,7 @@ namespace ECSRogue.ProceduralGeneration
                     Rotation = 0f,
                     Scale = 1f,
                     SpriteEffect = SpriteEffects.None,
-                    SpriteSource = new Rectangle(2 * cellSize, 0 * cellSize, cellSize, cellSize)
+                    SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize)
                 };
                 spaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 5 };
                 spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 100, Health = 100, MagicAttack = 0, MagicDefense = 0, PhysicalAttack = 5, PhysicalDefense = 5, Wealth = 25 };

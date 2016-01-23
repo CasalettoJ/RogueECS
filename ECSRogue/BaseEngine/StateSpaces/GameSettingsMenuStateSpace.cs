@@ -85,9 +85,6 @@ namespace ECSRogue.BaseEngine.StateSpaces
             menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(1.25f);
             menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(1.5f);
             menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(2f);
-            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(2.25f);
-            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(2.5f);
-            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(4f);
             menuOptions[(int)Options.GRAPHICS_SCALE].Selection =
                 menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.FindIndex(x => Convert.ToDouble(x) == (double)gameSettings.Scale) > 0 ?
                 menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.FindIndex(x => Convert.ToDouble(x) == (double)gameSettings.Scale) : 0;

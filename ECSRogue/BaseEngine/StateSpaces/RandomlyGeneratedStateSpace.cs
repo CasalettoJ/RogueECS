@@ -60,7 +60,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         public void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera, StateComponents stateComponents, bool createEntities = true)
         {
             this.stateComponents = stateComponents;
-            sprites = content.Load<Texture2D>("Sprites/anonsheet");
+            sprites = content.Load<Texture2D>("Sprites/Ball");
             dungeonSprites = content.Load<Texture2D>(dungeonSpriteFile);
             messageFont = content.Load<SpriteFont>("Fonts/InfoText");
             UI = content.Load<Texture2D>("Sprites/ball");
@@ -112,9 +112,9 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 };
             }
             //Set Display
-            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.White, SpriteSource = new Rectangle(2 * cellSize, 0 * cellSize, cellSize, cellSize), Origin = Vector2.Zero, SpriteEffect = SpriteEffects.None, Scale = 1f, Rotation = 0f };
+            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.Wheat, SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize), Origin = Vector2.Zero, SpriteEffect = SpriteEffects.None, Scale = 1f, Rotation = 0f };
             //Set Sightradius
-            stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 8 };
+            stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 15 };
             //Set first turn
             stateSpaceComponents.PlayerComponent = new PlayerComponent() { PlayerJustLoaded = true };
             //Collision information
@@ -130,6 +130,10 @@ namespace ECSRogue.BaseEngine.StateSpaces
             stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = Component.COMPONENT_GAMEMESSAGE;
             stateSpaceComponents.GameMessageComponent = new GameMessageComponent() { GlobalColor = Color.White, GlobalMessage = string.Empty,
                  MaxMessages = 100, IndexBegin = 0, GameMessages = new List<Tuple<Color,string>>()};
+            if (stateComponents.GameplayInfo.FloorsReached <= 0)
+            {
+                MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.GameEntranceMessages, MessageColors.SpecialAction);
+            }
             MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.CaveEntranceMessages, MessageColors.SpecialAction);
         }
         #endregion
@@ -162,7 +166,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             #region Debug
             if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && prevKeyboardState.IsKeyUp(Keys.LeftShift))
             {
-                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
+                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 50, 100);
                 LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
             }
             #endregion
@@ -222,7 +226,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
         {
-            spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue);
+            spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .5f);
             MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont);
         }
         #endregion

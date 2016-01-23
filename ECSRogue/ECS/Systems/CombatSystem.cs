@@ -39,10 +39,10 @@ namespace ECSRogue.ECS.Systems
                             spaceComponents.GameplayInfoComponent = gameInfo;
                             spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("You killed the {0}!", spaceComponents.NameComponents[collidedEntity].Name)));
                         }
-                        spaceComponents.DelayedActions.Add(new Action(() =>
-                        {
-                            MakeCombatText("-" + damageDone.ToString(), MessageColors.Harm, spaceComponents, spaceComponents.PositionComponents[collidedEntity], cellSize);
-                        }));
+                        //spaceComponents.DelayedActions.Add(new Action(() =>
+                        //{
+                        //    MakeCombatText("-" + damageDone.ToString(), MessageColors.Harm, spaceComponents, spaceComponents.PositionComponents[collidedEntity], cellSize);
+                        //}));
 
                     }
                 }

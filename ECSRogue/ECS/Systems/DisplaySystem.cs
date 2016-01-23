@@ -20,7 +20,7 @@ namespace ECSRogue.ECS.Systems
             {
                 DisplayComponent display = spaceComponents.DisplayComponents[id];
                 Vector2 position = new Vector2(spaceComponents.PositionComponents[id].Position.X * cellSize, spaceComponents.PositionComponents[id].Position.Y * cellSize);
-                if(dungeonGrid[(int)spaceComponents.PositionComponents[id].Position.X, (int)spaceComponents.PositionComponents[id].Position.Y].Found)
+                if(dungeonGrid[(int)spaceComponents.PositionComponents[id].Position.X, (int)spaceComponents.PositionComponents[id].Position.Y].InRange)
                 {
                     Vector2 bottomRight = Vector2.Transform(new Vector2((position.X) + cellSize, (position.Y) + cellSize), cameraMatrix);
                     Vector2 topLeft = Vector2.Transform(new Vector2(position.X, position.Y), cameraMatrix);
@@ -42,7 +42,7 @@ namespace ECSRogue.ECS.Systems
                 for (int j = 0; j < (int)dungeonDimensions.Y; j++)
                 {
                     Vector2 tile = new Vector2((int)i * cellSize, (int)j * cellSize);
-                    Rectangle floor = new Rectangle(1 * cellSize, 0 * cellSize, cellSize, cellSize); //Need to be moved eventually
+                    Rectangle floor = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize); //Need to be moved eventually
                     Rectangle wall = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize); //Need to be moved eventually
 
                     Vector2 bottomRight = Vector2.Transform(new Vector2((i * cellSize) + cellSize, (j * cellSize) + cellSize), cameraMatrix);

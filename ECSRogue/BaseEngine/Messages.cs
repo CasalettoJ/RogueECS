@@ -25,6 +25,13 @@ namespace ECSRogue.BaseEngine
             "Your eyes adjust to the darkness and you find yourself surrounded by tunnels."
         };
 
+        public static readonly string[] GameEntranceMessages =
+        {
+            "There is a DRAGON at the bottom of this cave!  Find her!  Kill her!  Steal her treasure!",
+            "The map that led you to these caves shows a giant gold hoard twenty-five floors down. ....And a massive DRAGON.",
+            "Find the pile of gold and jewels beneath these caves.  You won't let a little DRAGON scare you, right?!",
+        };
+
         public static readonly string[] CameraDetatchedMessage =
         {
             "Press \'R\' to reset the camera position."
