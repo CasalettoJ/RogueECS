@@ -30,14 +30,6 @@ namespace ECSRogue.ECS.Systems
                         {
                             spaceComponents.SkillLevelsComponents[collidedEntity] = collidedStats;
                             spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Microsoft.Xna.Framework.Color, string>(MessageColors.DamageDealt, combatString));
-                           
-                            //foreach (Guid enemyId in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.NPC) == ComponentMasks.NPC).Select(x => x.Id))
-                            //{
-                            //    spaceComponents.DelayedActions.Add(new Action(() =>
-                            //    {
-                            //        MakeCombatText("-" + damageDone.ToString(), MessageColors.Harm, spaceComponents, spaceComponents.PositionComponents[enemyId], cellSize);
-                            //    }));
-                            //}
                         }
                         else
                         {
@@ -71,7 +63,7 @@ namespace ECSRogue.ECS.Systems
                 SpriteEffect = SpriteEffects.None,
                 Text = text
             };
-            spaceComponents.VelocityComponents[id] = new VelocityComponent() { Velocity = new Vector2(spaceComponents.random.Next(100,200), spaceComponents.random.Next(100,200)) };
+            spaceComponents.VelocityComponents[id] = new VelocityComponent() { Velocity = new Vector2(150,150)};
             spaceComponents.TargetPositionComponents[id] = new TargetPositionComponent() { DestroyWhenReached = true, TargetPosition = new Vector2(spaceComponents.PositionComponents[id].Position.X, spaceComponents.PositionComponents[id].Position.Y - 100) };
         }
 
