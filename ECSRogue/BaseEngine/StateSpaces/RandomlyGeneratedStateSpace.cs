@@ -226,6 +226,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
         {
+            spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.Black);
             spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .5f);
             MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont);
         }
