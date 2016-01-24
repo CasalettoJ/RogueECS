@@ -19,6 +19,10 @@ namespace ECSRogue.ECS.Components
         public double Accuracy;
         public double Defense;
 
+        public int MinimumDamage;
+        public int MaximumDamage;
+        public int DieNumber;
+
         //"Hidden" statistics
         public double TimesMissed;
         public double TimesHit;

@@ -379,8 +379,8 @@ namespace ECSRogue.ProceduralGeneration
                     Symbol = "m",
                     SymbolColor = Color.White
                 };
-                spaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 5 };
-                spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 100, Health = 100, Power = 5, Defense = 1, Accuracy = 100, Wealth = 25 };
+                spaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 3 };
+                spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 10, DieNumber = 1, Health = 100, Power = 5, Defense = 1, Accuracy = 100, Wealth = 25, MinimumDamage = 1, MaximumDamage = 2 };
                 spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
                 spaceComponents.NameComponents[id] = new NameComponent() { Name = "TEST ENEMY NPC" };
                 //AIComponenthere

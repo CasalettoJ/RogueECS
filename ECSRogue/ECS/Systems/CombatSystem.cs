@@ -33,7 +33,7 @@ namespace ECSRogue.ECS.Systems
                         if (CombatSystem.WillMeleeAttackHit(spaceComponents.random, CombatSystem.CalculateAccuracy(attackingStats, collidedStats)))
                         {
                             //Determine weapon strength and die numbers here, then...
-                            damageDone = CombatSystem.CalculateMeleeDamage(spaceComponents.random, (int)attackingStats.Power - 5, (int)attackingStats.Power + 5, 1);
+                            damageDone = CombatSystem.CalculateMeleeDamage(spaceComponents.random, attackingStats.MinimumDamage, attackingStats.MaximumDamage, attackingStats.DieNumber);
                             collidedStats.CurrentHealth -= damageDone;
                             if (attackingStats.TimesMissed > 5)
                             {
