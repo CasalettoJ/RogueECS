@@ -44,19 +44,45 @@ namespace ECSRogue.BaseEngine
 
         public static readonly string[] MeleeAttack =
         {
-            "You swing at the {0}",
-            "You apply your fury to the {0}'s face",
-            "You attempt brute force against {0}",
-            "You use your walking attack fearlessly at {0}"
+            "{0} swings at the {1}",
+            "{0} applies fury to the {1}'s face",
+            "{0} attempts brute force against {1}",
+            "{0} uses a walking attack fearlessly at {1}"
         };
 
         public static readonly string[] DamageDealt =
         {
-            " and hit it for {0} damage.",
-            " and deal {0} damage to the poor thing.",
+            " and hits it for {0} damage.",
+            " and deals {0} damage to the poor thing.",
             " and it cries out, having taken {0} damage.",
             " and it seems {0} health weaker...",
             " dealing {0} damage to it!"
+        };
+
+        public static readonly string[] MeleeMissed =
+        {
+            " but the attack missed!",
+            " and the creature dodges the attack.",
+            " but the creature's defense protects it.",
+            " and recoils in embarrassment as the blow fails to damage it.",
+            " and misses expertly!",
+            " and shyly calls out \"That was a practice attack!\" as it fails."
+        };
+
+        public static readonly string[] MeleeMissedALot =
+        {
+            " but stops, realizing the futility of it all.",
+            " and, as always, misses the attack.",
+            " the creature doesn't even flinch.",
+            " while the monster stands there and laughs.",
+            "; no one watching thinks this will work."
+        };
+
+        public static readonly string[] BrokenMissSpree =
+        {
+            " and against all odds deals {0} damage!",
+            " and the cocky creature stands, allowing {0} damage to go through!",
+            ", breaking impossible odds, landing {0} damage!!"
         };
     }
 }

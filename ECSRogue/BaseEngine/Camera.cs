@@ -19,7 +19,7 @@ namespace ECSRogue.BaseEngine
         {
             get
             {
-                return new Vector2(600, 600);
+                return new Vector2(900, 900);
             }
         }
         public Viewport DungeonViewport;

@@ -15,5 +15,7 @@ namespace ECSRogue.ECS.Components
         public Vector2 Origin;
         public SpriteEffects SpriteEffect;
         public float Rotation;
+        public string Symbol;
+        public Color SymbolColor;
     }
 }

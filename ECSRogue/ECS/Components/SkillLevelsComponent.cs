@@ -15,5 +15,9 @@ namespace ECSRogue.ECS.Components
         public double Power;
         public double Accuracy;
         public double Defense;
+
+        //"Hidden" statistics
+        public double TimesMissed;
+        public double TimesHit;
     }
 }

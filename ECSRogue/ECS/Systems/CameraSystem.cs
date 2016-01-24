@@ -15,6 +15,7 @@ namespace ECSRogue.ECS.Systems
         {
             if (Mouse.GetState().RightButton == ButtonState.Pressed)
             {
+                MessageDisplaySystem.SetRandomGlobalMessage(stateSpaceComponents, Messages.CameraDetatchedMessage);
                 camera.Target = Vector2.Transform(Mouse.GetState().Position.ToVector2(), camera.GetInverseMatrix());
                 camera.AttachedToPlayer = false;
             }

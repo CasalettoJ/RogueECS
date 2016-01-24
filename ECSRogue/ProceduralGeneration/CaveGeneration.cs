@@ -359,7 +359,7 @@ namespace ECSRogue.ProceduralGeneration
         public void GenerateDungeonEntities(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellsize, List<Vector2> freeTiles)
         {
             //Generate Monsters
-            int numberOfMonsters = spaceComponents.random.Next(1, 25);
+            int numberOfMonsters = spaceComponents.random.Next(1, 100);
             for(int i = 0; i < numberOfMonsters; i++)
             {
                 Guid id = spaceComponents.CreateEntity();
@@ -370,17 +370,19 @@ namespace ECSRogue.ProceduralGeneration
                 freeTiles.RemoveAt(tileIndex);
                 spaceComponents.DisplayComponents[id] = new DisplayComponent()
                 {
-                    Color = Color.Red,
+                    Color = Color.DarkRed,
                     Origin = Vector2.Zero,
                     Rotation = 0f,
                     Scale = 1f,
                     SpriteEffect = SpriteEffects.None,
-                    SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize)
+                    SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize),
+                    Symbol = "m",
+                    SymbolColor = Color.White
                 };
                 spaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 5 };
                 spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 100, Health = 100, Power = 5, Defense = 1, Accuracy = 100, Wealth = 25 };
                 spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
-                spaceComponents.NameComponents[id] = new NameComponent() { Name = "Test Enemy NPC" };
+                spaceComponents.NameComponents[id] = new NameComponent() { Name = "TEST ENEMY NPC" };
                 //AIComponenthere
             }
         }

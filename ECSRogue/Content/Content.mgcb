@@ -53,3 +53,9 @@
 /processorParam:TextureFormat=Color
 /build:Sprites/anonsheet.png
 
+#begin Fonts/DisplayText.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/DisplayText.spritefont
+

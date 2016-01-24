@@ -12,7 +12,7 @@ namespace ECSRogue.ECS.Systems
 {
     public static class DisplaySystem
     {
-        public static void DrawDungeonEntities(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D spriteSheet, int cellSize, DungeonTile[,] dungeonGrid)
+        public static void DrawDungeonEntities(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D spriteSheet, int cellSize, DungeonTile[,] dungeonGrid, SpriteFont font)
         {
             Matrix cameraMatrix = camera.GetMatrix();
             IEnumerable<Guid> drawableEntities = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Drawable) == ComponentMasks.Drawable).Select(x => x.Id);
@@ -29,6 +29,12 @@ namespace ECSRogue.ECS.Systems
                     if (camera.IsInView(cameraMatrix, cameraBounds))
                     {
                         spriteBatch.Draw(spriteSheet, position, display.SpriteSource, display.Color, display.Rotation, display.Origin, display.Scale, display.SpriteEffect, 0f);
+                        if (!string.IsNullOrEmpty(spaceComponents.DisplayComponents[id].Symbol))
+                        {
+                            Vector2 size = font.MeasureString(spaceComponents.DisplayComponents[id].Symbol);
+                            spriteBatch.DrawString(font, display.Symbol, new Vector2((int)(position.X + display.SpriteSource.Center.X), (int)(position.Y + display.SpriteSource.Center.Y)), 
+                                display.SymbolColor, 0f, new Vector2((int)(size.X/2), (int)(size.Y/2)), 1f, SpriteEffects.None, 0f);
+                        }
                     }
                 }
             }

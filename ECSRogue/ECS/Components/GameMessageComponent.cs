@@ -22,6 +22,7 @@ namespace ECSRogue.ECS.Components
     {
         public List<Tuple<Color,string>> GameMessages;
         public string GlobalMessage;
+        public string MenuMessage;
         public int IndexBegin;
         public int MaxMessages;
         public Color GlobalColor;

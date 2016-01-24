@@ -25,12 +25,13 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
         #region Dungeon Environment Variables
         private Texture2D sprites;
+        private Texture2D dungeonSprites;
+        private Texture2D UI;
         private SpriteFont messageFont;
+        private SpriteFont asciiDisplay;
         private Vector2 dungeonDimensions;
         private DungeonTile[,] dungeonGrid = null;
         private int cellSize;
-        private Texture2D dungeonSprites;
-        private Texture2D UI;
         private string dungeonSpriteFile;
         private DungeonColorInfo dungeonColorInfo;
         #endregion
@@ -65,6 +66,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             sprites = content.Load<Texture2D>("Sprites/Ball");
             dungeonSprites = content.Load<Texture2D>(dungeonSpriteFile);
             messageFont = content.Load<SpriteFont>("Fonts/InfoText");
+            asciiDisplay = content.Load<SpriteFont>("Fonts/DisplayText");
             UI = content.Load<Texture2D>("Sprites/ball");
             if (createEntities)
             {
@@ -113,7 +115,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 };
             }
             //Set Display
-            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.Wheat, SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize), Origin = Vector2.Zero, SpriteEffect = SpriteEffects.None, Scale = 1f, Rotation = 0f };
+            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.Wheat, SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize),
+                Origin = Vector2.Zero, SpriteEffect = SpriteEffects.None, Scale = 1f, Rotation = 0f };
             //Set Sightradius
             stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 15 };
             //Set first turn
@@ -121,7 +124,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             //Collision information
             stateSpaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = true };
             //Set name of player
-            stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "You" };
+            stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "PLAYER" };
 
         }
 
@@ -188,7 +191,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
         {
             DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo);
-            DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize, dungeonGrid);
+            DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize, dungeonGrid, asciiDisplay);
             LabelDisplaySystem.DrawString(spriteBatch, stateSpaceComponents, messageFont, camera);
         }
 
