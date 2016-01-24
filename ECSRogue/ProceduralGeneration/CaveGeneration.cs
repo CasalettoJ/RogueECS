@@ -378,7 +378,7 @@ namespace ECSRogue.ProceduralGeneration
                     SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize)
                 };
                 spaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 5 };
-                spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 100, Health = 100, MagicAttack = 0, MagicDefense = 0, PhysicalAttack = 5, PhysicalDefense = 5, Wealth = 25 };
+                spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 100, Health = 100, Power = 5, Defense = 1, Accuracy = 100, Wealth = 25 };
                 spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
                 spaceComponents.NameComponents[id] = new NameComponent() { Name = "Test Enemy NPC" };
                 //AIComponenthere

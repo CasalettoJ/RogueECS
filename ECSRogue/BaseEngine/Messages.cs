@@ -30,6 +30,9 @@ namespace ECSRogue.BaseEngine
             "There is a DRAGON at the bottom of this cave!  Find her!  Kill her!  Steal her treasure!",
             "The map that led you to these caves shows a giant gold hoard twenty-five floors down. ....And a massive DRAGON.",
             "Find the pile of gold and jewels beneath these caves.  You won't let a little DRAGON scare you, right?!",
+            "A DRAGON lies below these caverns.  Kill her and take her treasure!",
+            "You enter a maze of caves which a DRAGON calls home; slay her and claim her hoard as your own.",
+            "Twenty-five floors beneath here waits a covetous DRAGON.  Brave the depths, claim her life, and take her gold!"
         };
 
         public static readonly string[] CameraDetatchedMessage =

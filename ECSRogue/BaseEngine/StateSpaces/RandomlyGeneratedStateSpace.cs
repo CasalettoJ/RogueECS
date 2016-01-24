@@ -35,6 +35,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         private DungeonColorInfo dungeonColorInfo;
         #endregion
 
+        #region Constructors
         public RandomlyGeneratedStateSpace(IGenerationAlgorithm dungeonGeneration, int worldMin, int worldMax)
         {
             stateSpaceComponents = new StateSpaceComponents();
@@ -55,6 +56,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             dungeonColorInfo = data.dungeonColorInfo;
             dungeonDimensions = data.dungeonDimensions;
         }
+        #endregion
 
         #region Load Logic
         public void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera, StateComponents stateComponents, bool createEntities = true)
@@ -104,10 +106,9 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 {
                     CurrentHealth = 100,
                     Health = 100,
-                    MagicAttack = 10,
-                    MagicDefense = 3,
-                    PhysicalAttack = 20,
-                    PhysicalDefense = 10,
+                    Power = 10,
+                    Defense = 5,
+                    Accuracy = 100,
                     Wealth = 100
                 };
             }
@@ -134,7 +135,10 @@ namespace ECSRogue.BaseEngine.StateSpaces
             {
                 MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.GameEntranceMessages, MessageColors.SpecialAction);
             }
-            MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.CaveEntranceMessages, MessageColors.SpecialAction);
+            else
+            {
+                MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.CaveEntranceMessages, MessageColors.SpecialAction);
+            }
         }
         #endregion
 
@@ -150,18 +154,6 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 stateSpaceComponents.EntitiesToDelete.Clear();
             }
             IStateSpace nextStateSpace = this;
-            if (Mouse.GetState().RightButton == ButtonState.Pressed)
-            {
-                camera.Target = Vector2.Transform(Mouse.GetState().Position.ToVector2(), camera.GetInverseMatrix());
-                camera.AttachedToPlayer = false;
-                MessageDisplaySystem.SetRandomGlobalMessage(stateSpaceComponents, Messages.CameraDetatchedMessage);
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.R))
-            {
-                camera.AttachedToPlayer = true;
-                MessageDisplaySystem.SetRandomGlobalMessage(stateSpaceComponents, new string[] { string.Empty });
-            }
 
             #region Debug
             if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && prevKeyboardState.IsKeyUp(Keys.LeftShift))
@@ -171,10 +163,10 @@ namespace ECSRogue.BaseEngine.StateSpaces
             }
             #endregion
 
+            CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, cellSize, prevKeyboardState);
             InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
             TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
             TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
-            UpdateCamera(camera, gameTime);
             DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
             MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
             MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
@@ -189,31 +181,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             CollisionSystem.ResetCollision(stateSpaceComponents);
             stateSpaceComponents.InvokeDelayedActions();
             return nextStateSpace;
-        }
-
-        private void UpdateCamera(Camera camera, GameTime gameTime)
-        {
-            if(camera.AttachedToPlayer)
-            {
-                Entity playerId = stateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
-                if(playerId != null)
-                {
-                    camera.Target = new Vector2((int)stateSpaceComponents.PositionComponents[playerId.Id].Position.X * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Width/2,
-                    (int)stateSpaceComponents.PositionComponents[playerId.Id].Position.Y * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Height/2);
-                }
-            }
-            if (Vector2.Distance(camera.Position, camera.Target) > 0)
-            {
-                float distance = Vector2.Distance(camera.Position, camera.Target);
-                Vector2 direction = Vector2.Normalize(camera.Target - camera.Position);
-                float velocity = distance * 2.5f;
-                camera.Position += direction * velocity * (camera.Scale >= 1 ? camera.Scale : 1) * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if (distance < 2.5)
-                {
-                    camera.Position = camera.Target;
-                }
-            }
-        }
+        }  
         #endregion
 
         #region Draw Logic
@@ -227,7 +195,9 @@ namespace ECSRogue.BaseEngine.StateSpaces
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
         {
             spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.Black);
-            spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .5f);
+            spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .25f);
+            spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.Black);
+            spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.DarkRed * .25f);
             MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont);
         }
         #endregion

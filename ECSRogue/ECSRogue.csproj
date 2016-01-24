@@ -72,6 +72,7 @@
     <Compile Include="ECS\Entity.cs" />
     <Compile Include="ECSRogue.cs" />
     <Compile Include="ECS\Systems\AnimationSystem.cs" />
+    <Compile Include="ECS\Systems\CameraSystem.cs" />
     <Compile Include="ECS\Systems\CollisionSystem.cs" />
     <Compile Include="ECS\Systems\CombatSystem.cs" />
     <Compile Include="ECS\Systems\DestructionSystem.cs" />

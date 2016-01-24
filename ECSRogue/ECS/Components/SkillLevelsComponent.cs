@@ -12,9 +12,8 @@ namespace ECSRogue.ECS.Components
 
         public int Wealth;
 
-        public int PhysicalAttack;
-        public int MagicAttack;
-        public int PhysicalDefense;
-        public int MagicDefense;
+        public double Power;
+        public double Accuracy;
+        public double Defense;
     }
 }

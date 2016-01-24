@@ -25,6 +25,7 @@ namespace ECSRogue.BaseEngine
         public Viewport DungeonViewport;
         public Viewport FullViewport;
         public Viewport DungeonUIViewport;
+        public Viewport DungeonUIViewportLeft;
 
         public Camera(Vector2 position, Vector2 origin, float rotation, float scale, GraphicsDeviceManager graphics)
         {
@@ -41,21 +42,18 @@ namespace ECSRogue.BaseEngine
 
             DungeonViewport = FullViewport;
             DungeonViewport.Height -= 200;
+            DungeonViewport.Width -= 200;
             Bounds = DungeonViewport.Bounds;
 
             DungeonUIViewport = FullViewport;
             DungeonUIViewport.Height = 200;
+            DungeonUIViewport.Width -= DungeonUIViewport.Height;
             DungeonUIViewport.Y = DungeonViewport.Height;
-        }
 
-        //public Vector3 ResetScreenScale(GraphicsDeviceManager graphics, Vector2 screenScale)
-        //{
-        //    var scaleX = (float)graphics.GraphicsDevice.Viewport.Width / screenScale.X;
-        //    var scaleY = (float)graphics.GraphicsDevice.Viewport.Height / screenScale.Y;
-        //    Scale = new Vector3(scaleX, scaleY, 1.0f);
-        //    Viewport = graphics.GraphicsDevice.Viewport;
-        //    return Scale;
-        //}
+            DungeonUIViewportLeft = FullViewport;
+            DungeonUIViewportLeft.Width = DungeonUIViewport.Height;
+            DungeonUIViewportLeft.X = DungeonUIViewport.Width;
+        }
 
         public Matrix GetMatrix()
         {

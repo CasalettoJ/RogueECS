@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ECSRogue.ECS.Systems
 {
@@ -32,7 +33,9 @@ namespace ECSRogue.ECS.Systems
                     break;
                 }
                 opacity -= decrement;
-                spriteBatch.DrawString(font, message.Item2, new Vector2(10, (int)camera.DungeonUIViewport.Y + 10 + (messageNumber * messageSpacing)), message.Item1 * opacity);
+                string text = MessageDisplaySystem.WordWrap(font, message.Item2, camera.DungeonUIViewport.Width-20);
+                spriteBatch.DrawString(font,text, new Vector2(10, (int)camera.DungeonUIViewport.Y + 10 + (messageNumber * messageSpacing)), message.Item1 * opacity);
+                messageNumber += Regex.Matches(text, System.Environment.NewLine).Count;
                 messageNumber += 1;
             }
             while (spaceComponents.GameMessageComponent.GameMessages.Count > spaceComponents.GameMessageComponent.MaxMessages)
@@ -52,21 +55,20 @@ namespace ECSRogue.ECS.Systems
                 statsToPrint.Add(string.Format("Floor {0}", gameplayInfo.FloorsReached));
                 statsToPrint.Add(string.Format("Steps: {0}", gameplayInfo.StepsTaken));
                 statsToPrint.Add(string.Format("Kills: {0}", gameplayInfo.Kills));
-                statsToPrint.Add("\n");
+                statsToPrint.Add(System.Environment.NewLine);
                 statsToPrint.Add(string.Format("Health:  {0} / {1}", skills.CurrentHealth, skills.Health));
                 statsToPrint.Add(string.Format("Wealth: {0}", skills.Wealth));
-                statsToPrint.Add("\n");
-                statsToPrint.Add(string.Format("ATK: {0}", skills.PhysicalAttack));
-                statsToPrint.Add(string.Format("DEF: {0}", skills.PhysicalDefense));
-                statsToPrint.Add(string.Format("MATK: {0}", skills.MagicAttack));
-                statsToPrint.Add(string.Format("MDEF: {0}", skills.MagicDefense));
+                statsToPrint.Add(System.Environment.NewLine);
+                statsToPrint.Add(string.Format("Power: {0}", skills.Power));
+                statsToPrint.Add(string.Format("Accuracy: {0}", skills.Accuracy));
+                statsToPrint.Add(string.Format("Defense: {0}", skills.Defense));
 
                 if (font != null)
                 {
                     foreach (string stat in statsToPrint)
                     {
                         Vector2 messageSize = font.MeasureString(stat);
-                        spriteBatch.DrawString(font, stat, new Vector2(camera.Bounds.Width - messageSize.X - 10, camera.DungeonUIViewport.Y + (messageSpacing * messageNumber)), MessageColors.SpecialAction);
+                        spriteBatch.DrawString(font, stat, new Vector2(camera.DungeonUIViewportLeft.X + 10, 10 + (messageSpacing * messageNumber)), MessageColors.SpecialAction);
                         messageNumber += 1;
                     }
                 }
@@ -111,6 +113,29 @@ namespace ECSRogue.ECS.Systems
                 messageComponent.IndexBegin -= 1;
             }
             spaceComponents.GameMessageComponent = messageComponent;
+        }
+
+        public static string WordWrap(SpriteFont font, string text, float maxLineWidth)
+        {
+            string[] splitMessage = text.Split(' ');
+            StringBuilder sb = new StringBuilder();
+            float lineWidth = 0f;
+            float spaceWidth = font.MeasureString(" ").X;
+            foreach (string word in splitMessage)
+            {
+                Vector2 size = font.MeasureString(word);
+                if(lineWidth + size.X < maxLineWidth)
+                {
+                    sb.Append(word + " ");
+                    lineWidth += size.X + spaceWidth;
+                }
+                else
+                {
+                    sb.Append(System.Environment.NewLine + word + " ");
+                    lineWidth = size.X + spaceWidth;
+                }
+            }
+            return sb.ToString();
         }
     }
 }

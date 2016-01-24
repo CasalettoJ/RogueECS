@@ -37,7 +37,7 @@ namespace ECSRogue.BaseEngine.States
             PrevMouseState = mouseState;
             PrevGamepadState = gamePadState;
             PrevKeyboardState = keyboardState;
-            SkillLevelsComponent newPlayerStats = new SkillLevelsComponent() { CurrentHealth = 100, Health = 100, MagicAttack = 10, MagicDefense = 5, PhysicalAttack = 21, PhysicalDefense = 15, Wealth = 0 };
+            SkillLevelsComponent newPlayerStats = new SkillLevelsComponent() { CurrentHealth = 100, Health = 100, Power = 10, Accuracy = 100, Defense = 1, Wealth = 0 };
             StateComponents = saveInfo == null ? new StateComponents() { PlayerSkillLevels = newPlayerStats } : saveInfo.stateComponents;
             SetStateSpace(space, camera, saveInfo == null);
             previousState = prevState;

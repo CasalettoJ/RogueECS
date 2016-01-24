@@ -56,10 +56,10 @@ namespace ECSRogue.ECS.Systems
                             switch (dungeonGrid[i, j].Type)
                             {
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, position: tile, sourceRectangle: floor, color: colorInfo.Floor);
+                                    spriteBatch.Draw(spriteSheet, position: tile, sourceRectangle: floor, color: colorInfo.Floor * .75f);
                                     break;
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, tile, wall, colorInfo.Wall);
+                                    spriteBatch.Draw(spriteSheet, tile, wall, colorInfo.Wall * .75f);
                                     break;
                             }
                         }

@@ -21,7 +21,7 @@ namespace ECSRogue.ECS.Systems
                 {
                     if((spaceComponents.Entities.Where(x => x.Id == collidedEntity).First().ComponentFlags & ComponentMasks.NPC) == ComponentMasks.NPC)
                     {
-                        int damageDone = spaceComponents.random.Next(0, spaceComponents.SkillLevelsComponents[id].PhysicalAttack); //Replace with actual damage calculation
+                        int damageDone = spaceComponents.random.Next(0, (int)spaceComponents.SkillLevelsComponents[id].Power); //Replace with actual damage calculation
                         SkillLevelsComponent collidedStats = spaceComponents.SkillLevelsComponents[collidedEntity];
                         collidedStats.CurrentHealth -= damageDone;
                         string combatString = string.Format(Messages.MeleeAttack[spaceComponents.random.Next(0, Messages.MeleeAttack.Count())], spaceComponents.NameComponents[collidedEntity].Name);
