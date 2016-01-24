@@ -10,6 +10,9 @@ namespace ECSRogue.ECS.Components
         public int Health;
         public int CurrentHealth;
 
+        public int Hunger;
+        public int CurrentHunger;
+
         public int Wealth;
 
         public double Power;

@@ -57,6 +57,7 @@ namespace ECSRogue.ECS.Systems
                 statsToPrint.Add(string.Format("Kills: {0}", gameplayInfo.Kills));
                 statsToPrint.Add(System.Environment.NewLine);
                 statsToPrint.Add(string.Format("Health:  {0} / {1}", skills.CurrentHealth, skills.Health));
+                statsToPrint.Add(string.Format("Hunger:  {0} / {1}", skills.CurrentHunger, skills.Hunger));
                 statsToPrint.Add(string.Format("Wealth: {0}", skills.Wealth));
                 statsToPrint.Add(System.Environment.NewLine);
                 statsToPrint.Add(string.Format("Power: {0}", skills.Power));
