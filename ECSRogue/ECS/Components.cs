@@ -45,7 +45,7 @@ namespace ECSRogue.ECS
         public const Component DrawableLabel = Component.COMPONENT_LABEL | Component.COMPONENT_POSITION; 
 
         public const Component Animated = Component.COMPONENT_DISPLAY | Component.COMPONENT_POSITION | Component.COMPONENT_ANIMATION; //Not implemented
-        public const Component Collidable = Component.COMPONENT_POSITION | Component.COMPONENT_COLLISION; // Not Implemented
+        public const Component Collidable = Component.COMPONENT_POSITION | Component.COMPONENT_COLLISION;
 
         public const Component MovingEntity = Component.COMPONENT_POSITION | Component.COMPONENT_VELOCITY | Component.COMPONENT_TARGET_POSITION; 
         public const Component IndefiniteMovingEntity = Component.COMPONENT_POSITION | Component.COMPONENT_VELOCITY | Component.COMPONENT_DIRECTION; 
@@ -73,6 +73,7 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, TimeToLiveComponent> TimeToLiveComponents { get; private set; }
         public Dictionary<Guid, CollisionComponent> CollisionComponents { get; private set; }
         public Dictionary<Guid, NameComponent> NameComponents { get; private set; }
+        public Dictionary<Guid, AIComponent> AIComponents { get; private set; }
         public List<Action> DelayedActions { get; private set; }
         public PlayerComponent PlayerComponent { get; set; }
         public GameMessageComponent GameMessageComponent { get; set; }
@@ -95,6 +96,7 @@ namespace ECSRogue.ECS
             TimeToLiveComponents = new Dictionary<Guid, TimeToLiveComponent>();
             CollisionComponents = new Dictionary<Guid, CollisionComponent>();
             NameComponents = new Dictionary<Guid, NameComponent>();
+            AIComponents = new Dictionary<Guid, AIComponent>();
             PlayerComponent = new PlayerComponent();
             GameMessageComponent = new GameMessageComponent();
             GameplayInfoComponent = new GameplayInfoComponent();
@@ -127,6 +129,7 @@ namespace ECSRogue.ECS
                 TimeToLiveComponents.Remove(id);
                 CollisionComponents.Remove(id);
                 NameComponents.Remove(id);
+                AIComponents.Remove(id);
             }
         }
 

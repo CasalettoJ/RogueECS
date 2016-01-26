@@ -77,6 +77,7 @@
     <Compile Include="ECS\Systems\CombatSystem.cs" />
     <Compile Include="ECS\Systems\DestructionSystem.cs" />
     <Compile Include="ECS\Systems\DisplaySystem.cs" />
+    <Compile Include="ECS\Systems\DungeonMappingSystem.cs" />
     <Compile Include="ECS\Systems\InputMovementSystem.cs" />
     <Compile Include="ECS\Systems\LabelDisplaySystem.cs" />
     <Compile Include="ECS\Systems\LevelChangeSystem.cs" />

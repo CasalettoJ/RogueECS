@@ -9,15 +9,7 @@ namespace ECSRogue.ProceduralGeneration
     {
         NONE,
         TILE_ROCK,
-        TILE_TOPLEFT_WALL,
-        TILE_TOP_WALL,
-        TILE_TOPRIGHT_WALL,
-        TILE_LEFT_WALL,
         TILE_WALL,
-        TILE_RIGHT_WALL,
-        TILE_BOTTOMLEFT_WALL,
-        TILE_BOTTOM_WALL,
-        TILE_BOTTOMRIGHT_WALL,
         TILE_FLOOR
     }
 

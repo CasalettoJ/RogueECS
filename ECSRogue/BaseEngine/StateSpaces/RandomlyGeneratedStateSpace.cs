@@ -31,16 +31,18 @@ namespace ECSRogue.BaseEngine.StateSpaces
         private SpriteFont asciiDisplay;
         private Vector2 dungeonDimensions;
         private DungeonTile[,] dungeonGrid = null;
+        private List<Vector2> freeTiles;
         private int cellSize;
         private string dungeonSpriteFile;
         private DungeonColorInfo dungeonColorInfo;
+        private int[,] mapToPlayer;
         #endregion
 
         #region Constructors
         public RandomlyGeneratedStateSpace(IGenerationAlgorithm dungeonGeneration, int worldMin, int worldMax)
         {
             stateSpaceComponents = new StateSpaceComponents();
-            List<Vector2> freeTiles = new List<Vector2>();
+            freeTiles = new List<Vector2>();
             dungeonDimensions = dungeonGeneration.GenerateDungeon(ref dungeonGrid, worldMin, worldMax, stateSpaceComponents.random, freeTiles);
             cellSize = dungeonGeneration.GetCellsize();
             dungeonSpriteFile = dungeonGeneration.GetDungeonSpritesheetFileName();
@@ -56,6 +58,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             cellSize = data.cellSize;
             dungeonColorInfo = data.dungeonColorInfo;
             dungeonDimensions = data.dungeonDimensions;
+            freeTiles = data.freeTiles;
         }
         #endregion
 
@@ -75,6 +78,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 
             }
             camera.AttachedToPlayer = true;
+            mapToPlayer = new int[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
         }
 
         private void CreatePlayer()
@@ -166,19 +170,24 @@ namespace ECSRogue.BaseEngine.StateSpaces
             }
             #endregion
 
-            CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, cellSize, prevKeyboardState);
             InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
+            CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, cellSize, prevKeyboardState);
+            //Create new map
+
             TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
             TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
             DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
             MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
             MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
             MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
+
+            DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
             CombatSystem.HandleMeleeCombat(stateSpaceComponents, cellSize);
-            if(!stateSpaceComponents.PlayerComponent.PlayerJustLoaded)
+            if(stateSpaceComponents.PlayerComponent.PlayerJustLoaded || stateSpaceComponents.PlayerComponent.PlayerTookTurn)
             {
                 PlayerComponent player = stateSpaceComponents.PlayerComponent;
                 player.PlayerJustLoaded = false;
+                player.PlayerTookTurn = false;
                 stateSpaceComponents.PlayerComponent = player;
             }
             CollisionSystem.ResetCollision(stateSpaceComponents);
@@ -190,7 +199,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         #region Draw Logic
         public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
         {
-            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo);
+            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo, messageFont, mapToPlayer);
             DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize, dungeonGrid, asciiDisplay);
             LabelDisplaySystem.DrawString(spriteBatch, stateSpaceComponents, messageFont, camera);
         }
@@ -216,7 +225,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 dungeonGrid = this.dungeonGrid,
                 stateComponents = this.stateComponents,
                 dungeonSpriteFile = this.dungeonSpriteFile,
-                stateSpaceComponents = this.stateSpaceComponents
+                stateSpaceComponents = this.stateSpaceComponents,
+                freeTiles = this.freeTiles
             };
         }
         #endregion

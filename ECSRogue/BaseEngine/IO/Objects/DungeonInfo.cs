@@ -12,6 +12,7 @@ namespace ECSRogue.BaseEngine.IO.Objects
     {
         public Vector2 dungeonDimensions;
         public DungeonTile[,] dungeonGrid;
+        public List<Vector2> freeTiles;
         public int cellSize;
         public string dungeonSpriteFile;
         public DungeonColorInfo dungeonColorInfo;

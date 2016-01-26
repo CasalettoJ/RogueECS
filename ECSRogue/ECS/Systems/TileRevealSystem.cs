@@ -224,8 +224,6 @@ namespace ECSRogue.ECS.Systems
 
         public static void IncreaseTileOpacity(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, GameTime gameTime, StateSpaceComponents spaceComponents)
         {
-            if(spaceComponents.PlayerComponent.PlayerTookTurn)
-            {
                 for (int i = 0; i < dungeonDimensions.X; i++)
                 {
                     for (int j = 0; j < dungeonDimensions.Y; j++)
@@ -243,8 +241,7 @@ namespace ECSRogue.ECS.Systems
                         }
                     }
                 }
-            }
-            else if(spaceComponents.PlayerComponent.PlayerJustLoaded)
+            if(spaceComponents.PlayerComponent.PlayerJustLoaded)
             {
                 for (int i = 0; i < dungeonDimensions.X; i++)
                 {

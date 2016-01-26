@@ -87,7 +87,7 @@ namespace ECSRogue
             {
                 currentState = currentState.UpdateContent(gameTime, gameCamera, ref gameSettings);
             }
-            catch
+            catch (Exception ex)
             {
                 Environment.Exit(0); // When laptop is unplugged game.exit() doesn't work...
             }
