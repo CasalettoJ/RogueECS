@@ -11,67 +11,7 @@ namespace ECSRogue.ECS.Systems
     {
         private const int WallValue = 10000;
 
-        public static int[,] CreateDijkstraMap(DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, Vector2 target)
-        {
-            int[,] dijkstraMap = new int[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
-
-            //Set up map
-            for(int i = 0; i < dungeonDimensions.X; i++)
-            {
-                for(int j = 0; j < dungeonDimensions.Y; j++)
-                {
-                    if(dungeonGrid[i,j].Occupiable)
-                    {
-                        dijkstraMap[i, j] = 100;
-                    }
-                    else
-                    {
-                        dijkstraMap[i, j] = WallValue;
-                    }
-                    if(i == (int)target.X && j == (int)target.Y)
-                    {
-                        dijkstraMap[i, j] = 0;
-                    }
-                }
-            }
-
-            //Set map values
-            bool changes = true;
-            while(changes)
-            {
-                changes = false;
-                for (int i = 0; i < dungeonDimensions.X; i++)
-                {
-                    for (int j = 0; j < dungeonDimensions.Y; j++)
-                    {
-                        //Get lowest neighbor
-                        int lowestNeighbor = WallValue + 1;
-                        for( int k = i - 1; k <= i + 1; k++)
-                        {
-                            for (int l = j - 1; l <= j + 1; l++)
-                            {
-                                if (l >= 0 && k >= 0 && l < (int)dungeonDimensions.Y && k < (int)dungeonDimensions.X)
-                                {
-                                    lowestNeighbor = (lowestNeighbor < dijkstraMap[k, l]) ? lowestNeighbor : dijkstraMap[k, l];
-                                }
-                            }
-                        }
-                        //If the tile is at least 2 greater than the lowest neighbor, set value to lowestneighbor+1
-                        if(dijkstraMap[i,j] >= lowestNeighbor + 2)
-                        {
-                            dijkstraMap[i, j] = lowestNeighbor + 1;
-                            changes = true;
-                        }
-                    }
-                }
-            }
-
-            return dijkstraMap;
-        }
-
-        
-
-        public static void ShouldPlayerMapRecalc(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, ref int[,] playerMap)
+        public static void ShouldPlayerMapRecalc(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, ref DijkstraMapTile[,] playerMap)
         {
             if(spaceComponents.PlayerComponent.PlayerTookTurn || spaceComponents.PlayerComponent.PlayerJustLoaded)
             {
@@ -79,7 +19,7 @@ namespace ECSRogue.ECS.Systems
             }
         }
 
-        private static void CreateDijkstraMapToPlayers(DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, StateSpaceComponents spaceComponents, ref int[,] dijkstraMap)
+        private static void CreateDijkstraMapToPlayers(DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, StateSpaceComponents spaceComponents, ref DijkstraMapTile[,] dijkstraMap)
         {
             List<Vector2> targets = new List<Vector2>();
             //targets are any entities with friendly AI and players
@@ -102,85 +42,58 @@ namespace ECSRogue.ECS.Systems
                 {
                     if (dungeonGrid[i, j].Occupiable)
                     {
-                        dijkstraMap[i, j] = WallValue-1;
+                        dijkstraMap[i, j].Weight = WallValue-1;
                     }
                     else
                     {
-                        dijkstraMap[i, j] = WallValue;
+                        dijkstraMap[i, j].Weight = WallValue;
                     }
                     if (targets.Contains(new Vector2(i, j)))
                     {
-                        dijkstraMap[i, j] = 0;
+                        dijkstraMap[i, j].Weight = 0;
                     }
+                    dijkstraMap[i, j].Checked = false;
                 }
             }
 
-            //Set map values
-            bool changes = true;
-            while (changes)
+            Queue<Vector2> floodQueue = new Queue<Vector2>();
+            foreach(Vector2 item in targets)
             {
-                changes = false;
+                floodQueue.Enqueue(item);
+            }
 
-                for (int i = 0; i < dungeonDimensions.X; i++)
+            while (floodQueue.Count > 0)
+            {
+                Vector2 pos = floodQueue.Dequeue();
+
+                int x = (int)pos.X;
+                int y = (int)pos.Y;
+                int lowestNeighbor = WallValue;
+                HashSet<Vector2> toAdd = new HashSet<Vector2>();
+                for (int k = x - 1; k <= x + 1; k++)
                 {
-                    for (int j = 0; j < dungeonDimensions.Y; j++)
+                    for (int l = y - 1; l <= y + 1; l++)
                     {
-                        //Get lowest neighbor
-                        if (dijkstraMap[i, j] != WallValue)
+                        if (l >= 0 && k >= 0 && l < (int)dungeonDimensions.Y && k < (int)dungeonDimensions.X && dijkstraMap[(int)pos.X, (int)pos.Y].Weight != WallValue)
                         {
-                            int lowestNeighbor = WallValue + 1;
-                            //for (int k = i - 1; k <= i + 1; k++)
-                            //{
-                            //    for (int l = j - 1; l <= j + 1; l++)
-                            //    {
-                            //        if (l >= 0 && k >= 0 && l < (int)dungeonDimensions.Y && k < (int)dungeonDimensions.X)
-                            //        {
-                            //            lowestNeighbor = (lowestNeighbor < dijkstraMap[k, l]) ? lowestNeighbor : dijkstraMap[k, l];
-                            //        }
-                            //    }
-                            //}
-                            if(j-1 >= 0 && i-1 >= 0)
+                            lowestNeighbor = (lowestNeighbor < dijkstraMap[k, l].Weight) ? lowestNeighbor : dijkstraMap[k, l].Weight;
+                            if(!dijkstraMap[k,l].Checked)
                             {
-                                lowestNeighbor = (lowestNeighbor < dijkstraMap[i-1,j-1]) ? lowestNeighbor : dijkstraMap[i-1,j-1];
-                            }
-                            if(j-1 >= 0)
-                            {
-                                lowestNeighbor = (lowestNeighbor < dijkstraMap[i, j-1]) ? lowestNeighbor : dijkstraMap[i, j-1];
-                            }
-                            if(j-1 >= 0 && i+1 < (int)dungeonDimensions.X)
-                            {
-                                lowestNeighbor = (lowestNeighbor < dijkstraMap[i+1, j-1]) ? lowestNeighbor : dijkstraMap[i+1, j-1];
-                            }
-                            if(i-1 >= 0)
-                            {
-                                lowestNeighbor = (lowestNeighbor < dijkstraMap[i-1, j]) ? lowestNeighbor : dijkstraMap[i-1, j];
-                            }
-                            if(i+1 < (int)dungeonDimensions.X)
-                            {
-                                lowestNeighbor = (lowestNeighbor < dijkstraMap[i+1, j]) ? lowestNeighbor : dijkstraMap[i+1, j];
-                            }
-                            if (j + 1 < (int)dungeonDimensions.Y && i-1 >= 0)
-                            {
-                                lowestNeighbor = (lowestNeighbor < dijkstraMap[i-1, j + 1]) ? lowestNeighbor : dijkstraMap[i-1, j + 1];
-                            }
-                            if (j+1 < (int)dungeonDimensions.Y)
-                            {
-                                lowestNeighbor = (lowestNeighbor < dijkstraMap[i, j+1]) ? lowestNeighbor : dijkstraMap[i, j+1];
-                            }
-                            if (j + 1 < (int)dungeonDimensions.Y && i + 1 < (int)dungeonDimensions.Y)
-                            {
-                                lowestNeighbor = (lowestNeighbor < dijkstraMap[i + 1, j + 1]) ? lowestNeighbor : dijkstraMap[i + 1, j + 1];
-                            }
-                            //If the tile is at least 2 greater than the lowest neighbor, set value to lowestneighbor+1
-                            if (dijkstraMap[i, j] >= lowestNeighbor + 2)
-                            {
-                                dijkstraMap[i, j] = lowestNeighbor + 1;
-                                changes = true;
+                                dijkstraMap[k, l].Checked = true;
+                                floodQueue.Enqueue(new Vector2(k, l));
                             }
                         }
                     }
                 }
+                if (dijkstraMap[x,y].Weight >= lowestNeighbor + 2)
+                {
+                    dijkstraMap[x,y].Weight = lowestNeighbor + 1;
+                }
             }
+
+
+
+
         }
 
     }

@@ -40,7 +40,7 @@ namespace ECSRogue.ECS.Systems
             }
         }
 
-        public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo, SpriteFont font, int[,] mapToPlayer)
+        public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo)
         {
             Matrix cameraMatrix = camera.GetMatrix();
             for (int i = 0; i < (int)dungeonDimensions.X; i++)
@@ -99,10 +99,6 @@ namespace ECSRogue.ECS.Systems
                                 dungeonGrid[i, j].Found = true;
                             }
                         }
-                        //DEBUGGING
-                        Vector2 size = font.MeasureString(mapToPlayer[i, j].ToString());
-                        spriteBatch.DrawString(font, mapToPlayer[i, j].ToString(), new Vector2(tile.X + 16, tile.Y + 16),
-                            Color.White, 0f, new Vector2((int)(size.X / 2), (int)(size.Y / 2)), 1f, SpriteEffects.None, 0f);
                     }
 
                    

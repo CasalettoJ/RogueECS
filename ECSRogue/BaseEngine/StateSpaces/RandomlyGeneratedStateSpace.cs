@@ -35,7 +35,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         private int cellSize;
         private string dungeonSpriteFile;
         private DungeonColorInfo dungeonColorInfo;
-        private int[,] mapToPlayer;
+        private DijkstraMapTile[,] mapToPlayer;
         #endregion
 
         #region Constructors
@@ -78,7 +78,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 
             }
             camera.AttachedToPlayer = true;
-            mapToPlayer = new int[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
+            mapToPlayer = new DijkstraMapTile[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
         }
 
         private void CreatePlayer()
@@ -165,7 +165,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             #region Debug
             if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && prevKeyboardState.IsKeyUp(Keys.LeftShift))
             {
-                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 50, 100);
+                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 50, 75);
                 LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
             }
             #endregion
@@ -199,7 +199,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         #region Draw Logic
         public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
         {
-            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo, messageFont, mapToPlayer);
+            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo);
             DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize, dungeonGrid, asciiDisplay);
             LabelDisplaySystem.DrawString(spriteBatch, stateSpaceComponents, messageFont, camera);
         }

@@ -23,4 +23,10 @@ namespace ECSRogue.ProceduralGeneration
         public bool Occupiable;
         public float Opacity;
     }
+
+    public struct DijkstraMapTile
+    {
+        public int Weight;
+        public bool Checked;
+    }
 }
