@@ -172,7 +172,6 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
             InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
             CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, cellSize, prevKeyboardState);
-            //Create new map
 
             TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
             TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
