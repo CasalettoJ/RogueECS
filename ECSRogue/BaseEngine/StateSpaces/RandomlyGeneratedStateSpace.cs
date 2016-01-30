@@ -115,20 +115,22 @@ namespace ECSRogue.BaseEngine.StateSpaces
                     Power = 10,
                     Defense = 5,
                     Accuracy = 100,
-                    Wealth = 100
+                    Wealth = 0
                 };
             }
             //Set Display
             stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.Wheat, SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize),
                 Origin = Vector2.Zero, SpriteEffect = SpriteEffects.None, Scale = 1f, Rotation = 0f };
             //Set Sightradius
-            stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 15 };
+            stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { CurrentRadius = 12, MaxRadius = 15, DrawRadius = true };
             //Set first turn
             stateSpaceComponents.PlayerComponent = new PlayerComponent() { PlayerJustLoaded = true };
             //Collision information
             stateSpaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = true };
             //Set name of player
             stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "PLAYER" };
+            //Set Input of the player
+            stateSpaceComponents.InputMovementComponents[id] = new InputMovementComponent() { TimeIntervalBetweenMovements = .09f, TimeSinceLastMovement = 0f, InitialWait = .5f, TotalTimeButtonDown = 0f, LastKeyPressed = Keys.None };
 
         }
 
@@ -152,16 +154,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         #region Update Logic
         public IStateSpace UpdateSpace(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, ref GameSettings gameSettings)
         {
-            if(stateSpaceComponents.EntitiesToDelete.Count > 0)
-            {
-                foreach(Guid entity in stateSpaceComponents.EntitiesToDelete)
-                {
-                    stateSpaceComponents.DestroyEntity(entity);
-                }
-                stateSpaceComponents.EntitiesToDelete.Clear();
-            }
             IStateSpace nextStateSpace = this;
-
             #region Debug
             if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && prevKeyboardState.IsKeyUp(Keys.LeftShift))
             {
@@ -170,18 +163,31 @@ namespace ECSRogue.BaseEngine.StateSpaces
             }
             #endregion
 
+            //Deletion and Cleanup
+            if (stateSpaceComponents.EntitiesToDelete.Count > 0)
+            {
+                foreach(Guid entity in stateSpaceComponents.EntitiesToDelete)
+                {
+                    stateSpaceComponents.DestroyEntity(entity);
+                }
+                stateSpaceComponents.EntitiesToDelete.Clear();
+            }
+            DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
+
+            //Movement and Reaction
             InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
             CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, cellSize, prevKeyboardState);
-
             TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
             TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
-            DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
             MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
             MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
             MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
-
             DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
+
+            //AI and Combat
             CombatSystem.HandleMeleeCombat(stateSpaceComponents, cellSize);
+
+            //Resetting Systems
             if(stateSpaceComponents.PlayerComponent.PlayerJustLoaded || stateSpaceComponents.PlayerComponent.PlayerTookTurn)
             {
                 PlayerComponent player = stateSpaceComponents.PlayerComponent;

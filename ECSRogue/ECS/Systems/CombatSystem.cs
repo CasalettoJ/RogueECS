@@ -19,7 +19,7 @@ namespace ECSRogue.ECS.Systems
             {
                 foreach(Guid collidedEntity in spaceComponents.CollisionComponents[id].CollidedObjects)
                 {
-                    if((spaceComponents.Entities.Where(x => x.Id == collidedEntity).First().ComponentFlags & ComponentMasks.NPC) == ComponentMasks.NPC)
+                    if((spaceComponents.Entities.Where(x => x.Id == collidedEntity).First().ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI)
                     {
                         int damageDone = 0;
                         SkillLevelsComponent collidedStats = spaceComponents.SkillLevelsComponents[collidedEntity];

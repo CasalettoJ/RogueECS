@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ECSRogue.ECS;
 using ECSRogue.ECS.Systems;
 using ECSRogue.ECS.Components;
+using ECSRogue.ECS.Components.AIComponents;
 
 namespace ECSRogue.ProceduralGeneration
 {
@@ -363,7 +364,7 @@ namespace ECSRogue.ProceduralGeneration
             for(int i = 0; i < numberOfMonsters; i++)
             {
                 Guid id = spaceComponents.CreateEntity();
-                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.NPC;
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.CombatReadyAI;
 
                 int tileIndex = spaceComponents.random.Next(0, freeTiles.Count);
                 spaceComponents.PositionComponents[id] = new PositionComponent() { Position = freeTiles[tileIndex] };
@@ -379,24 +380,19 @@ namespace ECSRogue.ProceduralGeneration
                     Symbol = "t",
                     SymbolColor = Color.White
                 };
-                spaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 3 };
                 spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 10, DieNumber = 1, Health = 10, Power = 5, Defense = 1, Accuracy = 100, Wealth = 25, MinimumDamage = 1, MaximumDamage = 2 };
                 spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
                 spaceComponents.NameComponents[id] = new NameComponent() { Name = "TEST ENEMY NPC" };
-                spaceComponents.AIComponents[id] = new AIComponent()
-                {
-                    Alignment = AIAlignment.ALIGNMENT_HOSTILE,
-                    AttackType = AIAttackType.ATTACK_TYPE_NORMAL,
-                    FleesWhenLowHealth = true,
-                    State = AIState.STATE_SLEEPING
-                };
+                spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
+                spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
+                spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_ROAMING };
             }
 
-            numberOfMonsters = spaceComponents.random.Next(1, 100);
+            numberOfMonsters = spaceComponents.random.Next(1, 25);
             for (int i = 0; i < numberOfMonsters; i++)
             {
                 Guid id = spaceComponents.CreateEntity();
-                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.NPC;
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.CombatReadyAI;
 
                 int tileIndex = spaceComponents.random.Next(0, freeTiles.Count);
                 spaceComponents.PositionComponents[id] = new PositionComponent() { Position = freeTiles[tileIndex] };
@@ -412,17 +408,12 @@ namespace ECSRogue.ProceduralGeneration
                     Symbol = "W",
                     SymbolColor = Color.White
                 };
-                spaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 3 };
                 spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 45, DieNumber = 2, Health = 45, Power = 5, Defense = 10, Accuracy = 135, Wealth = 25, MinimumDamage = 5, MaximumDamage = 14 };
                 spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
                 spaceComponents.NameComponents[id] = new NameComponent() { Name = "WILD ROOTS" };
-                spaceComponents.AIComponents[id] = new AIComponent()
-                {
-                    Alignment = AIAlignment.ALIGNMENT_HOSTILE,
-                    AttackType = AIAttackType.ATTACK_TYPE_NORMAL,
-                    FleesWhenLowHealth = true,
-                    State = AIState.STATE_SLEEPING
-                };
+                spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
+                spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
+                spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_ROAMING };
             }
         }
 

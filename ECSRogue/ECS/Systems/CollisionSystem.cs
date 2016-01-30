@@ -14,8 +14,8 @@ namespace ECSRogue.ECS.Systems
             bool canMove = true;
             foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Collidable) == ComponentMasks.Collidable).Select(x => x.Id))
             {
-                if(spaceComponents.PositionComponents[id].Position.X == newPosition.Position.X &&
-                    spaceComponents.PositionComponents[id].Position.Y == newPosition.Position.Y)
+                if((int)spaceComponents.PositionComponents[id].Position.X == (int)newPosition.Position.X &&
+                    (int)spaceComponents.PositionComponents[id].Position.Y == (int)newPosition.Position.Y)
                 {
                     spaceComponents.CollisionComponents[attemptingEntity].CollidedObjects.Add(id);
                     if(spaceComponents.CollisionComponents[id].Solid)

@@ -24,52 +24,63 @@ namespace ECSRogue.ECS.Systems
                 KeyboardState keyState = Keyboard.GetState();
                 PositionComponent pos = spaceComponents.PositionComponents[id];
                 GameplayInfoComponent gameInfo = spaceComponents.GameplayInfoComponent;
-                if (keyState.IsKeyDown(Keys.NumPad8) && !prevKeyboardState.IsKeyDown(Keys.NumPad8))
+                InputMovementComponent movementComponent = spaceComponents.InputMovementComponents[id];
+                if (keyState.IsKeyDown(Keys.NumPad8))
                 {
-                    pos.Position.Y -= 1;
+                    movement = InputMovementSystem.CalculateMovement(ref pos, 0, -1, ref movementComponent, gameTime, Keys.NumPad8);
+                }
+                else if (keyState.IsKeyDown(Keys.NumPad2))
+                {
+                    movement = InputMovementSystem.CalculateMovement(ref pos, 0, 1, ref movementComponent, gameTime, Keys.NumPad2);
+                }
+                else if (keyState.IsKeyDown(Keys.NumPad6))
+                {
+                    movement = InputMovementSystem.CalculateMovement(ref pos, 1, 0, ref movementComponent, gameTime, Keys.NumPad6);
+                }
+                else if (keyState.IsKeyDown(Keys.NumPad4))
+                {
+                    movement = InputMovementSystem.CalculateMovement(ref pos, -1, 0, ref movementComponent, gameTime, Keys.NumPad4);
+                }
+                else if (keyState.IsKeyDown(Keys.NumPad7))
+                {
+                    movement = InputMovementSystem.CalculateMovement(ref pos, -1, -1, ref movementComponent, gameTime, Keys.NumPad7);
+                }
+                else if (keyState.IsKeyDown(Keys.NumPad9))
+                {
+                    movement = InputMovementSystem.CalculateMovement(ref pos, 1, -1, ref movementComponent, gameTime, Keys.NumPad9);
+                }
+                else if (keyState.IsKeyDown(Keys.NumPad1))
+                {
+                    movement = InputMovementSystem.CalculateMovement(ref pos, -1, 1, ref movementComponent, gameTime, Keys.NumPad1);
+                }
+                else if (keyState.IsKeyDown(Keys.NumPad3))
+                {
+                    movement = InputMovementSystem.CalculateMovement(ref pos, 1, 1, ref movementComponent, gameTime, Keys.NumPad3);
+                }
+
+                else if (keyState.IsKeyDown(Keys.Z) && prevKeyboardState.IsKeyUp(Keys.Z))
+                {
+                    SightRadiusComponent radius = spaceComponents.SightRadiusComponents[id];
+                    radius.CurrentRadius -= 1;
+                    spaceComponents.SightRadiusComponents[id] = (radius.CurrentRadius <= 0) ? spaceComponents.SightRadiusComponents[id] : radius;
                     movement = true;
                 }
-                else if (keyState.IsKeyDown(Keys.NumPad2) && !prevKeyboardState.IsKeyDown(Keys.NumPad2))
+                else if (keyState.IsKeyDown(Keys.X) && prevKeyboardState.IsKeyUp(Keys.X))
                 {
-                    pos.Position.Y += 1;
+                    SightRadiusComponent radius = spaceComponents.SightRadiusComponents[id];
+                    radius.CurrentRadius += 1;
+                    spaceComponents.SightRadiusComponents[id] = (radius.CurrentRadius > spaceComponents.SightRadiusComponents[id].MaxRadius) ? spaceComponents.SightRadiusComponents[id] : radius;
                     movement = true;
                 }
-                else if (keyState.IsKeyDown(Keys.NumPad6) && !prevKeyboardState.IsKeyDown(Keys.NumPad6))
+                else
                 {
-                    pos.Position.X += 1;
-                    movement = true;
-                }
-                else if (keyState.IsKeyDown(Keys.NumPad4) && !prevKeyboardState.IsKeyDown(Keys.NumPad4))
-                {
-                    pos.Position.X -= 1;
-                    movement = true;
-                }
-                else if (keyState.IsKeyDown(Keys.NumPad7) && !prevKeyboardState.IsKeyDown(Keys.NumPad7))
-                {
-                    pos.Position.X -= 1;
-                    pos.Position.Y -= 1;
-                    movement = true;
-                }
-                else if (keyState.IsKeyDown(Keys.NumPad9) && !prevKeyboardState.IsKeyDown(Keys.NumPad9))
-                {
-                    pos.Position.X += 1;
-                    pos.Position.Y -= 1;
-                    movement = true;
-                }
-                else if (keyState.IsKeyDown(Keys.NumPad1) && !prevKeyboardState.IsKeyDown(Keys.NumPad1))
-                {
-                    pos.Position.X -= 1;
-                    pos.Position.Y += 1;
-                    movement = true;
-                }
-                else if (keyState.IsKeyDown(Keys.NumPad3) && !prevKeyboardState.IsKeyDown(Keys.NumPad3))
-                {
-                    pos.Position.X += 1;
-                    pos.Position.Y += 1;
-                    movement = true;
+                    movementComponent.IsButtonDown = false;
+                    movementComponent.TotalTimeButtonDown = 0f;
+                    movementComponent.LastKeyPressed = Keys.None;
                 }
 
                 hitWall = !dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Occupiable;
+                spaceComponents.InputMovementComponents[id] = movementComponent;
                 if (!hitWall && movement)
                 {
                     //Check collisions.  If no collisions, move into spot.
@@ -89,7 +100,40 @@ namespace ECSRogue.ECS.Systems
 
             }
         }
+
+
+        private static bool CalculateMovement(ref PositionComponent pos, int xChange, int yChange, ref InputMovementComponent movementComponent, GameTime gameTime, Keys keyPressed)
+        {
+            bool movement = false;
+            if (movementComponent.IsButtonDown)
+            {
+                if(keyPressed == movementComponent.LastKeyPressed)
+                {
+                    movementComponent.TimeSinceLastMovement += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    movementComponent.TotalTimeButtonDown += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                else
+                {
+                    movementComponent.IsButtonDown = false;
+                    movementComponent.TotalTimeButtonDown = 0f;
+                }
+            }
+            if (!movementComponent.IsButtonDown || (movementComponent.TimeIntervalBetweenMovements < movementComponent.TimeSinceLastMovement 
+                && movementComponent.InitialWait < movementComponent.TotalTimeButtonDown))
+            {
+                movementComponent.IsButtonDown = true;
+                movementComponent.LastKeyPressed = keyPressed;
+                movementComponent.TimeSinceLastMovement = 0f;
+                movement = true;
+                pos.Position.X += xChange;
+                pos.Position.Y += yChange;
+
+            }
+
+
+            return movement;
+        }
+
+
     }
-
-
 }

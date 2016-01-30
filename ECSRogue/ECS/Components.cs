@@ -1,4 +1,5 @@
 ﻿using ECSRogue.ECS.Components;
+using ECSRogue.ECS.Components.AIComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,13 +21,16 @@ namespace ECSRogue.ECS
         COMPONENT_GAMEMESSAGE = 1 << 8,
         COMPONENT_GAMEPLAY_INFO = 1 << 9,
         COMPONENT_SKILL_LEVELS = 1 << 10,
-        COMPONENT_AI = 1 << 11,
-        COMPONENT_TARGET_POSITION = 1 << 12,
-        COMPONENT_DIRECTION = 1 << 13,
-        COMPONENT_TIME_TO_LIVE = 1  << 14,
-        COMPONENT_PLAYER = 1 << 15,
-        COMPONENT_COLLISION = 1 << 16,
-        COMPONENT_NAME = 1 << 17
+        COMPONENT_TARGET_POSITION = 1 << 11,
+        COMPONENT_DIRECTION = 1 << 12,
+        COMPONENT_TIME_TO_LIVE = 1 << 13,
+        COMPONENT_PLAYER = 1 << 14,
+        COMPONENT_COLLISION = 1 << 15,
+        COMPONENT_NAME = 1 << 16,
+        COMPONENT_AI_MOVEMENT = 1 << 17,
+        COMPONENT_AI_COMBAT = 1 << 18,
+        COMPONENT_AI_ALIGNMENT = 1 << 19,
+        COMPONENT_AI_STATE = 1 << 20
     }
 
 
@@ -35,9 +39,10 @@ namespace ECSRogue.ECS
     {
         public const Component Player = Component.COMPONENT_POSITION | Component.COMPONENT_DISPLAY | Component.COMPONENT_SIGHTRADIUS 
             | Component.COMPONENT_GAMEPLAY_INFO | Component.COMPONENT_SKILL_LEVELS |  Component.COMPONENT_COLLISION | Component.COMPONENT_NAME | Component.COMPONENT_PLAYER;
-
-        public const Component NPC = Component.COMPONENT_POSITION | Component.COMPONENT_DISPLAY | Component.COMPONENT_SIGHTRADIUS 
-            | Component.COMPONENT_SKILL_LEVELS |   Component.COMPONENT_NAME | Component.COMPONENT_COLLISION | Component.COMPONENT_AI;
+   
+        public const Component CombatReadyAI = Component.COMPONENT_AI_ALIGNMENT | Component.COMPONENT_AI_COMBAT | Component.COMPONENT_AI_STATE 
+            | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_COLLISION | Component.COMPONENT_NAME; 
+        public const Component MovingAI = Component.COMPONENT_POSITION | Component.COMPONENT_AI_MOVEMENT; //Not Implemented
 
         public const Component InputMoveable = Component.COMPONENT_POSITION | Component.COMPONENT_INPUTMOVEMENT;
 
@@ -73,7 +78,12 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, TimeToLiveComponent> TimeToLiveComponents { get; private set; }
         public Dictionary<Guid, CollisionComponent> CollisionComponents { get; private set; }
         public Dictionary<Guid, NameComponent> NameComponents { get; private set; }
-        public Dictionary<Guid, AIComponent> AIComponents { get; private set; }
+        public Dictionary<Guid, AIMovement> AIMovementComponents { get; private set; }
+        public Dictionary<Guid, AICombat> AICombatComponents { get; private set; }
+        public Dictionary<Guid, AIAlignment> AIAlignmentComponents { get; private set; }
+        public Dictionary<Guid, AIState> AIStateComponents { get; private set; }
+        public Dictionary<Guid, InputMovementComponent> InputMovementComponents { get; private set; }
+
         public List<Action> DelayedActions { get; private set; }
         public PlayerComponent PlayerComponent { get; set; }
         public GameMessageComponent GameMessageComponent { get; set; }
@@ -96,7 +106,12 @@ namespace ECSRogue.ECS
             TimeToLiveComponents = new Dictionary<Guid, TimeToLiveComponent>();
             CollisionComponents = new Dictionary<Guid, CollisionComponent>();
             NameComponents = new Dictionary<Guid, NameComponent>();
-            AIComponents = new Dictionary<Guid, AIComponent>();
+            AIMovementComponents = new Dictionary<Guid, AIMovement>();
+            AICombatComponents = new Dictionary<Guid, AICombat>();
+            AIAlignmentComponents = new Dictionary<Guid, AIAlignment>();
+            AIStateComponents = new Dictionary<Guid, AIState>();
+            InputMovementComponents = new Dictionary<Guid, InputMovementComponent>();
+
             PlayerComponent = new PlayerComponent();
             GameMessageComponent = new GameMessageComponent();
             GameplayInfoComponent = new GameplayInfoComponent();
@@ -129,7 +144,11 @@ namespace ECSRogue.ECS
                 TimeToLiveComponents.Remove(id);
                 CollisionComponents.Remove(id);
                 NameComponents.Remove(id);
-                AIComponents.Remove(id);
+                AIMovementComponents.Remove(id);
+                AICombatComponents.Remove(id);
+                AIAlignmentComponents.Remove(id);
+                AIStateComponents.Remove(id);
+                InputMovementComponents.Remove(id);
             }
         }
 

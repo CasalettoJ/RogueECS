@@ -83,24 +83,27 @@ namespace ECSRogue
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            try
+            if (this.IsActive)
             {
-                currentState = currentState.UpdateContent(gameTime, gameCamera, ref gameSettings);
+                try
+                {
+                    currentState = currentState.UpdateContent(gameTime, gameCamera, ref gameSettings);
+                }
+                catch (Exception ex)
+                {
+                    Environment.Exit(0); // When laptop is unplugged game.exit() doesn't work...
+                }
+                prevKey = Keyboard.GetState();
+                if (currentState == null)
+                {
+                    Exit();
+                }
+                if (gameSettings.HasChanges)
+                {
+                    ResetGameSettings();
+                }
+                base.Update(gameTime);
             }
-            catch (Exception ex)
-            {
-                Environment.Exit(0); // When laptop is unplugged game.exit() doesn't work...
-            }
-            prevKey = Keyboard.GetState();
-            if(currentState == null)
-            {
-                Exit();
-            }
-            if(gameSettings.HasChanges)
-            {
-                ResetGameSettings();
-            }
-            base.Update(gameTime);
         }
 
         /// <summary>

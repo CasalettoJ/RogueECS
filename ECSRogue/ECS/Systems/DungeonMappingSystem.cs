@@ -1,4 +1,5 @@
-﻿using ECSRogue.ProceduralGeneration;
+﻿using ECSRogue.ECS.Components.AIComponents;
+using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -27,9 +28,9 @@ namespace ECSRogue.ECS.Systems
             {
                 targets.Add(spaceComponents.PositionComponents[id].Position);
             }
-            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.NPC) == ComponentMasks.NPC).Select(x => x.Id))
+            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_AI_ALIGNMENT) == Component.COMPONENT_AI_ALIGNMENT).Select(x => x.Id))
             {
-                if(spaceComponents.AIComponents[id].Alignment == Components.AIAlignment.ALIGNMENT_FRIENDLY)
+                if(spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_FRIENDLY)
                 {
                     targets.Add(spaceComponents.PositionComponents[id].Position);
                 }
