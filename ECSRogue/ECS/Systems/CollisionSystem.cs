@@ -15,7 +15,8 @@ namespace ECSRogue.ECS.Systems
             foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Collidable) == ComponentMasks.Collidable).Select(x => x.Id))
             {
                 if((int)spaceComponents.PositionComponents[id].Position.X == (int)newPosition.Position.X &&
-                    (int)spaceComponents.PositionComponents[id].Position.Y == (int)newPosition.Position.Y)
+                    (int)spaceComponents.PositionComponents[id].Position.Y == (int)newPosition.Position.Y &&
+                    id != attemptingEntity)
                 {
                     spaceComponents.CollisionComponents[attemptingEntity].CollidedObjects.Add(id);
                     if(spaceComponents.CollisionComponents[id].Solid)

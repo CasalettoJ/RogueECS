@@ -75,6 +75,7 @@
     <Compile Include="ECS\Components\VelocityComponent.cs" />
     <Compile Include="ECS\Entity.cs" />
     <Compile Include="ECSRogue.cs" />
+    <Compile Include="ECS\Systems\AISystem.cs" />
     <Compile Include="ECS\Systems\AnimationSystem.cs" />
     <Compile Include="ECS\Systems\CameraSystem.cs" />
     <Compile Include="ECS\Systems\CollisionSystem.cs" />

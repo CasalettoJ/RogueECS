@@ -38,10 +38,10 @@ namespace ECSRogue.ECS
     public struct ComponentMasks
     {
         public const Component Player = Component.COMPONENT_POSITION | Component.COMPONENT_DISPLAY | Component.COMPONENT_SIGHTRADIUS 
-            | Component.COMPONENT_GAMEPLAY_INFO | Component.COMPONENT_SKILL_LEVELS |  Component.COMPONENT_COLLISION | Component.COMPONENT_NAME | Component.COMPONENT_PLAYER;
+            | Component.COMPONENT_GAMEPLAY_INFO | Component.COMPONENT_SKILL_LEVELS |  Component.COMPONENT_COLLISION | Component.COMPONENT_NAME | Component.COMPONENT_PLAYER | Component.COMPONENT_AI_ALIGNMENT;
    
         public const Component CombatReadyAI = Component.COMPONENT_AI_ALIGNMENT | Component.COMPONENT_AI_COMBAT | Component.COMPONENT_AI_STATE 
-            | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_COLLISION | Component.COMPONENT_NAME; 
+            | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_COLLISION | Component.COMPONENT_NAME | Component.COMPONENT_POSITION; 
         public const Component MovingAI = Component.COMPONENT_POSITION | Component.COMPONENT_AI_MOVEMENT; //Not Implemented
 
         public const Component InputMoveable = Component.COMPONENT_POSITION | Component.COMPONENT_INPUTMOVEMENT;

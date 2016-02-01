@@ -13,6 +13,7 @@ using ECSRogue.ProceduralGeneration.Interfaces;
 using ECSRogue.ECS.Systems;
 using ECSRogue.ECS.Components;
 using ECSRogue.BaseEngine.IO.Objects;
+using ECSRogue.ECS.Components.AIComponents;
 
 namespace ECSRogue.BaseEngine.StateSpaces
 {
@@ -113,7 +114,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                     CurrentHealth = 100,
                     Health = 100,
                     Power = 10,
-                    Defense = 5,
+                    Defense = 10,
                     Accuracy = 100,
                     Wealth = 0
                 };
@@ -131,6 +132,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "PLAYER" };
             //Set Input of the player
             stateSpaceComponents.InputMovementComponents[id] = new InputMovementComponent() { TimeIntervalBetweenMovements = .09f, TimeSinceLastMovement = 0f, InitialWait = .5f, TotalTimeButtonDown = 0f, LastKeyPressed = Keys.None };
+            //Set an alignment for AI to communicate with
+            stateSpaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_FRIENDLY };
 
         }
 
@@ -185,6 +188,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
 
             //AI and Combat
+            AISystem.AICheckDetection(stateSpaceComponents, dungeonGrid);
+            AISystem.AIMovement(stateSpaceComponents, dungeonGrid, dungeonDimensions, mapToPlayer);
             CombatSystem.HandleMeleeCombat(stateSpaceComponents, cellSize);
 
             //Resetting Systems
