@@ -11,6 +11,7 @@ using ECSRogue.ECS;
 using ECSRogue.ECS.Systems;
 using ECSRogue.ECS.Components;
 using ECSRogue.ECS.Components.AIComponents;
+using ECSRogue.ECS.Components.MeleeMessageComponents;
 
 namespace ECSRogue.ProceduralGeneration
 {
@@ -387,6 +388,60 @@ namespace ECSRogue.ProceduralGeneration
                 spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
                 spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_ROAMING };
                 spaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() {MaxRadius = 10, CurrentRadius = 0, DrawRadius = true};
+                spaceComponents.MeleeAttackNPCMessageComponents[id] = new MeleeAttackNPCMessageComponent()
+                {
+                    AttackNPCMessages = new string[]
+                    {
+                        "{0} swings at the {1}",
+                        "{0} applies fury to the {1}'s face",
+                        "{0} attempts brute force against {1}",
+                        "{0} uses a walking attack fearlessly at {1}"
+                    }
+                };
+                spaceComponents.MeleeAttackPlayerMessageComponents[id] = new MeleeAttackPlayerMessageComponent()
+                {
+                    AttackPlayerMessages = new string[]
+                    {
+                        "{0} tests a mighty attack on you",
+                        "The {0} glitches out against you",
+                        "Watch out! {0} tries to attack you"
+                    }
+                };
+                spaceComponents.DodgeMeleeMessageComponents[id] = new DodgeMeleeMessageComponent()
+                {
+                    NormalDodgeMessages = new string[]
+                    {
+                        " but the attack missed!",
+                        " and the creature dodges the attack.",
+                        " but the creature's defense protects it.",
+                        " and the defense test is a success.",
+                        " but the combat system test makes the attack miss."
+                    },
+                    StreakDodgeMessages = new string[]
+                    {
+                        " and, as always, the attack misses.",
+                        " and it misses again!",
+                        " and shows how advanced its AI is by dodging again.",
+                        " and taunts at the attack. \"Give up!\""
+                    }
+                };
+                spaceComponents.TakeMeleeDamageMesageComponents[id] = new TakeMeleeDamageMesageComponent()
+                {
+                    NormalTakeDamageMessages = new string[]
+                    {
+                        " and it takes {0} damage.",
+                        " and it cries out, {0} health weaker.",
+                        " and it glitches out, health dropping by {0}.",
+                        " for {0} damage."
+                    },
+                    BrokenDodgeStreakTakeDamageMessages = new string[]
+                    {
+                        " and against all odds deals {0} damage!",
+                        " and the cocky creature allows {0} damage to go through!",
+                        ", breaking impossible odds, landing {0} damage!!",
+                        " and the test is broken! It takes {0} damage!"
+                    }
+                };
             }
 
             numberOfMonsters = spaceComponents.random.Next(1, 25);
@@ -415,6 +470,62 @@ namespace ECSRogue.ProceduralGeneration
                 spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
                 spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
                 spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_ROAMING };
+                spaceComponents.MeleeAttackNPCMessageComponents[id] = new MeleeAttackNPCMessageComponent()
+                {
+                    AttackNPCMessages = new string[]
+                    {
+                        "{0} swings its tentacles toward {1}",
+                        "{0} applies fury to the {1}'s face",
+                        "{0} attempts brute force against {1}",
+                        "{0} uses a walking attack fearlessly at {1}"
+                    }
+                };
+                spaceComponents.MeleeAttackPlayerMessageComponents[id] = new MeleeAttackPlayerMessageComponent()
+                {
+                    AttackPlayerMessages = new string[]
+                    {
+                        "{0} wiggles its tentacles at you",
+                        "{0} wraps its tentacles around your ankles, binding you tightly in place.  Drifting tendrils slide slowly up your legs and across your thighs toward your nethers",
+                        "{0} dives one thick vines past your lips and into your throat.  You feel a slight buzz with a subtle burn as it injects you with some strange poison"
+                        //"The {0} swipes at you multiple times",
+                        //"Gross.. the tentacles of {0} smear around you"
+                    }
+                };
+                spaceComponents.DodgeMeleeMessageComponents[id] = new DodgeMeleeMessageComponent()
+                {
+                    NormalDodgeMessages = new string[]
+                    {
+                        " but the attack missed!",
+                        " and the creature dodges the attack.",
+                        " but the creature's defense protects it.",
+                        " but it uses its tentacle vines to protect itself.",
+                        " but the vines are too thick for the attack!"
+                    },
+                    StreakDodgeMessages = new string[]
+                    {
+                        " and, as always, the attack misses.",
+                        " and it misses again!",
+                        " and it slithers around, cackling",
+                        " and taunts at the attack. \"Give up!\""
+                    }
+                };
+                spaceComponents.TakeMeleeDamageMesageComponents[id] = new TakeMeleeDamageMesageComponent()
+                {
+                    NormalTakeDamageMessages = new string[]
+                    {
+                        " and it takes {0} damage.",
+                        " and it cries out, {0} health weaker.",
+                        " and takes {0}, some of its vines dropping dead",
+                        " for {0} damage."
+                    },
+                    BrokenDodgeStreakTakeDamageMessages = new string[]
+                    {
+                        " and against all odds deals {0} damage!",
+                        " and the cocky creature allows {0} damage to go through!",
+                        ", breaking impossible odds, landing {0} damage!!",
+                        " and the test is broken! It takes {0} damage!"
+                    }
+                };
             }
         }
 

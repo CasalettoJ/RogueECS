@@ -83,10 +83,9 @@ namespace ECSRogue.ECS.Systems
                 float distance = Vector2.Distance(camera.Position, camera.Target);
                 Vector2 direction = Vector2.Normalize(camera.Target - camera.Position);
                 float velocity = distance * 2.5f;
-                camera.Position += direction * velocity * (camera.Scale >= 1 ? camera.Scale : 1) * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if (distance < 2.5)
+                if (distance > 10f)
                 {
-                    camera.Position = camera.Target;
+                    camera.Position += direction * velocity * (camera.Scale >= 1 ? camera.Scale : 1) * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }
             }
         }

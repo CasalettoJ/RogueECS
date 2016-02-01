@@ -14,6 +14,7 @@ using ECSRogue.ECS.Systems;
 using ECSRogue.ECS.Components;
 using ECSRogue.BaseEngine.IO.Objects;
 using ECSRogue.ECS.Components.AIComponents;
+using ECSRogue.ECS.Components.MeleeMessageComponents;
 
 namespace ECSRogue.BaseEngine.StateSpaces
 {
@@ -114,7 +115,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                     CurrentHealth = 100,
                     Health = 100,
                     Power = 10,
-                    Defense = 10,
+                    Defense = 50,
                     Accuracy = 100,
                     Wealth = 0
                 };
@@ -129,12 +130,58 @@ namespace ECSRogue.BaseEngine.StateSpaces
             //Collision information
             stateSpaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = true };
             //Set name of player
-            stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "PLAYER" };
+            stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "You" };
             //Set Input of the player
             stateSpaceComponents.InputMovementComponents[id] = new InputMovementComponent() { TimeIntervalBetweenMovements = .09f, TimeSinceLastMovement = 0f, InitialWait = .5f, TotalTimeButtonDown = 0f, LastKeyPressed = Keys.None };
             //Set an alignment for AI to communicate with
             stateSpaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_FRIENDLY };
-
+            //Set combat messages
+            stateSpaceComponents.DodgeMeleeMessageComponents[id] = new DodgeMeleeMessageComponent()
+            {
+                NormalDodgeMessages = new string[]
+                {
+                    " and the attack misses you!",
+                    " but nothing happened.",
+                    " ... but it failed!",
+                    " and your defense protects you.",
+                    " but it fails to connect."
+                },
+                StreakDodgeMessages = new string[]
+                {
+                    " but you don't even notice.",
+                    " and you laugh at the attempt.",
+                    " but you easily dodge it again.",
+                    " and misses you. Again!"
+                }
+            };
+            stateSpaceComponents.MeleeAttackNPCMessageComponents[id] = new MeleeAttackNPCMessageComponent()
+            {
+                AttackNPCMessages = new string[]
+                {
+                    "{0} attack the {1}",
+                    "{0} take a swing at the {1}",
+                    "{0} swipe at {1}",
+                    "{0} try to damage the {1}",
+                    "{0} slash viciously at the {1}"
+                }
+            };
+            stateSpaceComponents.TakeMeleeDamageMesageComponents[id] = new TakeMeleeDamageMesageComponent()
+            {
+                NormalTakeDamageMessages = new string[]
+                {
+                    " and you take {0} damage.",
+                    " and it hurts! You take {0} damage.",
+                    "! Ow. You lose {0} health.",
+                    " and hits you for {0} damage."
+                },
+                BrokenDodgeStreakTakeDamageMessages = new string[]
+                {
+                    " and you finally take {0} damage.",
+                    " and this time you lose {0} health! Ow!",
+                    " and hits you for {0} THIS time.",
+                    "! {0} damage taken! Don't get cocky..."
+                }
+            };
         }
 
         private void CreateMessageLog()

@@ -26,17 +26,15 @@ namespace ECSRogue.ECS.Systems
                         int damageDone = 0;
                         SkillLevelsComponent collidedStats = spaceComponents.SkillLevelsComponents[collidedEntity];
                         SkillLevelsComponent attackingStats = spaceComponents.SkillLevelsComponents[id];
-                        bool isPlayer = ((spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player);
-                        bool isAttackingPlayer = ((spaceComponents.Entities.Where(x => x.Id == collidedEntity).First().ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player);
+                        bool isPlayerAttacking = ((spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player);
+                        bool isPlayerBeingAttacked = ((spaceComponents.Entities.Where(x => x.Id == collidedEntity).First().ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player);
 
                         //If the two attacking creatures don't share an alignment, allow the attack to happen.
                         if (spaceComponents.AIAlignmentComponents[id].Alignment != spaceComponents.AIAlignmentComponents[collidedEntity].Alignment && collidedStats.CurrentHealth > 0 && attackingStats.CurrentHealth > 0)
                         {
-                            string combatString = isPlayer ?
-                                string.Format(Messages.MeleeAttackPlayer[spaceComponents.random.Next(0, Messages.MeleeAttackPlayer.Count())], spaceComponents.NameComponents[collidedEntity].Name)
-                               : isAttackingPlayer?
-                                   string.Format(Messages.PlayerIsAttackedMelee[spaceComponents.random.Next(0, Messages.PlayerIsAttackedMelee.Count())], spaceComponents.NameComponents[id].Name)
-                                 : string.Format(Messages.MeleeAttack[spaceComponents.random.Next(0, Messages.MeleeAttack.Count())], spaceComponents.NameComponents[id].Name, spaceComponents.NameComponents[collidedEntity].Name);
+                            string combatString = isPlayerBeingAttacked ?
+                                string.Format(spaceComponents.MeleeAttackPlayerMessageComponents[id].AttackPlayerMessages[spaceComponents.random.Next(0, spaceComponents.MeleeAttackPlayerMessageComponents[id].AttackPlayerMessages.Count())], spaceComponents.NameComponents[id].Name)
+                                : string.Format(spaceComponents.MeleeAttackNPCMessageComponents[id].AttackNPCMessages[spaceComponents.random.Next(0, spaceComponents.MeleeAttackNPCMessageComponents[id].AttackNPCMessages.Count())], spaceComponents.NameComponents[id].Name, spaceComponents.NameComponents[collidedEntity].Name);
 
                             //Hit
                             if (CombatSystem.WillMeleeAttackHit(spaceComponents.random, CombatSystem.CalculateAccuracy(attackingStats, collidedStats)))
@@ -46,19 +44,11 @@ namespace ECSRogue.ECS.Systems
                                 collidedStats.CurrentHealth -= damageDone;
                                 if (attackingStats.TimesMissed > 5)
                                 {
-                                    combatString += isPlayer?
-                                          string.Format(Messages.BrokenMissSpreePlayer[spaceComponents.random.Next(0, Messages.BrokenMissSpreePlayer.Count())], damageDone)
-                                        : isAttackingPlayer?
-                                              string.Format(Messages.BrokenPlayerDodgeSpree[spaceComponents.random.Next(0, Messages.BrokenPlayerDodgeSpree.Count())], damageDone)
-                                            : string.Format(Messages.BrokenMissSpree[spaceComponents.random.Next(0, Messages.BrokenMissSpree.Count())], damageDone);
+                                    combatString += string.Format(spaceComponents.TakeMeleeDamageMesageComponents[collidedEntity].BrokenDodgeStreakTakeDamageMessages[spaceComponents.random.Next(0, spaceComponents.TakeMeleeDamageMesageComponents[collidedEntity].BrokenDodgeStreakTakeDamageMessages.Count())], damageDone);
                                 }
                                 else
                                 {
-                                    combatString += isPlayer?
-                                          string.Format(Messages.DamageDealtPlayer[spaceComponents.random.Next(0, Messages.DamageDealtPlayer.Count())], damageDone)
-                                        : isAttackingPlayer?
-                                              string.Format(Messages.PlayerTookDamage[spaceComponents.random.Next(0, Messages.PlayerTookDamage.Count())], damageDone)
-                                            : string.Format(Messages.DamageDealt[spaceComponents.random.Next(0, Messages.DamageDealt.Count())], damageDone);
+                                    combatString += string.Format(spaceComponents.TakeMeleeDamageMesageComponents[collidedEntity].NormalTakeDamageMessages[spaceComponents.random.Next(0, spaceComponents.TakeMeleeDamageMesageComponents[collidedEntity].NormalTakeDamageMessages.Count())], damageDone);
                                 }
                                 attackingStats.TimesMissed = 0;
                                 Color messageColor = (spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_HOSTILE) ? MessageColors.Harm : MessageColors.DamageDealt;
@@ -70,36 +60,28 @@ namespace ECSRogue.ECS.Systems
                                 attackingStats.TimesMissed += 1;
                                 if (attackingStats.TimesMissed > 5)
                                 {
-                                    combatString += isPlayer?
-                                          string.Format(Messages.MeleeMissedALotPlayer[spaceComponents.random.Next(0, Messages.MeleeMissedALotPlayer.Count())])
-                                        : isAttackingPlayer?
-                                              string.Format(Messages.MeleePlayerDodgedALot[spaceComponents.random.Next(0, Messages.MeleePlayerDodgedALot.Count())])
-                                            : string.Format(Messages.MeleeMissedALot[spaceComponents.random.Next(0, Messages.MeleeMissedALot.Count())]);
+                                    combatString += string.Format(spaceComponents.DodgeMeleeMessageComponents[collidedEntity].StreakDodgeMessages[spaceComponents.random.Next(0, spaceComponents.DodgeMeleeMessageComponents[collidedEntity].StreakDodgeMessages.Count())], damageDone);
                                 }
                                 else
                                 {
-                                    combatString += isPlayer?
-                                          string.Format(Messages.MeleeMissedPlayer[spaceComponents.random.Next(0, Messages.MeleeMissedPlayer.Count())])
-                                        : isAttackingPlayer?
-                                              string.Format(Messages.MeleePlayerDodged[spaceComponents.random.Next(0, Messages.MeleePlayerDodged.Count())])
-                                            : string.Format(Messages.MeleeMissed[spaceComponents.random.Next(0, Messages.MeleeMissed.Count())]);
+                                    combatString += string.Format(spaceComponents.DodgeMeleeMessageComponents[collidedEntity].NormalDodgeMessages[spaceComponents.random.Next(0, spaceComponents.DodgeMeleeMessageComponents[collidedEntity].NormalDodgeMessages.Count())], damageDone);
                                 }
-                                Color messageColor = (spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_HOSTILE) ? MessageColors.StatusChange : MessageColors.Failure;
-                                spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Microsoft.Xna.Framework.Color, string>(MessageColors.Failure, combatString));
+                                Color messageColor = (spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_HOSTILE) ? MessageColors.Dodge : MessageColors.Failure;
+                                spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Microsoft.Xna.Framework.Color, string>(messageColor, combatString));
                             }
 
 
                             if (collidedStats.CurrentHealth <= 0)
                             {
                                 spaceComponents.EntitiesToDelete.Add(collidedEntity);
-                                if (isPlayer)
+                                if (isPlayerAttacking)
                                 {
                                     spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("You killed the {0}!", spaceComponents.NameComponents[collidedEntity].Name)));
                                     GameplayInfoComponent gameInfo = spaceComponents.GameplayInfoComponent;
                                     gameInfo.Kills += 1;
                                     spaceComponents.GameplayInfoComponent = gameInfo;
                                 }
-                                else if(isAttackingPlayer)
+                                else if(isPlayerBeingAttacked)
                                 {
                                     spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("You were killed by a {0}!", spaceComponents.NameComponents[id].Name)));
                                 }
