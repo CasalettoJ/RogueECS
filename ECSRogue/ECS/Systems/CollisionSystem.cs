@@ -19,6 +19,7 @@ namespace ECSRogue.ECS.Systems
                     id != attemptingEntity)
                 {
                     spaceComponents.CollisionComponents[attemptingEntity].CollidedObjects.Add(id);
+                    spaceComponents.GlobalCollisionComponent.EntitiesThatCollided.Add(attemptingEntity);
                     if(spaceComponents.CollisionComponents[id].Solid)
                     {
                         canMove = false;
@@ -40,6 +41,7 @@ namespace ECSRogue.ECS.Systems
             {
                 spaceComponents.CollisionComponents[id].CollidedObjects.Clear();
             }
+            spaceComponents.GlobalCollisionComponent = new GlobalCollisionComponent() { EntitiesThatCollided = new List<Guid>() };
         }
 
     }

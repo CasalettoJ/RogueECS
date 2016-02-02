@@ -15,7 +15,7 @@ namespace ECSRogue.ECS.Systems
     {
         public static void HandleMeleeCombat(StateSpaceComponents spaceComponents, int cellSize)
         {
-            IEnumerable<Guid> entities = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Collidable) == ComponentMasks.Collidable).Select(x => x.Id);
+            IEnumerable<Guid> entities = spaceComponents.GlobalCollisionComponent.EntitiesThatCollided.Distinct();
             foreach (Guid id in entities)
             {
                 foreach(Guid collidedEntity in spaceComponents.CollisionComponents[id].CollidedObjects)
@@ -32,7 +32,8 @@ namespace ECSRogue.ECS.Systems
                         //If the two attacking creatures don't share an alignment, allow the attack to happen.
                         if (spaceComponents.AIAlignmentComponents[id].Alignment != spaceComponents.AIAlignmentComponents[collidedEntity].Alignment && collidedStats.CurrentHealth > 0 && attackingStats.CurrentHealth > 0)
                         {
-                            string combatString = isPlayerBeingAttacked ?
+                            string combatString = "[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] ";
+                             combatString += isPlayerBeingAttacked ?
                                 string.Format(spaceComponents.MeleeAttackPlayerMessageComponents[id].AttackPlayerMessages[spaceComponents.random.Next(0, spaceComponents.MeleeAttackPlayerMessageComponents[id].AttackPlayerMessages.Count())], spaceComponents.NameComponents[id].Name)
                                 : string.Format(spaceComponents.MeleeAttackNPCMessageComponents[id].AttackNPCMessages[spaceComponents.random.Next(0, spaceComponents.MeleeAttackNPCMessageComponents[id].AttackNPCMessages.Count())], spaceComponents.NameComponents[id].Name, spaceComponents.NameComponents[collidedEntity].Name);
 
@@ -76,18 +77,18 @@ namespace ECSRogue.ECS.Systems
                                 spaceComponents.EntitiesToDelete.Add(collidedEntity);
                                 if (isPlayerAttacking)
                                 {
-                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("You killed the {0}!", spaceComponents.NameComponents[collidedEntity].Name)));
+                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] "+ "You killed the {0}!", spaceComponents.NameComponents[collidedEntity].Name)));
                                     GameplayInfoComponent gameInfo = spaceComponents.GameplayInfoComponent;
                                     gameInfo.Kills += 1;
                                     spaceComponents.GameplayInfoComponent = gameInfo;
                                 }
                                 else if(isPlayerBeingAttacked)
                                 {
-                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("You were killed by a {0}!", spaceComponents.NameComponents[id].Name)));
+                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + "You were killed by a {0}!", spaceComponents.NameComponents[id].Name)));
                                 }
                                 else
                                 {
-                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("{0} killed the {1}!", spaceComponents.NameComponents[id].Name, spaceComponents.NameComponents[collidedEntity].Name)));
+                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + "{0} killed the {1}!", spaceComponents.NameComponents[id].Name, spaceComponents.NameComponents[collidedEntity].Name)));
                                 }
                             }
                             spaceComponents.SkillLevelsComponents[id] = attackingStats;

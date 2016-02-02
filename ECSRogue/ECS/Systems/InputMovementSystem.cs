@@ -84,11 +84,9 @@ namespace ECSRogue.ECS.Systems
                 if (!hitWall && movement)
                 {
                     //Check collisions.  If no collisions, move into spot.
-                    if(CollisionSystem.TryToMove(spaceComponents, dungeonGrid, pos, id))
-                    {
-                        gameInfo.StepsTaken += 1;
-                        spaceComponents.GameplayInfoComponent = gameInfo;
-                    }
+                    CollisionSystem.TryToMove(spaceComponents, dungeonGrid, pos, id);
+                    gameInfo.StepsTaken += 1;
+                    spaceComponents.GameplayInfoComponent = gameInfo;
                     PlayerComponent player = spaceComponents.PlayerComponent;
                     player.PlayerTookTurn = true;
                     spaceComponents.PlayerComponent = player;

@@ -23,7 +23,8 @@ namespace ECSRogue.ECS.Systems
             //Draw message log
             if(spaceComponents.GameMessageComponent.IndexBegin > 0)
             {
-                spriteBatch.DrawString(font, Messages.ScrollingMessages, new Vector2(10, (int)camera.DungeonUIViewport.Y + 10 + (messageNumber * messageSpacing)), Color.MediumVioletRed);
+                float textHeight = font.MeasureString(Messages.ScrollingMessages).Y;
+                spriteBatch.DrawString(font, Messages.ScrollingMessages, new Vector2(10, (int)camera.DungeonUIViewport.Bounds.Bottom -(int)textHeight - 10 - (messageNumber * messageSpacing)), Color.MediumVioletRed);
                 messageNumber += 1;
             }
             foreach(Tuple<Color,string> message in spaceComponents.GameMessageComponent.GameMessages.Reverse<Tuple<Color,string>>().Skip(spaceComponents.GameMessageComponent.IndexBegin))
@@ -34,7 +35,9 @@ namespace ECSRogue.ECS.Systems
                 }
                 opacity -= decrement;
                 string text = MessageDisplaySystem.WordWrap(font, message.Item2, camera.DungeonUIViewport.Width-20);
-                spriteBatch.DrawString(font,text, new Vector2(10, (int)camera.DungeonUIViewport.Y + 10 + (messageNumber * messageSpacing)), message.Item1 * opacity);
+
+                float textHeight = font.MeasureString(text).Y;
+                spriteBatch.DrawString(font,text, new Vector2(10, (int)camera.DungeonUIViewport.Bounds.Bottom - (int)textHeight - 10 - (messageNumber * messageSpacing)), message.Item1 * opacity);
                 messageNumber += Regex.Matches(text, System.Environment.NewLine).Count;
                 messageNumber += 1;
             }
@@ -82,7 +85,7 @@ namespace ECSRogue.ECS.Systems
             {
                 foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
                 {
-                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(color, messageList[spaceComponents.random.Next(0, messageList.Count())]));
+                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(color, "[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + messageList[spaceComponents.random.Next(0, messageList.Count())]));
                 }
             }
         }

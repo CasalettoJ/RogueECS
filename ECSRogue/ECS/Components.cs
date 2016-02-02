@@ -106,6 +106,7 @@ namespace ECSRogue.ECS
         public PlayerComponent PlayerComponent { get; set; }
         public GameMessageComponent GameMessageComponent { get; set; }
         public GameplayInfoComponent GameplayInfoComponent { get; set; }
+        public GlobalCollisionComponent GlobalCollisionComponent { get; set; }
         public Random random { get; private set; }
 
         public StateSpaceComponents()
@@ -134,6 +135,7 @@ namespace ECSRogue.ECS
             TakeMeleeDamageMesageComponents = new Dictionary<Guid, TakeMeleeDamageMesageComponent>();
             DodgeMeleeMessageComponents = new Dictionary<Guid, DodgeMeleeMessageComponent>();
 
+            GlobalCollisionComponent = new GlobalCollisionComponent() { EntitiesThatCollided = new List<Guid>() };
             PlayerComponent = new PlayerComponent();
             GameMessageComponent = new GameMessageComponent();
             GameplayInfoComponent = new GameplayInfoComponent();

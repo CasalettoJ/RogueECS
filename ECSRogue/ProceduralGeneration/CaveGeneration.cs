@@ -485,10 +485,8 @@ namespace ECSRogue.ProceduralGeneration
                     AttackPlayerMessages = new string[]
                     {
                         "{0} wiggles its tentacles at you",
-                        "{0} wraps its tentacles around your ankles, binding you tightly in place.  Drifting tendrils slide slowly up your legs and across your thighs toward your nethers",
-                        "{0} dives one thick vines past your lips and into your throat.  You feel a slight buzz with a subtle burn as it injects you with some strange poison"
-                        //"The {0} swipes at you multiple times",
-                        //"Gross.. the tentacles of {0} smear around you"
+                        "The {0} swipes at you multiple times",
+                        "Gross.. the tentacles of {0} smear around you"
                     }
                 };
                 spaceComponents.DodgeMeleeMessageComponents[id] = new DodgeMeleeMessageComponent()

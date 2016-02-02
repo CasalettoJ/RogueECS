@@ -63,6 +63,7 @@
     <Compile Include="ECS\Components\DisplayComponent.cs" />
     <Compile Include="ECS\Components\GameMessageComponent.cs" />
     <Compile Include="ECS\Components\GameplayInfoComponent.cs" />
+    <Compile Include="ECS\Components\GlobalCollisionComponent.cs" />
     <Compile Include="ECS\Components\InputMovementComponent.cs" />
     <Compile Include="ECS\Components\LabelComponent.cs" />
     <Compile Include="ECS\Components\MeleeMessageComponents\DodgeMeleeMessageComponent.cs" />
