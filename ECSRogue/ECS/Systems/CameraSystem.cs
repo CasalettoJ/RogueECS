@@ -77,6 +77,11 @@ namespace ECSRogue.ECS.Systems
                     camera.Target = new Vector2((int)stateSpaceComponents.PositionComponents[playerId.Id].Position.X * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Width / 2,
                     (int)stateSpaceComponents.PositionComponents[playerId.Id].Position.Y * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Height / 2);
                 }
+                if (stateSpaceComponents.PlayerComponent.PlayerJustLoaded)
+                {
+                    camera.Position = new Vector2((int)stateSpaceComponents.PositionComponents[playerId.Id].Position.X * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Width / 2,
+                    (int)stateSpaceComponents.PositionComponents[playerId.Id].Position.Y * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Height / 2);
+                }
             }
             if (Vector2.Distance(camera.Position, camera.Target) > 0)
             {
