@@ -1,5 +1,6 @@
 ﻿using ECSRogue.BaseEngine;
 using ECSRogue.ECS.Components;
+using ECSRogue.ECS.Components.AIComponents;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -43,6 +44,7 @@ namespace ECSRogue.ECS.Systems
         public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo)
         {
             Matrix cameraMatrix = camera.GetMatrix();
+            Vector2 origin = new Vector2(4, 4);
             for (int i = 0; i < (int)dungeonDimensions.X; i++)
             {
                 for (int j = 0; j < (int)dungeonDimensions.Y; j++)
@@ -62,10 +64,10 @@ namespace ECSRogue.ECS.Systems
                             switch (dungeonGrid[i, j].Type)
                             {
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, position: tile, sourceRectangle: floor, color: colorInfo.Floor * .5f);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.Floor * .5f, origin: origin);
                                     break;
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, tile, wall, colorInfo.Wall * .5f);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.Wall * .5f, origin: origin);
                                     break;
                             }
                         }
@@ -74,10 +76,10 @@ namespace ECSRogue.ECS.Systems
                             switch (dungeonGrid[i, j].Type)
                             {
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, tile, floor, colorInfo.FloorInRange);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.FloorInRange *.85f, origin: origin);
                                     break;
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, tile, wall, colorInfo.WallInRange);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.WallInRange *.85f, origin: origin);
                                     break;
                             }
                         }
@@ -87,13 +89,13 @@ namespace ECSRogue.ECS.Systems
                             switch (dungeonGrid[i, j].Type)
                             {
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, tile, floor, colorInfo.FloorInRange * opacity);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.FloorInRange * opacity, origin: origin);
                                     break;
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, tile, wall, colorInfo.WallInRange * opacity);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.WallInRange * opacity, origin: origin);
                                     break;
                             }
-                            if (dungeonGrid[i, j].Opacity > 1)
+                            if (dungeonGrid[i, j].Opacity > .5)
                             {
                                 dungeonGrid[i, j].NewlyFound = false;
                                 dungeonGrid[i, j].Found = true;
@@ -107,5 +109,32 @@ namespace ECSRogue.ECS.Systems
 
 
         }
+
+
+        public static void DrawAIFieldOfViews(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D rectangleTexture, int cellSize)
+        {
+            Matrix cameraMatrix = camera.GetMatrix();
+            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.AIView) == ComponentMasks.AIView).Select(x => x.Id))
+            {
+                AIFieldOfView fovInfo = spaceComponents.AIFieldOfViewComponents[id];
+                if(fovInfo.DrawField)
+                {
+                    foreach(Vector2 tilePosition in fovInfo.SeenTiles)
+                    {
+                        Vector2 tile = new Vector2((int)tilePosition.X * cellSize, (int)tilePosition.Y * cellSize);
+
+                        Vector2 bottomRight = Vector2.Transform(new Vector2((tile.X + cellSize), (tile.Y + cellSize)), cameraMatrix);
+                        Vector2 topLeft = Vector2.Transform(tile, cameraMatrix);
+                        Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
+
+                        if(camera.IsInView(cameraMatrix, cameraBounds))
+                        {
+                            spriteBatch.Draw(rectangleTexture, position: tile, color: fovInfo.Color * .31f, origin: new Vector2(4,4));
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

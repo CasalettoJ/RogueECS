@@ -224,6 +224,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             }
             DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
 
+            //Non-turn-based Animations
+
             //Movement and Reaction
             InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
             CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, cellSize, prevKeyboardState);
@@ -237,6 +239,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             //AI and Combat
             AISystem.AICheckDetection(stateSpaceComponents, dungeonGrid);
             AISystem.AIMovement(stateSpaceComponents, dungeonGrid, dungeonDimensions, mapToPlayer);
+            AISystem.AIUpdateVision(stateSpaceComponents, dungeonGrid, dungeonDimensions);
             CombatSystem.HandleMeleeCombat(stateSpaceComponents, cellSize);
 
             //Resetting Systems
@@ -257,6 +260,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
         {
             DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo);
+            DisplaySystem.DrawAIFieldOfViews(stateSpaceComponents, camera, spriteBatch, UI, cellSize);
             DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize, dungeonGrid, asciiDisplay);
             LabelDisplaySystem.DrawString(spriteBatch, stateSpaceComponents, messageFont, camera);
         }

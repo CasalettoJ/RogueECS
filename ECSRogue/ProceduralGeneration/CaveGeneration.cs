@@ -365,7 +365,7 @@ namespace ECSRogue.ProceduralGeneration
             for(int i = 0; i < numberOfMonsters; i++)
             {
                 Guid id = spaceComponents.CreateEntity();
-                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.CombatReadyAI | Component.COMPONENT_SIGHTRADIUS;
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.CombatReadyAI | ComponentMasks.AIView;
 
                 int tileIndex = spaceComponents.random.Next(0, freeTiles.Count);
                 spaceComponents.PositionComponents[id] = new PositionComponent() { Position = freeTiles[tileIndex] };
@@ -387,7 +387,7 @@ namespace ECSRogue.ProceduralGeneration
                 spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
                 spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
                 spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_ROAMING };
-                spaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() {MaxRadius = 10, CurrentRadius = 0, DrawRadius = true};
+                spaceComponents.AIFieldOfViewComponents[id] = new AIFieldOfView() { DrawField = true, radius = 4, SeenTiles = new List<Vector2>(), Color = Color.OrangeRed };
                 spaceComponents.MeleeAttackNPCMessageComponents[id] = new MeleeAttackNPCMessageComponent()
                 {
                     AttackNPCMessages = new string[]
@@ -448,7 +448,7 @@ namespace ECSRogue.ProceduralGeneration
             for (int i = 0; i < numberOfMonsters; i++)
             {
                 Guid id = spaceComponents.CreateEntity();
-                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.CombatReadyAI;
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.CombatReadyAI | ComponentMasks.AIView;
 
                 int tileIndex = spaceComponents.random.Next(0, freeTiles.Count);
                 spaceComponents.PositionComponents[id] = new PositionComponent() { Position = freeTiles[tileIndex] };
@@ -470,6 +470,7 @@ namespace ECSRogue.ProceduralGeneration
                 spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
                 spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
                 spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_ROAMING };
+                spaceComponents.AIFieldOfViewComponents[id] = new AIFieldOfView() { DrawField = true, radius = 7, SeenTiles = new List<Vector2>(), Color = Color.CornflowerBlue };
                 spaceComponents.MeleeAttackNPCMessageComponents[id] = new MeleeAttackNPCMessageComponent()
                 {
                     AttackNPCMessages = new string[]
