@@ -111,7 +111,7 @@ namespace ECSRogue.ECS.Systems
         }
 
 
-        public static void DrawAIFieldOfViews(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D rectangleTexture, int cellSize)
+        public static void DrawAIFieldOfViews(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D rectangleTexture, int cellSize, DungeonTile[,] dungeonGrid)
         {
             Matrix cameraMatrix = camera.GetMatrix();
             foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.AIView) == ComponentMasks.AIView).Select(x => x.Id))
@@ -127,9 +127,18 @@ namespace ECSRogue.ECS.Systems
                         Vector2 topLeft = Vector2.Transform(tile, cameraMatrix);
                         Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
 
-                        if(camera.IsInView(cameraMatrix, cameraBounds))
+                        if(dungeonGrid[(int)tilePosition.X, (int)tilePosition.Y].InRange && camera.IsInView(cameraMatrix, cameraBounds))
                         {
-                            spriteBatch.Draw(rectangleTexture, position: tile, color: fovInfo.Color * .31f, origin: new Vector2(4,4));
+                            if(spaceComponents.AlternateFOVColorChangeComponents.ContainsKey(id))
+                            {
+                                AlternateFOVColorChangeComponent altColorInfo = spaceComponents.AlternateFOVColorChangeComponents[id];
+                                spriteBatch.Draw(rectangleTexture, position: tile, color: Color.Lerp(fovInfo.Color,altColorInfo.AlternateColor,altColorInfo.Seconds/altColorInfo.SwitchAtSeconds) * .3f, origin: new Vector2(4, 4));
+                            }
+                            else
+                            {
+                                //origin is 4,4 because the tile texture is 40x40 and the grid is 32x32.  If size of grid changes, change this -- and then don't hardcode it anymore!!!
+                                spriteBatch.Draw(rectangleTexture, position: tile, color: fovInfo.Color * .3f, origin: new Vector2(4, 4));
+                            }
                         }
                     }
                 }

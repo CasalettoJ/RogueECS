@@ -36,7 +36,8 @@ namespace ECSRogue.ECS
         COMPONENT_MELEE_ATTACK_PLAYER_MESSAGES = 1 << 22,
         COMPONENT_MELEE_DODGE_MESSAGES = 1 << 23,
         COMPONENT_MELEE_TAKE_DAMAGE_MESSAGES = 1 << 24,
-        COMPONENT_AI_FIELDOFVIEW = 1 << 25
+        COMPONENT_AI_FIELDOFVIEW = 1 << 25,
+        COMPONENT_ALTERNATE_FOV_COLOR = 1 << 26
     }
 
 
@@ -58,6 +59,7 @@ namespace ECSRogue.ECS
             | ComponentMasks.SubMasks.MeleeMessageComponents;
 
         public const Component AIView = Component.COMPONENT_AI_FIELDOFVIEW | Component.COMPONENT_AI_STATE | Component.COMPONENT_AI_ALIGNMENT | Component.COMPONENT_POSITION;
+        public const Component FOVColorChange = Component.COMPONENT_ALTERNATE_FOV_COLOR | Component.COMPONENT_AI_FIELDOFVIEW;
 
         public const Component MovingAI = Component.COMPONENT_POSITION | Component.COMPONENT_AI_MOVEMENT; //Not Implemented
 
@@ -106,6 +108,7 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, MeleeAttackPlayerMessageComponent> MeleeAttackPlayerMessageComponents { get; private set; }
         public Dictionary<Guid, TakeMeleeDamageMesageComponent> TakeMeleeDamageMesageComponents { get; private set; }
         public Dictionary<Guid, DodgeMeleeMessageComponent> DodgeMeleeMessageComponents { get; private set; }
+        public Dictionary<Guid, AlternateFOVColorChangeComponent> AlternateFOVColorChangeComponents { get; private set; }
 
         public List<Action> DelayedActions { get; private set; }
         public PlayerComponent PlayerComponent { get; set; }
@@ -140,6 +143,7 @@ namespace ECSRogue.ECS
             MeleeAttackPlayerMessageComponents = new Dictionary<Guid, MeleeAttackPlayerMessageComponent>();
             TakeMeleeDamageMesageComponents = new Dictionary<Guid, TakeMeleeDamageMesageComponent>();
             DodgeMeleeMessageComponents = new Dictionary<Guid, DodgeMeleeMessageComponent>();
+            AlternateFOVColorChangeComponents = new Dictionary<Guid, AlternateFOVColorChangeComponent>();
 
             GlobalCollisionComponent = new GlobalCollisionComponent() { EntitiesThatCollided = new List<Guid>() };
             PlayerComponent = new PlayerComponent();
@@ -184,6 +188,7 @@ namespace ECSRogue.ECS
                 TakeMeleeDamageMesageComponents.Remove(id);
                 MeleeAttackNPCMessageComponents.Remove(id);
                 DodgeMeleeMessageComponents.Remove(id);
+                AlternateFOVColorChangeComponents.Remove(id);
             }
         }
 

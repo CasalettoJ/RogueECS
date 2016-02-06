@@ -124,7 +124,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.Wheat, SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize),
                 Origin = Vector2.Zero, SpriteEffect = SpriteEffects.None, Scale = 1f, Rotation = 0f };
             //Set Sightradius
-            stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { CurrentRadius = 12, MaxRadius = 15, DrawRadius = true };
+            stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { CurrentRadius = 15, MaxRadius = 15, DrawRadius = true };
             //Set first turn
             stateSpaceComponents.PlayerComponent = new PlayerComponent() { PlayerJustLoaded = true };
             //Collision information
@@ -208,7 +208,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             #region Debug
             if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && prevKeyboardState.IsKeyUp(Keys.LeftShift))
             {
-                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 50, 75);
+                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
                 LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
             }
             #endregion
@@ -225,6 +225,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
 
             //Non-turn-based Animations
+            AnimationSystem.UpdateFovColors(stateSpaceComponents, gameTime);
 
             //Movement and Reaction
             InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
@@ -260,7 +261,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
         {
             DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo);
-            DisplaySystem.DrawAIFieldOfViews(stateSpaceComponents, camera, spriteBatch, UI, cellSize);
+            DisplaySystem.DrawAIFieldOfViews(stateSpaceComponents, camera, spriteBatch, UI, cellSize, dungeonGrid);
             DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize, dungeonGrid, asciiDisplay);
             LabelDisplaySystem.DrawString(spriteBatch, stateSpaceComponents, messageFont, camera);
         }
