@@ -1,4 +1,5 @@
-﻿using ECSRogue.ECS.Components;
+﻿using ECSRogue.BaseEngine;
+using ECSRogue.ECS.Components;
 using ECSRogue.ECS.Components.AIComponents;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
@@ -13,14 +14,20 @@ namespace ECSRogue.ECS.Systems
     {
         public static void AICheckDetection(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid)
         {
-            foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_AI_STATE) == Component.COMPONENT_AI_STATE).Select(x => x.Id))
+            if(spaceComponents.PlayerComponent.PlayerTookTurn)
             {
-                PositionComponent position = spaceComponents.PositionComponents[id];
-                if(dungeonGrid[(int)position.Position.X, (int)position.Position.Y].InRange)
+                foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI).Select(x => x.Id))
                 {
                     AIState state = spaceComponents.AIStateComponents[id];
-                    state.State = AIStates.STATE_ATTACKING;
-                    spaceComponents.AIStateComponents[id] = state;
+                    switch (state.State)
+                    {
+                        case AIStates.STATE_SLEEPING:
+                            AISystem.AITryToWake(id, spaceComponents);
+                            break;
+                        case AIStates.STATE_ROAMING:
+                            AISystem.AITryToFind(id, spaceComponents);
+                            break;
+                    }
                 }
             }
         }
@@ -38,8 +45,6 @@ namespace ECSRogue.ECS.Systems
                     PositionComponent position = spaceComponents.PositionComponents[id];
                     switch(state.State)
                     {
-                        case AIStates.STATE_SLEEPING:
-                            break;
                         case AIStates.STATE_ROAMING:
                             position = AISystem.AIRoam(id, position, dungeonGrid, dungeonDimensions, spaceComponents.random);
                             break;
@@ -50,12 +55,6 @@ namespace ECSRogue.ECS.Systems
                             break;
                     }
                     CollisionSystem.TryToMove(spaceComponents, dungeonGrid, position, id);
-                }
-
-                //Handle AIs that have a direct target to get to
-                foreach (Guid id in spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.MovingAI) == ComponentMasks.MovingAI).Select(c => c.Id))
-                {
-
                 }
             }
         }
@@ -300,7 +299,58 @@ namespace ECSRogue.ECS.Systems
             return new PositionComponent() { Position = validSpots[random.Next(0, validSpots.Count)] };
 
         }
-        
+
+        private static void AITryToWake(Guid entity, StateSpaceComponents spaceComponents)
+        {
+            AIFieldOfView entityFOV = spaceComponents.AIFieldOfViewComponents[entity];
+            AIAlignment entityAlignment = spaceComponents.AIAlignmentComponents[entity];
+            AISleep entitySleep = spaceComponents.AISleepComponents[entity];
+            AIState entityState = spaceComponents.AIStateComponents[entity];
+            foreach (Guid id in spaceComponents.Entities.Where(x => ((x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player) || 
+                ((x.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI)).Select(x => x.Id))
+            {
+                PositionComponent position = spaceComponents.PositionComponents[id];
+                AIAlignment alignment = spaceComponents.AIAlignmentComponents[id];
+                if(entityFOV.SeenTiles.Contains(position.Position) && entityAlignment.Alignment != alignment.Alignment && spaceComponents.random.Next(1,101) <= entitySleep.ChanceToWake)
+                {
+                    entityState.State = AIStates.STATE_ROAMING;
+                    entityFOV.radius += entitySleep.FOVRadiusChangeOnWake;
+                    entityFOV.Color = FOVColors.Roaming;
+                    spaceComponents.AIStateComponents[entity] = entityState;
+                    spaceComponents.AIFieldOfViewComponents[entity] = entityFOV;
+                    Color messageColor = entityAlignment.Alignment == AIAlignments.ALIGNMENT_HOSTILE ? MessageColors.Danger : MessageColors.StatusChange;
+                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(messageColor,
+                        string.Format(Messages.AwokenBySight[spaceComponents.random.Next(0, Messages.AwokenBySight.Count())], spaceComponents.NameComponents[entity].Name)));
+                    return;
+                }
+            }
+        }
+
+        private static void AITryToFind(Guid entity, StateSpaceComponents spaceComponents)
+        {
+            AIFieldOfView entityFOV = spaceComponents.AIFieldOfViewComponents[entity];
+            AIAlignment entityAlignment = spaceComponents.AIAlignmentComponents[entity];
+            AIRoam entityRoam = spaceComponents.AIRoamComponents[entity];
+            AIState entityState = spaceComponents.AIStateComponents[entity];
+            foreach (Guid id in spaceComponents.Entities.Where(x => ((x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player) ||
+                ((x.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI)).Select(x => x.Id))
+            {
+                PositionComponent position = spaceComponents.PositionComponents[id];
+                AIAlignment alignment = spaceComponents.AIAlignmentComponents[id];
+                if (entityFOV.SeenTiles.Contains(position.Position) && entityAlignment.Alignment != alignment.Alignment && spaceComponents.random.Next(1, 101) <= entityRoam.ChanceToDetect)
+                {
+                    entityState.State = AIStates.STATE_ATTACKING;
+                    entityFOV.Color = FOVColors.Attacking;
+                    spaceComponents.AIStateComponents[entity] = entityState;
+                    spaceComponents.AIFieldOfViewComponents[entity] = entityFOV;
+                    Color messageColor = entityAlignment.Alignment == AIAlignments.ALIGNMENT_HOSTILE ? MessageColors.Danger : MessageColors.StatusChange;
+                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(messageColor,
+                        string.Format(Messages.FoundBySight[spaceComponents.random.Next(0, Messages.FoundBySight.Count())], spaceComponents.NameComponents[entity].Name)));
+                    return;
+                }
+            }
+        }
+
 
     }
 }

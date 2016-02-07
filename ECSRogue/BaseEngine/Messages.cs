@@ -41,5 +41,21 @@ namespace ECSRogue.BaseEngine
         };
 
         public static readonly string ScrollingMessages = "[Scrolling Log: \'PageUp\': Top, \'PageDown\': Bottom, \'Arrows\': Scroll]";
+
+        public static readonly string[] AwokenBySight =
+        {
+            "The {0} awakens...",
+            "{0} wakes up!",
+            "{0} stirs from sleep due to a nearby presence.",
+            "The {0} wakes up and starts wandering around."
+        };
+
+        public static readonly string[] FoundBySight =
+        {
+            "The {0} sees a target!",
+            "{0} spots prey and starts to attack.",
+            "{0} finds something to beat on.",
+            "The {0} turns face up in attack mode!"
+        };
     }
 }

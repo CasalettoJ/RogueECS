@@ -57,6 +57,8 @@
     <Compile Include="ECS\Components\AIComponents\AIMovement.cs" />
     <Compile Include="ECS\Components\AIComponents\AIAlignment.cs" />
     <Compile Include="ECS\Components\AIComponents\AICombat.cs" />
+    <Compile Include="ECS\Components\AIComponents\AIRoam.cs" />
+    <Compile Include="ECS\Components\AIComponents\AISleep.cs" />
     <Compile Include="ECS\Components\AIComponents\AIState.cs" />
     <Compile Include="ECS\Components\AlternateFOVColorChangeComponent.cs" />
     <Compile Include="ECS\Components\AnimationComponent.cs" />

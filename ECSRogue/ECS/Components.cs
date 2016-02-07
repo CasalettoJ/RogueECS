@@ -37,7 +37,9 @@ namespace ECSRogue.ECS
         COMPONENT_MELEE_DODGE_MESSAGES = 1 << 23,
         COMPONENT_MELEE_TAKE_DAMAGE_MESSAGES = 1 << 24,
         COMPONENT_AI_FIELDOFVIEW = 1 << 25,
-        COMPONENT_ALTERNATE_FOV_COLOR = 1 << 26
+        COMPONENT_ALTERNATE_FOV_COLOR = 1 << 26,
+        COMPONENT_AI_SLEEP = 1 << 27,
+        COMPONENT_AI_ROAM = 1 << 28
     }
 
 
@@ -55,7 +57,7 @@ namespace ECSRogue.ECS
             | Component.COMPONENT_PLAYER | Component.COMPONENT_AI_ALIGNMENT | ComponentMasks.SubMasks.MeleeMessageComponents;
 
         public const Component CombatReadyAI = Component.COMPONENT_AI_ALIGNMENT | Component.COMPONENT_AI_COMBAT | Component.COMPONENT_AI_STATE
-            | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_COLLISION | Component.COMPONENT_NAME | Component.COMPONENT_POSITION 
+            | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_COLLISION | Component.COMPONENT_AI_SLEEP | Component.COMPONENT_AI_ROAM | Component.COMPONENT_NAME | Component.COMPONENT_POSITION 
             | ComponentMasks.SubMasks.MeleeMessageComponents;
 
         public const Component AIView = Component.COMPONENT_AI_FIELDOFVIEW | Component.COMPONENT_AI_STATE | Component.COMPONENT_AI_ALIGNMENT | Component.COMPONENT_POSITION;
@@ -103,6 +105,8 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, AIAlignment> AIAlignmentComponents { get; private set; }
         public Dictionary<Guid, AIState> AIStateComponents { get; private set; }
         public Dictionary<Guid, AIFieldOfView> AIFieldOfViewComponents { get; private set; }
+        public Dictionary<Guid, AISleep> AISleepComponents { get; private set; }
+        public Dictionary<Guid, AIRoam> AIRoamComponents { get; private set; }
         public Dictionary<Guid, InputMovementComponent> InputMovementComponents { get; private set; }
         public Dictionary<Guid, MeleeAttackNPCMessageComponent> MeleeAttackNPCMessageComponents { get; private set; }
         public Dictionary<Guid, MeleeAttackPlayerMessageComponent> MeleeAttackPlayerMessageComponents { get; private set; }
@@ -138,6 +142,8 @@ namespace ECSRogue.ECS
             AIAlignmentComponents = new Dictionary<Guid, AIAlignment>();
             AIStateComponents = new Dictionary<Guid, AIState>();
             AIFieldOfViewComponents = new Dictionary<Guid, AIFieldOfView>();
+            AISleepComponents = new Dictionary<Guid, AISleep>();
+            AIRoamComponents = new Dictionary<Guid, AIRoam>();
             InputMovementComponents = new Dictionary<Guid, InputMovementComponent>();
             MeleeAttackNPCMessageComponents = new Dictionary<Guid, MeleeAttackNPCMessageComponent>();
             MeleeAttackPlayerMessageComponents = new Dictionary<Guid, MeleeAttackPlayerMessageComponent>();
@@ -183,6 +189,8 @@ namespace ECSRogue.ECS
                 AIAlignmentComponents.Remove(id);
                 AIStateComponents.Remove(id);
                 AIFieldOfViewComponents.Remove(id);
+                AISleepComponents.Remove(id);
+                AIRoamComponents.Remove(id);
                 InputMovementComponents.Remove(id);
                 MeleeAttackPlayerMessageComponents.Remove(id);
                 TakeMeleeDamageMesageComponents.Remove(id);

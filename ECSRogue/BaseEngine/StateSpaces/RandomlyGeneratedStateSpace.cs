@@ -224,8 +224,10 @@ namespace ECSRogue.BaseEngine.StateSpaces
             }
             DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
 
-            //Non-turn-based Animations
+            //Non-turn-based
             AnimationSystem.UpdateFovColors(stateSpaceComponents, gameTime);
+            MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
+            MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
 
             //Movement and Reaction
             InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
@@ -233,8 +235,6 @@ namespace ECSRogue.BaseEngine.StateSpaces
             TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
             TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
             MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
-            MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
-            MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
             DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
 
             //AI and Combat

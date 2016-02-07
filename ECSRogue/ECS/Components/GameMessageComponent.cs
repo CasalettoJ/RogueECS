@@ -17,6 +17,7 @@ namespace ECSRogue.ECS.Components
         public static readonly Color Failure = Color.PaleVioletRed;
         public static readonly Color Normal = Color.White;
         public static readonly Color Dodge = Color.DarkGreen;
+        public static readonly Color Danger = Color.OrangeRed;
     }
 
     public struct GameMessageComponent
