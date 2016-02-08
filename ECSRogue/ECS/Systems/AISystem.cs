@@ -12,7 +12,7 @@ namespace ECSRogue.ECS.Systems
 {
     public static class AISystem
     {
-        public static void AICheckDetection(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid)
+        public static void AICheckDetection(StateSpaceComponents spaceComponents)
         {
             if(spaceComponents.PlayerComponent.PlayerTookTurn)
             {
@@ -27,6 +27,57 @@ namespace ECSRogue.ECS.Systems
                         case AIStates.STATE_ROAMING:
                             AISystem.AITryToFind(id, spaceComponents);
                             break;
+                    }
+                }
+            }
+        }
+
+        public static void AICheckFleeing(StateSpaceComponents spaceComponents)
+        {
+            if (spaceComponents.PlayerComponent.PlayerTookTurn)
+            {
+                foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI).Select(x => x.Id))
+                {
+                    AIState state = spaceComponents.AIStateComponents[id];
+                    if (state.State == AIStates.STATE_ATTACKING)
+                    {
+                        AIFlee flee = spaceComponents.AIFleeComponents[id];
+                        if (flee.DoesFlee)
+                        {
+                            AIFieldOfView FOV = spaceComponents.AIFieldOfViewComponents[id];
+                            SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
+                            AIAlignment alignment = spaceComponents.AIAlignmentComponents[id];
+                            double healthPercent = ((double)skills.CurrentHealth / (double)skills.Health) * 100;
+                            if (healthPercent <= flee.FleeAtHealthPercent)
+                            {
+                                state.State = AIStates.STATE_FLEEING;
+                                FOV.Color = FOVColors.Fleeing;
+                                spaceComponents.AIStateComponents[id] = state;
+                                spaceComponents.AIFieldOfViewComponents[id] = FOV;
+                                Color messageColor = alignment.Alignment == AIAlignments.ALIGNMENT_HOSTILE ? MessageColors.Danger : MessageColors.StatusChange;
+                                spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(messageColor,
+                                    string.Format(Messages.Flee[spaceComponents.random.Next(0, Messages.Flee.Count())], spaceComponents.NameComponents[id].Name)));
+                            }
+                        }
+                    }
+                    else if (state.State == AIStates.STATE_FLEEING)
+                    {
+                        AIFlee flee = spaceComponents.AIFleeComponents[id];
+                        AIFieldOfView FOV = spaceComponents.AIFieldOfViewComponents[id];
+                        SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
+                        double healthPercent = ((double)skills.CurrentHealth / (double)skills.Health) * 100;
+                        AIAlignment alignment = spaceComponents.AIAlignmentComponents[id];
+                        if (healthPercent >= flee.FleeUntilHealthPercent)
+                        {
+                            state.State = AIStates.STATE_ATTACKING;
+                            spaceComponents.AIStateComponents[id] = state;
+                            FOV.Color = FOVColors.Fleeing;
+                            spaceComponents.AIStateComponents[id] = state;
+                            spaceComponents.AIFieldOfViewComponents[id] = FOV;
+                            Color messageColor = alignment.Alignment == AIAlignments.ALIGNMENT_HOSTILE ? MessageColors.Danger : MessageColors.StatusChange;
+                            spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(messageColor,
+                                string.Format(Messages.Flee[spaceComponents.random.Next(0, Messages.Flee.Count())], spaceComponents.NameComponents[id].Name)));
+                        }
                     }
                 }
             }
@@ -52,6 +103,7 @@ namespace ECSRogue.ECS.Systems
                             position = AISystem.AIAttack(id, position, dungeonDimensions, mapToPlayer, spaceComponents.random);
                             break;
                         case AIStates.STATE_FLEEING:
+                            position = AISystem.AIFlee(id, position, dungeonDimensions, mapToPlayer, spaceComponents.random);
                             break;
                     }
                     CollisionSystem.TryToMove(spaceComponents, dungeonGrid, position, id);
@@ -271,6 +323,36 @@ namespace ECSRogue.ECS.Systems
                 for (int j = (int)position.Position.Y - 1; j <= (int)position.Position.Y + 1; j++)
                 {
                     if (i >= 0 && j >= 0 && i < (int)dungeonDimensions.X && j < (int)dungeonDimensions.Y && mapToPlayer[i,j].Weight == lowestGridTile)
+                    {
+                        validSpots.Add(new Vector2(i, j));
+                    }
+                }
+            }
+            return new PositionComponent() { Position = validSpots[random.Next(0, validSpots.Count)] };
+        }
+
+        private static PositionComponent AIFlee(Guid entity, PositionComponent position, Vector2 dungeonDimensions, DijkstraMapTile[,] mapToPlayer, Random random)
+        {
+            int lowestGridTile = 1;
+            List<Vector2> validSpots = new List<Vector2>();
+            for (int i = (int)position.Position.X - 1; i <= (int)position.Position.X + 1; i++)
+            {
+                for (int j = (int)position.Position.Y - 1; j <= (int)position.Position.Y + 1; j++)
+                {
+                    if (i >= 0 && j >= 0 && i < (int)dungeonDimensions.X && j < (int)dungeonDimensions.Y)
+                    {
+                        if (mapToPlayer[i, j].Weight < DungeonMappingSystem.WallValue)
+                        {
+                            lowestGridTile = (mapToPlayer[i, j].Weight * -1 < lowestGridTile * -1) ? mapToPlayer[i, j].Weight : lowestGridTile;
+                        }
+                    }
+                }
+            }
+            for (int i = (int)position.Position.X - 1; i <= (int)position.Position.X + 1; i++)
+            {
+                for (int j = (int)position.Position.Y - 1; j <= (int)position.Position.Y + 1; j++)
+                {
+                    if (i >= 0 && j >= 0 && i < (int)dungeonDimensions.X && j < (int)dungeonDimensions.Y && mapToPlayer[i, j].Weight == lowestGridTile)
                     {
                         validSpots.Add(new Vector2(i, j));
                     }

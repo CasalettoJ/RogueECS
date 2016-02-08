@@ -10,7 +10,7 @@ namespace ECSRogue.ECS.Systems
 {
     public static class DungeonMappingSystem
     {
-        private const int WallValue = 10000;
+        public const int WallValue = 10000;
 
         public static void ShouldPlayerMapRecalc(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, ref DijkstraMapTile[,] playerMap)
         {

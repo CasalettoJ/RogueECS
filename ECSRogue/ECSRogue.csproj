@@ -54,6 +54,7 @@
     <Compile Include="BaseEngine\States\TitleState.cs" />
     <Compile Include="ECS\Components.cs" />
     <Compile Include="ECS\Components\AIComponents\AIFieldOfView.cs" />
+    <Compile Include="ECS\Components\AIComponents\AIFlee.cs" />
     <Compile Include="ECS\Components\AIComponents\AIMovement.cs" />
     <Compile Include="ECS\Components\AIComponents\AIAlignment.cs" />
     <Compile Include="ECS\Components\AIComponents\AICombat.cs" />

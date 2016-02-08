@@ -381,15 +381,16 @@ namespace ECSRogue.ProceduralGeneration
                     Symbol = "t",
                     SymbolColor = Color.White
                 };
-                spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 10, DieNumber = 1, Health = 10, Power = 5, Defense = 1, Accuracy = 100, Wealth = 25, MinimumDamage = 1, MaximumDamage = 2 };
+                spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 25, DieNumber = 1, Health = 25, Power = 5, Defense = 1, Accuracy = 100, Wealth = 25, MinimumDamage = 1, MaximumDamage = 2 };
                 spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
                 spaceComponents.NameComponents[id] = new NameComponent() { Name = "TEST ENEMY NPC" };
                 spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
                 spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
                 spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_SLEEPING};
-                spaceComponents.AIFieldOfViewComponents[id] = new AIFieldOfView() { DrawField = false, radius = 2, SeenTiles = new List<Vector2>(), Color = FOVColors.Sleeping };
+                spaceComponents.AIFieldOfViewComponents[id] = new AIFieldOfView() { DrawField = true, radius = 2, SeenTiles = new List<Vector2>(), Color = FOVColors.Sleeping };
                 spaceComponents.AISleepComponents[id] = new AISleep() { ChanceToWake = 15, FOVRadiusChangeOnWake = 2 };
                 spaceComponents.AIRoamComponents[id] = new AIRoam() { ChanceToDetect = 25 };
+                spaceComponents.AIFleeComponents[id] = new AIFlee() { DoesFlee = true, FleeAtHealthPercent = 25, FleeUntilHealthPercent = 30 };
                 spaceComponents.MeleeAttackNPCMessageComponents[id] = new MeleeAttackNPCMessageComponent()
                 {
                     AttackNPCMessages = new string[]
@@ -475,6 +476,7 @@ namespace ECSRogue.ProceduralGeneration
                 spaceComponents.AIFieldOfViewComponents[id] = new AIFieldOfView() { DrawField = false, radius = 5, SeenTiles = new List<Vector2>(), Color = FOVColors.Roaming };
                 spaceComponents.AISleepComponents[id] = new AISleep() { ChanceToWake = 10, FOVRadiusChangeOnWake = 2 };
                 spaceComponents.AIRoamComponents[id] = new AIRoam() { ChanceToDetect = 40 };
+                spaceComponents.AIFleeComponents[id] = new AIFlee() { DoesFlee = false, FleeAtHealthPercent = 25, FleeUntilHealthPercent = 30 };
                 spaceComponents.MeleeAttackNPCMessageComponents[id] = new MeleeAttackNPCMessageComponent()
                 {
                     AttackNPCMessages = new string[]

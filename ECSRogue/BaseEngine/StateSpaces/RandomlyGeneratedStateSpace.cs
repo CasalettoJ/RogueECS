@@ -238,7 +238,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
 
             //AI and Combat
-            AISystem.AICheckDetection(stateSpaceComponents, dungeonGrid);
+            AISystem.AICheckDetection(stateSpaceComponents);
+            AISystem.AICheckFleeing(stateSpaceComponents);
             AISystem.AIMovement(stateSpaceComponents, dungeonGrid, dungeonDimensions, mapToPlayer);
             AISystem.AIUpdateVision(stateSpaceComponents, dungeonGrid, dungeonDimensions);
             CombatSystem.HandleMeleeCombat(stateSpaceComponents, cellSize);

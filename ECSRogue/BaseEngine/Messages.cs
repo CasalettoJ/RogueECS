@@ -57,5 +57,13 @@ namespace ECSRogue.BaseEngine
             "{0} finds something to beat on.",
             "The {0} turns face up in attack mode!"
         };
+
+        public static readonly string[] Flee =
+        {
+            "{0} fears for its life and runs!",
+            "{0} flees the area.",
+            "{0} attempts a strategic retreat.",
+            "The {0} is afraid!"
+        };
     }
 }
