@@ -239,13 +239,13 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
             //AI and Combat
             AISystem.AICheckDetection(stateSpaceComponents);
-            AISystem.AICheckFleeing(stateSpaceComponents);
             AISystem.AIMovement(stateSpaceComponents, dungeonGrid, dungeonDimensions, mapToPlayer);
             AISystem.AIUpdateVision(stateSpaceComponents, dungeonGrid, dungeonDimensions);
             CombatSystem.HandleMeleeCombat(stateSpaceComponents, cellSize);
+            AISystem.AICheckFleeing(stateSpaceComponents);
 
             //Resetting Systems
-            if(stateSpaceComponents.PlayerComponent.PlayerJustLoaded || stateSpaceComponents.PlayerComponent.PlayerTookTurn)
+            if (stateSpaceComponents.PlayerComponent.PlayerJustLoaded || stateSpaceComponents.PlayerComponent.PlayerTookTurn)
             {
                 PlayerComponent player = stateSpaceComponents.PlayerComponent;
                 player.PlayerJustLoaded = false;
