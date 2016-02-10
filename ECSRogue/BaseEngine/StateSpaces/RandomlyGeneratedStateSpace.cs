@@ -86,7 +86,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         private void CreatePlayer()
         {
             Guid id = stateSpaceComponents.CreateEntity();
-            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Player | Component.COMPONENT_INPUTMOVEMENT;
+            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Player | Component.COMPONENT_INPUTMOVEMENT | Component.COMPONENT_HEALTH_REGENERATION;
             //Set Position
             int X = 0;
             int Y = 0;
@@ -135,6 +135,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             stateSpaceComponents.InputMovementComponents[id] = new InputMovementComponent() { TimeIntervalBetweenMovements = .09f, TimeSinceLastMovement = 0f, InitialWait = .5f, TotalTimeButtonDown = 0f, LastKeyPressed = Keys.None };
             //Set an alignment for AI to communicate with
             stateSpaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_FRIENDLY };
+            //Set health regeneration
+            stateSpaceComponents.HealthRegenerationComponents[id] = new HealthRegenerationComponent() { HealthRegain = 1, RegenerateTurnRate = 1, TurnsSinceLastHeal = 0 };
             //Set combat messages
             stateSpaceComponents.DodgeMeleeMessageComponents[id] = new DodgeMeleeMessageComponent()
             {
@@ -243,6 +245,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             AISystem.AIUpdateVision(stateSpaceComponents, dungeonGrid, dungeonDimensions);
             CombatSystem.HandleMeleeCombat(stateSpaceComponents, cellSize);
             AISystem.AICheckFleeing(stateSpaceComponents);
+            CombatSystem.RegenerateHealth(stateSpaceComponents);
 
             //Resetting Systems
             if (stateSpaceComponents.PlayerComponent.PlayerJustLoaded || stateSpaceComponents.PlayerComponent.PlayerTookTurn)

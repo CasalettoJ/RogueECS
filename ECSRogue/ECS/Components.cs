@@ -40,7 +40,8 @@ namespace ECSRogue.ECS
         COMPONENT_ALTERNATE_FOV_COLOR = 1 << 26,
         COMPONENT_AI_SLEEP = 1 << 27,
         COMPONENT_AI_ROAM = 1 << 28,
-        COMPONENT_AI_FLEE = 1 << 29
+        COMPONENT_AI_FLEE = 1 << 29,
+        COMPONENT_HEALTH_REGENERATION = 1 << 30
     }
 
 
@@ -65,6 +66,8 @@ namespace ECSRogue.ECS
         public const Component FOVColorChange = Component.COMPONENT_ALTERNATE_FOV_COLOR | Component.COMPONENT_AI_FIELDOFVIEW;
 
         public const Component MovingAI = Component.COMPONENT_POSITION | Component.COMPONENT_AI_MOVEMENT; //Not Implemented
+
+        public const Component HealthRegen = Component.COMPONENT_HEALTH_REGENERATION | Component.COMPONENT_SKILL_LEVELS;
 
         public const Component InputMoveable = Component.COMPONENT_POSITION | Component.COMPONENT_INPUTMOVEMENT;
 
@@ -115,6 +118,7 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, TakeMeleeDamageMesageComponent> TakeMeleeDamageMesageComponents { get; private set; }
         public Dictionary<Guid, DodgeMeleeMessageComponent> DodgeMeleeMessageComponents { get; private set; }
         public Dictionary<Guid, AlternateFOVColorChangeComponent> AlternateFOVColorChangeComponents { get; private set; }
+        public Dictionary<Guid, HealthRegenerationComponent> HealthRegenerationComponents { get; private set; }
 
         public List<Action> DelayedActions { get; private set; }
         public PlayerComponent PlayerComponent { get; set; }
@@ -153,6 +157,7 @@ namespace ECSRogue.ECS
             TakeMeleeDamageMesageComponents = new Dictionary<Guid, TakeMeleeDamageMesageComponent>();
             DodgeMeleeMessageComponents = new Dictionary<Guid, DodgeMeleeMessageComponent>();
             AlternateFOVColorChangeComponents = new Dictionary<Guid, AlternateFOVColorChangeComponent>();
+            HealthRegenerationComponents = new Dictionary<Guid, HealthRegenerationComponent>();
 
             GlobalCollisionComponent = new GlobalCollisionComponent() { EntitiesThatCollided = new List<Guid>() };
             PlayerComponent = new PlayerComponent();
@@ -201,6 +206,7 @@ namespace ECSRogue.ECS
                 MeleeAttackNPCMessageComponents.Remove(id);
                 DodgeMeleeMessageComponents.Remove(id);
                 AlternateFOVColorChangeComponents.Remove(id);
+                HealthRegenerationComponents.Remove(id);
             }
         }
 

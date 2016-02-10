@@ -135,6 +135,25 @@ namespace ECSRogue.ECS.Systems
             return 0;
         }
 
+        public static void RegenerateHealth(StateSpaceComponents spaceComponents)
+        {
+            if(spaceComponents.PlayerComponent.PlayerTookTurn)
+            {
+                foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.HealthRegen) == ComponentMasks.HealthRegen).Select(x => x.Id))
+                {
+                    HealthRegenerationComponent healthRegen = spaceComponents.HealthRegenerationComponents[id];
+                    healthRegen.TurnsSinceLastHeal += 1;
+                    if(healthRegen.TurnsSinceLastHeal >= healthRegen.RegenerateTurnRate)
+                    {
+                        SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
+                        skills.CurrentHealth += healthRegen.HealthRegain;
+                        skills.CurrentHealth = (skills.CurrentHealth >= skills.Health) ? skills.Health : skills.CurrentHealth;
+                        spaceComponents.SkillLevelsComponents[id] = skills;
+                    }
+                    spaceComponents.HealthRegenerationComponents[id] = healthRegen;
+                }
+            }
+        }
 
 
         //public static void MakeCombatText(string text, Color messageColor, StateSpaceComponents spaceComponents, PositionComponent position, int cellSize)
