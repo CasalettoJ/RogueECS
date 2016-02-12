@@ -52,7 +52,7 @@ namespace ECSRogue.ECS.Systems
                                     combatString += string.Format(spaceComponents.TakeMeleeDamageMesageComponents[collidedEntity].NormalTakeDamageMessages[spaceComponents.random.Next(0, spaceComponents.TakeMeleeDamageMesageComponents[collidedEntity].NormalTakeDamageMessages.Count())], damageDone);
                                 }
                                 attackingStats.TimesMissed = 0;
-                                Color messageColor = (spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_HOSTILE) ? MessageColors.Harm : MessageColors.DamageDealt;
+                                Color messageColor = (spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_HOSTILE) ? Colors.Messages.Bad : Colors.Messages.Good;
                                 spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Microsoft.Xna.Framework.Color, string>(messageColor, combatString));
                             }
                             //Miss
@@ -67,7 +67,7 @@ namespace ECSRogue.ECS.Systems
                                 {
                                     combatString += string.Format(spaceComponents.DodgeMeleeMessageComponents[collidedEntity].NormalDodgeMessages[spaceComponents.random.Next(0, spaceComponents.DodgeMeleeMessageComponents[collidedEntity].NormalDodgeMessages.Count())], damageDone);
                                 }
-                                Color messageColor = (spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_HOSTILE) ? MessageColors.Dodge : MessageColors.Failure;
+                                Color messageColor = (spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_HOSTILE) ? Colors.Messages.Good : Colors.Messages.Bad;
                                 spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Microsoft.Xna.Framework.Color, string>(messageColor, combatString));
                             }
 
@@ -77,18 +77,18 @@ namespace ECSRogue.ECS.Systems
                                 spaceComponents.EntitiesToDelete.Add(collidedEntity);
                                 if (isPlayerAttacking)
                                 {
-                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] "+ "You killed the {0}!", spaceComponents.NameComponents[collidedEntity].Name)));
+                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] "+ "You killed the {0}!", spaceComponents.NameComponents[collidedEntity].Name)));
                                     GameplayInfoComponent gameInfo = spaceComponents.GameplayInfoComponent;
                                     gameInfo.Kills += 1;
                                     spaceComponents.GameplayInfoComponent = gameInfo;
                                 }
                                 else if(isPlayerBeingAttacked)
                                 {
-                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + "You were killed by a {0}!", spaceComponents.NameComponents[id].Name)));
+                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + "You were killed by a {0}!", spaceComponents.NameComponents[id].Name)));
                                 }
                                 else
                                 {
-                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(MessageColors.SpecialAction, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + "{0} killed the {1}!", spaceComponents.NameComponents[id].Name, spaceComponents.NameComponents[collidedEntity].Name)));
+                                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + "{0} killed the {1}!", spaceComponents.NameComponents[id].Name, spaceComponents.NameComponents[collidedEntity].Name)));
                                 }
                             }
                             spaceComponents.SkillLevelsComponents[id] = attackingStats;

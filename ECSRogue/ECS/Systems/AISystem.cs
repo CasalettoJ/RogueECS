@@ -54,8 +54,7 @@ namespace ECSRogue.ECS.Systems
                                 FOV.Color = FOVColors.Fleeing;
                                 spaceComponents.AIStateComponents[id] = state;
                                 spaceComponents.AIFieldOfViewComponents[id] = FOV;
-                                Color messageColor = alignment.Alignment == AIAlignments.ALIGNMENT_HOSTILE ? MessageColors.Danger : MessageColors.StatusChange;
-                                spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(messageColor,
+                                spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.StatusChange,
                                     string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + Messages.Flee[spaceComponents.random.Next(0, Messages.Flee.Count())], spaceComponents.NameComponents[id].Name)));
                             }
                         }
@@ -74,8 +73,7 @@ namespace ECSRogue.ECS.Systems
                             FOV.Color = FOVColors.Fleeing;
                             spaceComponents.AIStateComponents[id] = state;
                             spaceComponents.AIFieldOfViewComponents[id] = FOV;
-                            Color messageColor = alignment.Alignment == AIAlignments.ALIGNMENT_HOSTILE ? MessageColors.Danger : MessageColors.StatusChange;
-                            spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(messageColor,
+                            spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.StatusChange,
                                 string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + Messages.Flee[spaceComponents.random.Next(0, Messages.Flee.Count())], spaceComponents.NameComponents[id].Name)));
                         }
                     }
@@ -400,8 +398,7 @@ namespace ECSRogue.ECS.Systems
                     entityFOV.Color = FOVColors.Roaming;
                     spaceComponents.AIStateComponents[entity] = entityState;
                     spaceComponents.AIFieldOfViewComponents[entity] = entityFOV;
-                    Color messageColor = entityAlignment.Alignment == AIAlignments.ALIGNMENT_HOSTILE ? MessageColors.Danger : MessageColors.StatusChange;
-                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(messageColor,
+                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.StatusChange,
                         string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + Messages.AwokenBySight[spaceComponents.random.Next(0, Messages.AwokenBySight.Count())], spaceComponents.NameComponents[entity].Name)));
                     return;
                 }
@@ -425,8 +422,7 @@ namespace ECSRogue.ECS.Systems
                     entityFOV.Color = FOVColors.Attacking;
                     spaceComponents.AIStateComponents[entity] = entityState;
                     spaceComponents.AIFieldOfViewComponents[entity] = entityFOV;
-                    Color messageColor = entityAlignment.Alignment == AIAlignments.ALIGNMENT_HOSTILE ? MessageColors.Danger : MessageColors.StatusChange;
-                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(messageColor,
+                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.StatusChange,
                         string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + Messages.FoundBySight[spaceComponents.random.Next(0, Messages.FoundBySight.Count())], spaceComponents.NameComponents[entity].Name)));
                     return;
                 }

@@ -39,6 +39,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BaseEngine\Camera.cs" />
+    <Compile Include="BaseEngine\Colors.cs" />
     <Compile Include="BaseEngine\IO\FileNames.cs" />
     <Compile Include="BaseEngine\Interfaces\IStateSpace.cs" />
     <Compile Include="BaseEngine\Interfaces\IState.cs" />

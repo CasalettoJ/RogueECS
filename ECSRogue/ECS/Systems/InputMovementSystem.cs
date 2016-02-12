@@ -93,7 +93,7 @@ namespace ECSRogue.ECS.Systems
                 }
                 if(hitWall)
                 {
-                    MessageDisplaySystem.GenerateRandomGameMessage(spaceComponents, Messages.WallCollisionMessages, MessageColors.Normal, gameSettings);
+                    MessageDisplaySystem.GenerateRandomGameMessage(spaceComponents, Messages.WallCollisionMessages, Colors.Messages.Normal, gameSettings);
                 }
 
             }

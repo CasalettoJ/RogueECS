@@ -72,7 +72,7 @@ namespace ECSRogue.ECS.Systems
                     foreach (string stat in statsToPrint)
                     {
                         Vector2 messageSize = font.MeasureString(stat);
-                        spriteBatch.DrawString(font, stat, new Vector2(camera.DungeonUIViewportLeft.X + 10, 10 + (messageSpacing * messageNumber)), MessageColors.SpecialAction);
+                        spriteBatch.DrawString(font, stat, new Vector2(camera.DungeonUIViewportLeft.X + 10, 10 + (messageSpacing * messageNumber)), Colors.Messages.Special);
                         messageNumber += 1;
                     }
                 }
@@ -81,7 +81,7 @@ namespace ECSRogue.ECS.Systems
 
         public static void GenerateRandomGameMessage(StateSpaceComponents spaceComponents, string[] messageList, Color color, GameSettings gameSettings = null)
         {
-            if (gameSettings == null || !(!gameSettings.ShowNormalMessages && color == MessageColors.Normal))
+            if (gameSettings == null || !(!gameSettings.ShowNormalMessages && color == Colors.Messages.Normal))
             {
                 foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
                 {

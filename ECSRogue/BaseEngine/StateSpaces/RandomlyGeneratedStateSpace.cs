@@ -194,12 +194,19 @@ namespace ECSRogue.BaseEngine.StateSpaces
                  MaxMessages = 100, IndexBegin = 0, GameMessages = new List<Tuple<Color,string>>()};
             if (stateComponents.GameplayInfo.FloorsReached <= 0)
             {
-                MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.GameEntranceMessages, MessageColors.SpecialAction);
+                MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.GameEntranceMessages, Colors.Messages.Special);
             }
             else
             {
-                MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.CaveEntranceMessages, MessageColors.SpecialAction);
+                MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.CaveEntranceMessages, Colors.Messages.Special);
             }
+
+            stateSpaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, "This is a normal message."));
+            stateSpaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Special, "This is a SPECIAL message."));
+            stateSpaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.StatusChange, "A status change has happened!"));
+            stateSpaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Good, "Something good happened."));
+            stateSpaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Bad, "Something awful happened!"));
+            stateSpaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.LootPickup, "You picked up cool loot!"));
         }
         #endregion
 
@@ -273,9 +280,13 @@ namespace ECSRogue.BaseEngine.StateSpaces
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
         {
             spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.Black);
-            spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .25f);
+            //spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .3f);
+            //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewport.Bounds.X, camera.DungeonUIViewport.Bounds.Y), new Point(camera.DungeonUIViewport.Bounds.Width, 3)), Color.DarkSlateBlue);
+            //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewport.Bounds.X, camera.DungeonUIViewport.Bounds.Y+5), new Point(camera.DungeonUIViewport.Bounds.Width, camera.DungeonUIViewport.Bounds.Height - 5)), Color.DarkSlateBlue * .3f);
             spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.Black);
-            spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.DarkRed * .25f);
+            //spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.DarkOrange * .15f);
+            //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewportLeft.Bounds.X, camera.DungeonUIViewportLeft.Bounds.Y), new Point(3, camera.DungeonUIViewportLeft.Bounds.Height - camera.DungeonUIViewport.Bounds.Height + 3)), Color.DarkSlateBlue);
+            //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewportLeft.Bounds.X, camera.DungeonUIViewportLeft.Bounds.Y), new Point(camera.DungeonUIViewportLeft.Bounds.Width, camera.DungeonUIViewportLeft.Bounds.Height)), Color.DarkSlateBlue * .3f);
             MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont);
         }
         #endregion
