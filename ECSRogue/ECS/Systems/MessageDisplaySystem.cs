@@ -49,15 +49,15 @@ namespace ECSRogue.ECS.Systems
 
             messageNumber = 0;
             //Draw statistics
-            foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).Select(x => x.Id))
-            {
                 List<string> statsToPrint = new List<string>();
                 GameplayInfoComponent gameplayInfo = spaceComponents.GameplayInfoComponent;
-                SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
 
                 statsToPrint.Add(string.Format("Floor {0}", gameplayInfo.FloorsReached));
                 statsToPrint.Add(string.Format("Steps: {0}", gameplayInfo.StepsTaken));
                 statsToPrint.Add(string.Format("Kills: {0}", gameplayInfo.Kills));
+            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).Select(x => x.Id))
+            {
+                SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
                 statsToPrint.Add(System.Environment.NewLine);
                 statsToPrint.Add(string.Format("Health:  {0} / {1}", skills.CurrentHealth, skills.Health));
                 statsToPrint.Add(string.Format("Hunger:  {0} / {1}", skills.CurrentHunger, skills.Hunger));
@@ -66,8 +66,9 @@ namespace ECSRogue.ECS.Systems
                 statsToPrint.Add(string.Format("Power: {0}", skills.Power));
                 statsToPrint.Add(string.Format("Accuracy: {0}", skills.Accuracy));
                 statsToPrint.Add(string.Format("Defense: {0}", skills.Defense));
+            }
 
-                if (font != null)
+            if (font != null)
                 {
                     foreach (string stat in statsToPrint)
                     {
@@ -76,7 +77,6 @@ namespace ECSRogue.ECS.Systems
                         messageNumber += 1;
                     }
                 }
-            }
         }
 
         public static void GenerateRandomGameMessage(StateSpaceComponents spaceComponents, string[] messageList, Color color, GameSettings gameSettings = null)
