@@ -28,10 +28,10 @@ namespace ECSRogue.ProceduralGeneration
         {
             return new DungeonColorInfo()
             {
-                Floor = Color.DarkGreen,
-                Wall = Color.DarkViolet,
-                FloorInRange = Color.Green,
-                WallInRange = Color.Violet
+                Floor = Colors.Caves.Floor,
+                Wall = Colors.Caves.Wall,
+                FloorInRange = Colors.Caves.FloorInRange,
+                WallInRange = Colors.Caves.WallInRange
             };
         }
 
