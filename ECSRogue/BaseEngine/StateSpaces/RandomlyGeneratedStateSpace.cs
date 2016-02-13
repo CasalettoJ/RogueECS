@@ -49,6 +49,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             cellSize = dungeonGeneration.GetCellsize();
             dungeonSpriteFile = dungeonGeneration.GetDungeonSpritesheetFileName();
             dungeonColorInfo = dungeonGeneration.GetColorInfo();
+            CreateGameplayInfo();
+            CreateMessageLog();
             dungeonGeneration.GenerateDungeonEntities(stateSpaceComponents, dungeonGrid, dungeonDimensions, cellSize, freeTiles);
         }
 
@@ -75,10 +77,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             UI = content.Load<Texture2D>("Sprites/ball");
             if (createEntities)
             {
-                CreateGameplayInfo();
                 CreatePlayer();
-                CreateMessageLog();
-                
             }
             camera.AttachedToPlayer = true;
             mapToPlayer = new DijkstraMapTile[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
@@ -94,9 +93,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             }
             else
             {
-
                 //Set GameplayInfo
-                stateSpaceComponents.GameplayInfoComponent = new GameplayInfoComponent() { Kills = 0, StepsTaken = 0, FloorsReached = 0, Madness = 0 };
+                stateSpaceComponents.GameplayInfoComponent = new GameplayInfoComponent() { Kills = 0, StepsTaken = 0, FloorsReached = 1, Madness = 0 };
             }
         }
 
@@ -202,7 +200,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = Component.COMPONENT_GAMEMESSAGE;
             stateSpaceComponents.GameMessageComponent = new GameMessageComponent() { GlobalColor = Color.White, GlobalMessage = string.Empty,
                  MaxMessages = 100, IndexBegin = 0, GameMessages = new List<Tuple<Color,string>>()};
-            if (stateComponents.GameplayInfo.FloorsReached <= 0)
+            if (stateSpaceComponents.GameplayInfoComponent.FloorsReached <= 1)
             {
                 MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.GameEntranceMessages, MessageColors.SpecialAction);
             }
