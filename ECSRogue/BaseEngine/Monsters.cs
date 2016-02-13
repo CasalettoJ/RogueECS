@@ -5,6 +5,7 @@ using ECSRogue.ECS.Components.MeleeMessageComponents;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,14 @@ namespace ECSRogue.BaseEngine
     {
         public static readonly List<MonsterInfo> MonsterCatalog = new List<MonsterInfo>()
         {
+            //Player
+            new MonsterInfo()
+            {
+                ValidDepths = new int[] { },
+                isRequiredSpawn = true,
+                SpawnFunction = MonsterSpawners.SpawnPlayer
+            },
+
             //Test Enemy NPC
             new MonsterInfo()
             {
@@ -46,6 +55,93 @@ namespace ECSRogue.BaseEngine
 
     public static class MonsterSpawners
     {
+        public static bool SpawnPlayer(StateSpaceComponents stateSpaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, List<Vector2> freeTiles)
+        {
+            Guid id = stateSpaceComponents.CreateEntity();
+            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Player | Component.COMPONENT_INPUTMOVEMENT | Component.COMPONENT_HEALTH_REGENERATION;
+            //Set Position
+            int X = 0;
+            int Y = 0;
+            do
+            {
+                X = stateSpaceComponents.random.Next(0, (int)dungeonDimensions.X);
+                Y = stateSpaceComponents.random.Next(0, (int)dungeonDimensions.Y);
+            } while (dungeonGrid[X, Y].Type != TileType.TILE_FLOOR);
+            stateSpaceComponents.PositionComponents[id] = new PositionComponent() { Position = new Vector2(X, Y) };
+            dungeonGrid[X, Y].Occupiable = true;
+            //Set Display
+            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent()
+            {
+                Color = Color.Wheat,
+                SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize),
+                Origin = Vector2.Zero,
+                SpriteEffect = SpriteEffects.None,
+                Scale = 1f,
+                Rotation = 0f
+            };
+            //Set Sightradius
+            stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { CurrentRadius = 15, MaxRadius = 15, DrawRadius = true };
+            //Set first turn
+            stateSpaceComponents.PlayerComponent = new PlayerComponent() { PlayerJustLoaded = true };
+            //Collision information
+            stateSpaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = true };
+            //Set name of player
+            stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "You" };
+            //Set Input of the player
+            stateSpaceComponents.InputMovementComponents[id] = new InputMovementComponent() { TimeIntervalBetweenMovements = .09f, TimeSinceLastMovement = 0f, InitialWait = .5f, TotalTimeButtonDown = 0f, LastKeyPressed = Keys.None };
+            //Set an alignment for AI to communicate with
+            stateSpaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_FRIENDLY };
+            //Set health regeneration
+            stateSpaceComponents.HealthRegenerationComponents[id] = new HealthRegenerationComponent() { HealthRegain = 1, RegenerateTurnRate = 1, TurnsSinceLastHeal = 0 };
+            //Set combat messages
+            stateSpaceComponents.DodgeMeleeMessageComponents[id] = new DodgeMeleeMessageComponent()
+            {
+                NormalDodgeMessages = new string[]
+                {
+                    " and the attack misses you!",
+                    " but nothing happened.",
+                    " ... but it failed!",
+                    " and your defense protects you.",
+                    " but it fails to connect."
+                },
+                StreakDodgeMessages = new string[]
+                {
+                    " but you don't even notice.",
+                    " and you laugh at the attempt.",
+                    " but you easily dodge it again.",
+                    " and misses you. Again!"
+                }
+            };
+            stateSpaceComponents.MeleeAttackNPCMessageComponents[id] = new MeleeAttackNPCMessageComponent()
+            {
+                AttackNPCMessages = new string[]
+                {
+                    "{0} attack the {1}",
+                    "{0} take a swing at the {1}",
+                    "{0} swipe at {1}",
+                    "{0} try to damage the {1}",
+                    "{0} slash viciously at the {1}"
+                }
+            };
+            stateSpaceComponents.TakeMeleeDamageMesageComponents[id] = new TakeMeleeDamageMesageComponent()
+            {
+                NormalTakeDamageMessages = new string[]
+                {
+                    " and you take {0} damage.",
+                    " and it hurts! You take {0} damage.",
+                    "! Ow. You lose {0} health.",
+                    " and hits you for {0} damage."
+                },
+                BrokenDodgeStreakTakeDamageMessages = new string[]
+                {
+                    " and you finally take {0} damage.",
+                    " and this time you lose {0} health! Ow!",
+                    " and hits you for {0} THIS time.",
+                    "! {0} damage taken! Don't get cocky..."
+                }
+            };
+            return true;
+        }
         public static bool SpawnTestEnemyNPC(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, List<Vector2> freeTiles)
         {
             Guid id = spaceComponents.CreateEntity();

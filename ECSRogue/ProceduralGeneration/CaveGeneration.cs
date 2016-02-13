@@ -17,13 +17,6 @@ namespace ECSRogue.ProceduralGeneration
 {
     public class CaveGeneration : IGenerationAlgorithm
     {
-        private const int cellSize = 32;
-
-        public int GetCellsize()
-        {
-            return cellSize;
-        }
-
         public DungeonColorInfo GetColorInfo()
         {
             return new DungeonColorInfo()
@@ -355,27 +348,7 @@ namespace ECSRogue.ProceduralGeneration
 
         public string GetDungeonSpritesheetFileName()
         {
-            return "Sprites/Ball";
-        }
-        
-        public void GenerateDungeonEntities(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellsize, List<Vector2> freeTiles)
-        {
-            int numberOfSpawns = 15; //Should be a formula based on depth level
-            List<MonsterInfo> monsterPossibilities = new List<MonsterInfo>();
-            //populate the monster possibility array based on how many slots a monster gets
-            foreach(MonsterInfo monster in Monsters.MonsterCatalog.Where(x => x.ValidDepths.Contains(spaceComponents.GameplayInfoComponent.FloorsReached)))
-            {
-                for(int i = 0; i < monster.spawnIndexSlots; i++)
-                {
-                    monsterPossibilities.Add(monster);
-                }
-            }
-            //Roll randomly in the index and add whatever monster it lands on
-            for(int i = 0; i < numberOfSpawns; i++)
-            {
-                monsterPossibilities[spaceComponents.random.Next(0, monsterPossibilities.Count)].SpawnFunction(spaceComponents, dungeonGrid, dungeonDimensions, cellsize, freeTiles);
-            }
-
+            return DevConstants.Graphics.CavesSpriteSheet;
         }
 
         private void FloodFill(int x, int y, int worldI, int worldJ, ref DungeonTile[,] dungeonGrid)

@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="BaseEngine\Camera.cs" />
     <Compile Include="BaseEngine\Colors.cs" />
+    <Compile Include="BaseEngine\DevConstants.cs" />
     <Compile Include="BaseEngine\IO\FileNames.cs" />
     <Compile Include="BaseEngine\Interfaces\IStateSpace.cs" />
     <Compile Include="BaseEngine\Interfaces\IState.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="ECS\Systems\LabelDisplaySystem.cs" />
     <Compile Include="ECS\Systems\LevelChangeSystem.cs" />
     <Compile Include="ECS\Systems\MessageDisplaySystem.cs" />
+    <Compile Include="ECS\Systems\MonsterCreationSystem.cs" />
     <Compile Include="ECS\Systems\MovementSystem.cs" />
     <Compile Include="ECS\Systems\TileRevealSystem.cs" />
     <Compile Include="ProceduralGeneration\CaveArenaGeneration.cs" />
@@ -132,9 +134,7 @@
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ECS\Systems\MonsterCreation\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

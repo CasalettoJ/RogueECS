@@ -44,7 +44,7 @@ namespace ECSRogue.ECS.Systems
         public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo)
         {
             Matrix cameraMatrix = camera.GetMatrix();
-            Vector2 origin = new Vector2(4, 4);
+            Vector2 origin = new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize);
             for (int i = 0; i < (int)dungeonDimensions.X; i++)
             {
                 for (int j = 0; j < (int)dungeonDimensions.Y; j++)
@@ -132,12 +132,12 @@ namespace ECSRogue.ECS.Systems
                             if(spaceComponents.AlternateFOVColorChangeComponents.ContainsKey(id))
                             {
                                 AlternateFOVColorChangeComponent altColorInfo = spaceComponents.AlternateFOVColorChangeComponents[id];
-                                spriteBatch.Draw(rectangleTexture, position: tile, color: Color.Lerp(fovInfo.Color,altColorInfo.AlternateColor,altColorInfo.Seconds/altColorInfo.SwitchAtSeconds) * .3f, origin: new Vector2(4, 4));
+                                spriteBatch.Draw(rectangleTexture, position: tile, color: Color.Lerp(fovInfo.Color,altColorInfo.AlternateColor,altColorInfo.Seconds/altColorInfo.SwitchAtSeconds) * .3f, origin: new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize));
                             }
                             else
                             {
                                 //origin is 4,4 because the tile texture is 40x40 and the grid is 32x32.  If size of grid changes, change this -- and then don't hardcode it anymore!!!
-                                spriteBatch.Draw(rectangleTexture, position: tile, color: fovInfo.Color * .3f, origin: new Vector2(4, 4));
+                                spriteBatch.Draw(rectangleTexture, position: tile, color: fovInfo.Color * .3f, origin: new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize));
                             }
                         }
                     }
