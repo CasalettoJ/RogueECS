@@ -75,12 +75,29 @@ namespace ECSRogue.BaseEngine.StateSpaces
             UI = content.Load<Texture2D>("Sprites/ball");
             if (createEntities)
             {
+                CreateGameplayInfo();
                 CreatePlayer();
                 CreateMessageLog();
                 
             }
             camera.AttachedToPlayer = true;
             mapToPlayer = new DijkstraMapTile[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
+        }
+
+        private void CreateGameplayInfo()
+        {
+            if (stateComponents != null)
+            {
+                GameplayInfoComponent info = stateComponents.GameplayInfo;
+                info.FloorsReached += 1;
+                stateSpaceComponents.GameplayInfoComponent = info;
+            }
+            else
+            {
+
+                //Set GameplayInfo
+                stateSpaceComponents.GameplayInfoComponent = new GameplayInfoComponent() { Kills = 0, StepsTaken = 0, FloorsReached = 0, Madness = 0 };
+            }
         }
 
         private void CreatePlayer()
@@ -98,18 +115,11 @@ namespace ECSRogue.BaseEngine.StateSpaces
             stateSpaceComponents.PositionComponents[id] = new PositionComponent() { Position = new Vector2(X, Y) };
             dungeonGrid[X, Y].Occupiable = true;
             if(stateComponents != null)
-            {
-                GameplayInfoComponent info = stateComponents.GameplayInfo;
-                info.FloorsReached += 1;
-                stateSpaceComponents.GameplayInfoComponent = info;
+            { 
                 stateSpaceComponents.SkillLevelsComponents[id] = stateComponents.PlayerSkillLevels;
             }
             else
             {
-
-                //Set GameplayInfo
-                stateSpaceComponents.GameplayInfoComponent = new GameplayInfoComponent() { Kills = 0, StepsTaken = 0, FloorsReached = 0 };
-                //Set Skills Level
                 stateSpaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent()
                 {
                     CurrentHealth = 100,
