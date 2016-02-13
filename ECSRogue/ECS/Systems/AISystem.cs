@@ -339,7 +339,7 @@ namespace ECSRogue.ECS.Systems
                 {
                     if (i >= 0 && j >= 0 && i < (int)dungeonDimensions.X && j < (int)dungeonDimensions.Y)
                     {
-                        if (mapToPlayer[i, j].Weight < DungeonMappingSystem.WallValue)
+                        if (mapToPlayer[i, j].Weight < DevConstants.Grid.WallWeight)
                         {
                             lowestGridTile = (mapToPlayer[i, j].Weight * -1 < lowestGridTile * -1) ? mapToPlayer[i, j].Weight : lowestGridTile;
                         }

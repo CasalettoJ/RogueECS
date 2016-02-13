@@ -1,4 +1,5 @@
-﻿using ECSRogue.ECS.Components.AIComponents;
+﻿using ECSRogue.BaseEngine;
+using ECSRogue.ECS.Components.AIComponents;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
 using System;
@@ -10,7 +11,6 @@ namespace ECSRogue.ECS.Systems
 {
     public static class DungeonMappingSystem
     {
-        public const int WallValue = 10000;
 
         public static void ShouldPlayerMapRecalc(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, ref DijkstraMapTile[,] playerMap)
         {
@@ -43,11 +43,11 @@ namespace ECSRogue.ECS.Systems
                 {
                     if (dungeonGrid[i, j].Occupiable)
                     {
-                        dijkstraMap[i, j].Weight = WallValue-1;
+                        dijkstraMap[i, j].Weight = DevConstants.Grid.WallWeight -1;
                     }
                     else
                     {
-                        dijkstraMap[i, j].Weight = WallValue;
+                        dijkstraMap[i, j].Weight = DevConstants.Grid.WallWeight;
                     }
                     if (targets.Contains(new Vector2(i, j)))
                     {
@@ -69,13 +69,13 @@ namespace ECSRogue.ECS.Systems
 
                 int x = (int)pos.X;
                 int y = (int)pos.Y;
-                int lowestNeighbor = WallValue;
+                int lowestNeighbor = DevConstants.Grid.WallWeight;
                 HashSet<Vector2> toAdd = new HashSet<Vector2>();
                 for (int k = x - 1; k <= x + 1; k++)
                 {
                     for (int l = y - 1; l <= y + 1; l++)
                     {
-                        if (l >= 0 && k >= 0 && l < (int)dungeonDimensions.Y && k < (int)dungeonDimensions.X && dijkstraMap[(int)pos.X, (int)pos.Y].Weight != WallValue)
+                        if (l >= 0 && k >= 0 && l < (int)dungeonDimensions.Y && k < (int)dungeonDimensions.X && dijkstraMap[(int)pos.X, (int)pos.Y].Weight != DevConstants.Grid.WallWeight)
                         {
                             lowestNeighbor = (lowestNeighbor < dijkstraMap[k, l].Weight) ? lowestNeighbor : dijkstraMap[k, l].Weight;
                             if(!dijkstraMap[k,l].Checked)
