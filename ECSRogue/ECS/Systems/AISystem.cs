@@ -86,8 +86,7 @@ namespace ECSRogue.ECS.Systems
             if (spaceComponents.PlayerComponent.PlayerTookTurn)
             {
                 // Handle Combat ready AI entities
-                foreach (Guid id in spaceComponents.Entities.Where(c => ((c.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI)
-                     && ((c.ComponentFlags & ComponentMasks.MovingAI) != ComponentMasks.MovingAI)).Select(c => c.Id))
+                foreach (Guid id in spaceComponents.Entities.Where(c => ((c.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI)).Select(c => c.Id))
                 {
                     AIAlignment alignment = spaceComponents.AIAlignmentComponents[id];
                     AIState state = spaceComponents.AIStateComponents[id];
@@ -386,7 +385,7 @@ namespace ECSRogue.ECS.Systems
             AIAlignment entityAlignment = spaceComponents.AIAlignmentComponents[entity];
             AISleep entitySleep = spaceComponents.AISleepComponents[entity];
             AIState entityState = spaceComponents.AIStateComponents[entity];
-            foreach (Guid id in spaceComponents.Entities.Where(x => ((x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player) || 
+            foreach (Guid id in spaceComponents.Entities.Where(x => ((x.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER) || 
                 ((x.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI)).Select(x => x.Id))
             {
                 PositionComponent position = spaceComponents.PositionComponents[id];
@@ -411,7 +410,7 @@ namespace ECSRogue.ECS.Systems
             AIAlignment entityAlignment = spaceComponents.AIAlignmentComponents[entity];
             AIRoam entityRoam = spaceComponents.AIRoamComponents[entity];
             AIState entityState = spaceComponents.AIStateComponents[entity];
-            foreach (Guid id in spaceComponents.Entities.Where(x => ((x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player) ||
+            foreach (Guid id in spaceComponents.Entities.Where(x => ((x.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER) ||
                 ((x.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI)).Select(x => x.Id))
             {
                 PositionComponent position = spaceComponents.PositionComponents[id];

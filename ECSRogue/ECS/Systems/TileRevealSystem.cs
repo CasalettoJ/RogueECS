@@ -11,7 +11,7 @@ namespace ECSRogue.ECS.Systems
     {
         public static void RevealTiles(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, StateSpaceComponents spaceComponents)
         {
-            Entity player = spaceComponents.Entities.Where(z => (z.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
+            Entity player = spaceComponents.Entities.Where(z => (z.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER).FirstOrDefault();
             if (player != null && (spaceComponents.PlayerComponent.PlayerTookTurn || spaceComponents.PlayerComponent.PlayerJustLoaded)) 
             {
 

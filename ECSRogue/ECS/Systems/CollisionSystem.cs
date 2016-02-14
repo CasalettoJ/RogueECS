@@ -20,7 +20,7 @@ namespace ECSRogue.ECS.Systems
                 {
                     spaceComponents.CollisionComponents[attemptingEntity].CollidedObjects.Add(id);
                     spaceComponents.GlobalCollisionComponent.EntitiesThatCollided.Add(attemptingEntity);
-                    if(spaceComponents.CollisionComponents[id].Solid)
+                    if(spaceComponents.CollisionComponents[id].Solid && spaceComponents.CollisionComponents[attemptingEntity].Solid)
                     {
                         canMove = false;
                     }

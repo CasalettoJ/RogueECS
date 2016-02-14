@@ -110,7 +110,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
 
             //Movement and Reaction
-            InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
+            InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings, dungeonDimensions);
             CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
             TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
             TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
@@ -150,6 +150,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
         {
+            ObserverSystem.PrintObserversFindings(stateSpaceComponents, messageFont, spriteBatch, dungeonGrid, camera, UI);
             spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.Black);
             //spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .3f);
             //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewport.Bounds.X, camera.DungeonUIViewport.Bounds.Y), new Point(camera.DungeonUIViewport.Bounds.Width, 3)), Color.DarkSlateBlue);

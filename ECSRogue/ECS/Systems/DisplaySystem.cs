@@ -21,15 +21,15 @@ namespace ECSRogue.ECS.Systems
             {
                 DisplayComponent display = spaceComponents.DisplayComponents[id];
                 Vector2 position = new Vector2(spaceComponents.PositionComponents[id].Position.X * cellSize, spaceComponents.PositionComponents[id].Position.Y * cellSize);
-                if(dungeonGrid[(int)spaceComponents.PositionComponents[id].Position.X, (int)spaceComponents.PositionComponents[id].Position.Y].InRange)
+                if(dungeonGrid[(int)spaceComponents.PositionComponents[id].Position.X, (int)spaceComponents.PositionComponents[id].Position.Y].InRange || display.AlwaysDraw)
                 {
                     Vector2 bottomRight = Vector2.Transform(new Vector2((position.X) + cellSize, (position.Y) + cellSize), cameraMatrix);
                     Vector2 topLeft = Vector2.Transform(new Vector2(position.X, position.Y), cameraMatrix);
                     Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
 
-                    if (camera.IsInView(cameraMatrix, cameraBounds))
+                    if (camera.IsInView(cameraMatrix, cameraBounds) )
                     {
-                        spriteBatch.Draw(spriteSheet, position, display.SpriteSource, display.Color, display.Rotation, display.Origin, display.Scale, display.SpriteEffect, 0f);
+                        spriteBatch.Draw(spriteSheet, position, display.SpriteSource, display.Color * display.Opacity, display.Rotation, display.Origin, display.Scale, display.SpriteEffect, 0f);
                         if (!string.IsNullOrEmpty(spaceComponents.DisplayComponents[id].Symbol))
                         {
                             Vector2 size = font.MeasureString(spaceComponents.DisplayComponents[id].Symbol);

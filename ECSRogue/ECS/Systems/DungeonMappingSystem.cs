@@ -24,7 +24,7 @@ namespace ECSRogue.ECS.Systems
         {
             List<Vector2> targets = new List<Vector2>();
             //targets are any entities with friendly AI and players
-            foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).Select(x => x.Id))
+            foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER).Select(x => x.Id))
             {
                 targets.Add(spaceComponents.PositionComponents[id].Position);
             }

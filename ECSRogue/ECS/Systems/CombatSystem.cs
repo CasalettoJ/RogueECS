@@ -18,16 +18,22 @@ namespace ECSRogue.ECS.Systems
             IEnumerable<Guid> entities = spaceComponents.GlobalCollisionComponent.EntitiesThatCollided.Distinct();
             foreach (Guid id in entities)
             {
+                Entity collidingObject = spaceComponents.Entities.Where(x => x.Id == id).First();
+                if(collidingObject == null || (((collidingObject.ComponentFlags & ComponentMasks.CombatReadyAI) != ComponentMasks.CombatReadyAI) && (collidingObject.ComponentFlags & Component.COMPONENT_PLAYER) != Component.COMPONENT_PLAYER))
+                {
+                    //If the colliding object isn't a combat ready AI or a player, don't try to do combat with it.
+                    continue;
+                }
                 foreach(Guid collidedEntity in spaceComponents.CollisionComponents[id].CollidedObjects)
                 {
                     Entity collidedObject = spaceComponents.Entities.Where(x => x.Id == collidedEntity).First();
-                    if (collidedObject != null && (((collidedObject.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI) || (collidedObject.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player))
+                    if (collidedObject != null && (((collidedObject.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI) || (collidedObject.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER))
                     {
                         int damageDone = 0;
                         SkillLevelsComponent collidedStats = spaceComponents.SkillLevelsComponents[collidedEntity];
                         SkillLevelsComponent attackingStats = spaceComponents.SkillLevelsComponents[id];
-                        bool isPlayerAttacking = ((spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player);
-                        bool isPlayerBeingAttacked = ((spaceComponents.Entities.Where(x => x.Id == collidedEntity).First().ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player);
+                        bool isPlayerAttacking = ((spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER);
+                        bool isPlayerBeingAttacked = ((spaceComponents.Entities.Where(x => x.Id == collidedEntity).First().ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER);
 
                         //If the two attacking creatures don't share an alignment, allow the attack to happen.
                         if (spaceComponents.AIAlignmentComponents[id].Alignment != spaceComponents.AIAlignmentComponents[collidedEntity].Alignment && collidedStats.CurrentHealth > 0 && attackingStats.CurrentHealth > 0)

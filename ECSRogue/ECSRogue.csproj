@@ -58,7 +58,6 @@
     <Compile Include="ECS\Components.cs" />
     <Compile Include="ECS\Components\AIComponents\AIFieldOfView.cs" />
     <Compile Include="ECS\Components\AIComponents\AIFlee.cs" />
-    <Compile Include="ECS\Components\AIComponents\AIMovement.cs" />
     <Compile Include="ECS\Components\AIComponents\AIAlignment.cs" />
     <Compile Include="ECS\Components\AIComponents\AICombat.cs" />
     <Compile Include="ECS\Components\AIComponents\AIRoam.cs" />
@@ -103,6 +102,7 @@
     <Compile Include="ECS\Systems\MessageDisplaySystem.cs" />
     <Compile Include="ECS\Systems\MonsterCreationSystem.cs" />
     <Compile Include="ECS\Systems\MovementSystem.cs" />
+    <Compile Include="ECS\Systems\ObserverSystem.cs" />
     <Compile Include="ECS\Systems\TileRevealSystem.cs" />
     <Compile Include="ProceduralGeneration\CaveArenaGeneration.cs" />
     <Compile Include="ProceduralGeneration\CaveGeneration.cs" />

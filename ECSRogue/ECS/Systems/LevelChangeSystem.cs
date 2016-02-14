@@ -12,7 +12,7 @@ namespace ECSRogue.ECS.Systems
     {
         public static void RetainPlayerStatistics(StateComponents stateComponents, StateSpaceComponents spaceComponents)
         {
-            Guid id = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).Select(x => x.Id).First();
+            Guid id = spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER).Select(x => x.Id).First();
             SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
             GameplayInfoComponent gameInfo = spaceComponents.GameplayInfoComponent;
             stateComponents.GameplayInfo = gameInfo;
@@ -21,7 +21,7 @@ namespace ECSRogue.ECS.Systems
 
         public static void LoadPlayerSkillset(StateComponents stateComponents, StateSpaceComponents spaceComponents)
         {
-            foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).Select(x => x.Id))
+            foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER).Select(x => x.Id))
             if (stateComponents != null)
             {
                 spaceComponents.SkillLevelsComponents[id] = stateComponents.PlayerSkillLevels;

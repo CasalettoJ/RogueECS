@@ -55,7 +55,7 @@ namespace ECSRogue.ECS.Systems
                 statsToPrint.Add(string.Format("Floor {0}", gameplayInfo.FloorsReached));
                 statsToPrint.Add(string.Format("Steps: {0}", gameplayInfo.StepsTaken));
                 statsToPrint.Add(string.Format("Kills: {0}", gameplayInfo.Kills));
-            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).Select(x => x.Id))
+            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER).Select(x => x.Id))
             {
                 SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
                 statsToPrint.Add(System.Environment.NewLine);
@@ -121,6 +121,10 @@ namespace ECSRogue.ECS.Systems
 
         public static string WordWrap(SpriteFont font, string text, float maxLineWidth)
         {
+            if(string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
             string[] splitMessage = text.Split(' ');
             StringBuilder sb = new StringBuilder();
             float lineWidth = 0f;

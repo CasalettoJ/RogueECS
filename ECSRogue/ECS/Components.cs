@@ -28,7 +28,7 @@ namespace ECSRogue.ECS
         COMPONENT_PLAYER = 1 << 14,
         COMPONENT_COLLISION = 1 << 15,
         COMPONENT_NAME = 1 << 16,
-        COMPONENT_AI_MOVEMENT = 1 << 17,
+        COMPONENT_OBSERVER = 1 << 17,
         COMPONENT_AI_COMBAT = 1 << 18,
         COMPONENT_AI_ALIGNMENT = 1 << 19,
         COMPONENT_AI_STATE = 1 << 20,
@@ -44,7 +44,11 @@ namespace ECSRogue.ECS
         COMPONENT_HEALTH_REGENERATION = 1 << 30
     }
 
-
+    [Flags]
+    public enum AbilityComponents : ulong
+    {
+        NONE = 0
+    }
 
     public struct ComponentMasks
     {
@@ -62,10 +66,10 @@ namespace ECSRogue.ECS
             | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_COLLISION | Component.COMPONENT_AI_SLEEP | Component.COMPONENT_AI_ROAM | Component.COMPONENT_AI_FLEE 
             | Component.COMPONENT_NAME | Component.COMPONENT_POSITION | ComponentMasks.SubMasks.MeleeMessageComponents;
 
+        public const Component Observer = Component.COMPONENT_POSITION | Component.COMPONENT_COLLISION | Component.COMPONENT_DISPLAY | Component.COMPONENT_INPUTMOVEMENT | Component.COMPONENT_OBSERVER;
+
         public const Component AIView = Component.COMPONENT_AI_FIELDOFVIEW | Component.COMPONENT_AI_STATE | Component.COMPONENT_AI_ALIGNMENT | Component.COMPONENT_POSITION;
         public const Component FOVColorChange = Component.COMPONENT_ALTERNATE_FOV_COLOR | Component.COMPONENT_AI_FIELDOFVIEW;
-
-        public const Component MovingAI = Component.COMPONENT_POSITION | Component.COMPONENT_AI_MOVEMENT; //Not Implemented
 
         public const Component HealthRegen = Component.COMPONENT_HEALTH_REGENERATION | Component.COMPONENT_SKILL_LEVELS;
 
@@ -73,6 +77,9 @@ namespace ECSRogue.ECS
 
         public const Component Drawable = Component.COMPONENT_DISPLAY | Component.COMPONENT_POSITION;
         public const Component DrawableLabel = Component.COMPONENT_LABEL | Component.COMPONENT_POSITION;
+        public const Component DrawableName = Component.COMPONENT_NAME | Component.COMPONENT_POSITION;
+        public const Component DrawableAIState = Component.COMPONENT_AI_STATE | Component.COMPONENT_POSITION | Component.COMPONENT_AI_ALIGNMENT;
+        public const Component DrawableSkills = Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_POSITION | Component.COMPONENT_AI_ALIGNMENT;
        
 
         public const Component Animated = Component.COMPONENT_DISPLAY | Component.COMPONENT_POSITION | Component.COMPONENT_ANIMATION; //Not implemented
@@ -104,7 +111,6 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, TimeToLiveComponent> TimeToLiveComponents { get; private set; }
         public Dictionary<Guid, CollisionComponent> CollisionComponents { get; private set; }
         public Dictionary<Guid, NameComponent> NameComponents { get; private set; }
-        public Dictionary<Guid, AIMovement> AIMovementComponents { get; private set; }
         public Dictionary<Guid, AICombat> AICombatComponents { get; private set; }
         public Dictionary<Guid, AIAlignment> AIAlignmentComponents { get; private set; }
         public Dictionary<Guid, AIState> AIStateComponents { get; private set; }
@@ -143,7 +149,6 @@ namespace ECSRogue.ECS
             TimeToLiveComponents = new Dictionary<Guid, TimeToLiveComponent>();
             CollisionComponents = new Dictionary<Guid, CollisionComponent>();
             NameComponents = new Dictionary<Guid, NameComponent>();
-            AIMovementComponents = new Dictionary<Guid, AIMovement>();
             AICombatComponents = new Dictionary<Guid, AICombat>();
             AIAlignmentComponents = new Dictionary<Guid, AIAlignment>();
             AIStateComponents = new Dictionary<Guid, AIState>();
@@ -192,7 +197,6 @@ namespace ECSRogue.ECS
                 TimeToLiveComponents.Remove(id);
                 CollisionComponents.Remove(id);
                 NameComponents.Remove(id);
-                AIMovementComponents.Remove(id);
                 AICombatComponents.Remove(id);
                 AIAlignmentComponents.Remove(id);
                 AIStateComponents.Remove(id);

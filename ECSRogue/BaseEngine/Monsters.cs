@@ -77,7 +77,8 @@ namespace ECSRogue.BaseEngine
                 Origin = Vector2.Zero,
                 SpriteEffect = SpriteEffects.None,
                 Scale = 1f,
-                Rotation = 0f
+                Rotation = 0f,
+                Opacity = 1f
             };
             //Set Sightradius
             stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { CurrentRadius = 15, MaxRadius = 15, DrawRadius = true };
@@ -86,7 +87,7 @@ namespace ECSRogue.BaseEngine
             //Collision information
             stateSpaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = true };
             //Set name of player
-            stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "You" };
+            stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "You", Description = "This is me.  I came to these caves to find my fortune." };
             //Set Input of the player
             stateSpaceComponents.InputMovementComponents[id] = new InputMovementComponent() { TimeIntervalBetweenMovements = .09f, TimeSinceLastMovement = 0f, InitialWait = .5f, TotalTimeButtonDown = 0f, LastKeyPressed = Keys.None };
             //Set an alignment for AI to communicate with
@@ -159,11 +160,12 @@ namespace ECSRogue.BaseEngine
                 SpriteEffect = SpriteEffects.None,
                 SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize),
                 Symbol = "t",
-                SymbolColor = Color.White
+                SymbolColor = Color.White,
+                Opacity = 1f
             };
             spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 25, DieNumber = 1, Health = 25, Power = 5, Defense = 1, Accuracy = 100, Wealth = 25, MinimumDamage = 1, MaximumDamage = 2 };
             spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
-            spaceComponents.NameComponents[id] = new NameComponent() { Name = "TEST ENEMY NPC" };
+            spaceComponents.NameComponents[id] = new NameComponent() { Name = "TEST ENEMY NPC", Description = "It seems harmless enough.  How dangerous could a red square be?" };
             spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
             spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
             spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_SLEEPING };
@@ -244,11 +246,12 @@ namespace ECSRogue.BaseEngine
                 SpriteEffect = SpriteEffects.None,
                 SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize),
                 Symbol = "W",
-                SymbolColor = Color.White
+                SymbolColor = Color.White,
+                Opacity = 1f
             };
             spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 45, DieNumber = 2, Health = 45, Power = 5, Defense = 10, Accuracy = 135, Wealth = 25, MinimumDamage = 5, MaximumDamage = 14 };
             spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
-            spaceComponents.NameComponents[id] = new NameComponent() { Name = "WILD ROOTS" };
+            spaceComponents.NameComponents[id] = new NameComponent() { Name = "WILD ROOTS", Description = "Imported fresh from Japan." };
             spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
             spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
             spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_ROAMING };

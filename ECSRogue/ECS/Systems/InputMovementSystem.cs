@@ -3,6 +3,7 @@ using ECSRogue.BaseEngine.IO.Objects;
 using ECSRogue.ECS.Components;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace ECSRogue.ECS.Systems
     public static class InputMovementSystem
     {
         public static void HandleDungeonMovement(StateSpaceComponents spaceComponents, GraphicsDeviceManager graphics, GameTime gameTime,
-            KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, DungeonTile[,] dungeonGrid, GameSettings gameSettings)
+            KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, DungeonTile[,] dungeonGrid, GameSettings gameSettings, Vector2 dungeonDimensions)
         {
             IEnumerable<Guid> movableEntities = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.InputMoveable) == ComponentMasks.InputMoveable).Select(x => x.Id);
             foreach(Guid id in movableEntities)
@@ -58,19 +59,27 @@ namespace ECSRogue.ECS.Systems
                     movement = InputMovementSystem.CalculateMovement(ref pos, 1, 1, ref movementComponent, gameTime, Keys.NumPad3);
                 }
 
-                else if (keyState.IsKeyDown(Keys.Z) && prevKeyboardState.IsKeyUp(Keys.Z))
+                //else if (keyState.IsKeyDown(Keys.Z) && prevKeyboardState.IsKeyUp(Keys.Z))
+                //{
+                //    SightRadiusComponent radius = spaceComponents.SightRadiusComponents[id];
+                //    radius.CurrentRadius -= 1;
+                //    spaceComponents.SightRadiusComponents[id] = (radius.CurrentRadius <= 0) ? spaceComponents.SightRadiusComponents[id] : radius;
+                //    movement = true;
+                //}
+                //else if (keyState.IsKeyDown(Keys.X) && prevKeyboardState.IsKeyUp(Keys.X))
+                //{
+                //    SightRadiusComponent radius = spaceComponents.SightRadiusComponents[id];
+                //    radius.CurrentRadius += 1;
+                //    spaceComponents.SightRadiusComponents[id] = (radius.CurrentRadius > spaceComponents.SightRadiusComponents[id].MaxRadius) ? spaceComponents.SightRadiusComponents[id] : radius;
+                //    movement = true;
+                //}
+                else if (keyState.IsKeyDown(Keys.Enter) && prevKeyboardState.IsKeyUp(Keys.Enter))
                 {
-                    SightRadiusComponent radius = spaceComponents.SightRadiusComponents[id];
-                    radius.CurrentRadius -= 1;
-                    spaceComponents.SightRadiusComponents[id] = (radius.CurrentRadius <= 0) ? spaceComponents.SightRadiusComponents[id] : radius;
-                    movement = true;
-                }
-                else if (keyState.IsKeyDown(Keys.X) && prevKeyboardState.IsKeyUp(Keys.X))
-                {
-                    SightRadiusComponent radius = spaceComponents.SightRadiusComponents[id];
-                    radius.CurrentRadius += 1;
-                    spaceComponents.SightRadiusComponents[id] = (radius.CurrentRadius > spaceComponents.SightRadiusComponents[id].MaxRadius) ? spaceComponents.SightRadiusComponents[id] : radius;
-                    movement = true;
+                    //If observer exists, remove it and add input component to player(s), otherwise, remove input component from all players and create an observer.
+                    if(ObserverSystem.CreateOrDestroyObserver(spaceComponents, pos))
+                    {
+                        break;
+                    }
                 }
                 else
                 {
@@ -78,26 +87,38 @@ namespace ECSRogue.ECS.Systems
                     movementComponent.TotalTimeButtonDown = 0f;
                     movementComponent.LastKeyPressed = Keys.None;
                 }
-
-                hitWall = !dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Occupiable;
-                spaceComponents.InputMovementComponents[id] = movementComponent;
-                if (!hitWall && movement)
+                bool outOfBounds = false;
+                if(pos.Position.X < 0 || pos.Position.Y < 0 || pos.Position.X >= dungeonDimensions.X || pos.Position.Y >= dungeonDimensions.Y)
                 {
-                    //Check collisions.  If no collisions, move into spot.
-                    CollisionSystem.TryToMove(spaceComponents, dungeonGrid, pos, id);
-                    gameInfo.StepsTaken += 1;
-                    spaceComponents.GameplayInfoComponent = gameInfo;
-                    PlayerComponent player = spaceComponents.PlayerComponent;
-                    player.PlayerTookTurn = true;
-                    spaceComponents.PlayerComponent = player;
+                    outOfBounds = true;
                 }
-                if(hitWall)
+                if(!outOfBounds)
                 {
-                    MessageDisplaySystem.GenerateRandomGameMessage(spaceComponents, Messages.WallCollisionMessages, Colors.Messages.Normal, gameSettings);
+                    hitWall = !dungeonGrid[(int)pos.Position.X, (int)pos.Position.Y].Occupiable && spaceComponents.CollisionComponents[id].Solid;
+                    spaceComponents.InputMovementComponents[id] = movementComponent;
+                    if (!hitWall && movement)
+                    {
+                        //Check collisions.  If no collisions, move into spot.
+                        CollisionSystem.TryToMove(spaceComponents, dungeonGrid, pos, id);
+                        if ((spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER)
+                        {
+                            gameInfo.StepsTaken += 1;
+                            spaceComponents.GameplayInfoComponent = gameInfo;
+                            PlayerComponent player = spaceComponents.PlayerComponent;
+                            player.PlayerTookTurn = true;
+                            spaceComponents.PlayerComponent = player;
+                        }
+                    }
+                    if (hitWall)
+                    {
+                        MessageDisplaySystem.GenerateRandomGameMessage(spaceComponents, Messages.WallCollisionMessages, Colors.Messages.Normal, gameSettings);
+                    }
                 }
 
             }
         }
+
+
 
 
         private static bool CalculateMovement(ref PositionComponent pos, int xChange, int yChange, ref InputMovementComponent movementComponent, GameTime gameTime, Keys keyPressed)

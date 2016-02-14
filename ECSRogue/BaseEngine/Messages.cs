@@ -7,6 +7,16 @@ namespace ECSRogue.BaseEngine
 {
     public static class Messages
     {
+        public static class Observer
+        {
+            public static readonly string NotFound = "You have not explored here.  Who knows what creatures lurk behind the darkness, stalking you from the safety of shadows?";
+            public static readonly string InRange = "You can clearly see this position and could attack at range.";
+            public static readonly string OutOfRange = "You can only remember what was here.";
+            public static readonly string Floor = "The floor here is moss-covered and damp.";
+            public static readonly string Wall = "A thick cavern wall, glistening with precious gems and minerals.  If only you had a picaxe, you would not have to kill a dragon to get rich.";
+            public static readonly string Rock = "Impenetrable rock that has hardened over thousands of years.";
+        }
+
         public static readonly string[] WallCollisionMessages =
         {
             "You run face-first into a wall.",

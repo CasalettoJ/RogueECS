@@ -17,5 +17,7 @@ namespace ECSRogue.ECS.Components
         public float Rotation;
         public string Symbol;
         public Color SymbolColor;
+        public float Opacity;
+        public bool AlwaysDraw;
     }
 }
