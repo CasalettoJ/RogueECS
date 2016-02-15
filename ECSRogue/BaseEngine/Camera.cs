@@ -57,11 +57,15 @@ namespace ECSRogue.BaseEngine
 
         public Matrix GetMatrix()
         {
-            return
+            Matrix transform = 
                 Matrix.CreateTranslation(new Vector3((int)-Position.X, (int)-Position.Y, 0)) *
                 Matrix.CreateRotationZ(Rotation) *
                 Matrix.CreateScale(Scale) *
                 Matrix.CreateTranslation(new Vector3((int)(Bounds.Width * 0.5f), (int)(Bounds.Height * 0.5f), 0));
+            //M41 and M42 are for translation, cast them to ints to avoid jitteryness
+            transform.M41 = (int)transform.M41;
+            transform.M42 = (int)transform.M42;
+            return transform;
         }
 
         public Matrix GetInverseMatrix()
