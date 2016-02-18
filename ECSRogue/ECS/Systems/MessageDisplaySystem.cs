@@ -79,14 +79,11 @@ namespace ECSRogue.ECS.Systems
                 }
         }
 
-        public static void GenerateRandomGameMessage(StateSpaceComponents spaceComponents, string[] messageList, Color color, GameSettings gameSettings = null)
+        public static void GenerateRandomGameMessage(StateSpaceComponents spaceComponents, string[] messageList, Color color)
         {
-            if (gameSettings == null || !(!gameSettings.ShowNormalMessages && color == Colors.Messages.Normal))
+            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
             {
-                foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
-                {
-                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(color, "[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + messageList[spaceComponents.random.Next(0, messageList.Count())]));
-                }
+                spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(color, "[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + messageList[spaceComponents.random.Next(0, messageList.Count())]));
             }
         }
 

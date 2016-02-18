@@ -67,7 +67,7 @@ namespace ECSRogue.BaseEngine.IO
                 HasChanges = false,
                 Scale = .5f,
                 Resolution = new Vector2(1024, 768),
-                ShowNormalMessages = true
+                ShowGlow = true
             };
             string defaultSettingsJson = JsonConvert.SerializeObject(defaultSettings);
             Directory.CreateDirectory(FileNames.SettingsDirectory);

@@ -59,6 +59,9 @@ namespace ECSRogue.BaseEngine.StateSpaces
             dungeonColorInfo = data.dungeonColorInfo;
             dungeonDimensions = data.dungeonDimensions;
             freeTiles = data.freeTiles;
+            PlayerComponent player = stateSpaceComponents.PlayerComponent;
+            player.PlayerJustLoaded = true;
+            stateSpaceComponents.PlayerComponent = player;
         }
         #endregion
 
@@ -190,7 +193,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
 
             //Movement and Reaction
-            InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings, dungeonDimensions);
+            InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, dungeonDimensions);
             CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
             TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
             TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
@@ -220,11 +223,14 @@ namespace ECSRogue.BaseEngine.StateSpaces
         #endregion
 
         #region Draw Logic
-        public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
+        public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera, ref GameSettings gameSettings)
         {
             DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, dungeonSprites, dungeonColorInfo);
             DisplaySystem.DrawAIFieldOfViews(stateSpaceComponents, camera, spriteBatch, UI, DevConstants.Grid.CellSize, dungeonGrid);
-            DisplaySystem.DrawOutlines(stateSpaceComponents, camera, spriteBatch, UI, dungeonGrid);
+            if(gameSettings.ShowGlow)
+            {
+                DisplaySystem.DrawOutlines(stateSpaceComponents, camera, spriteBatch, UI, dungeonGrid);
+            }
             DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, DevConstants.Grid.CellSize, dungeonGrid, asciiDisplay);
             LabelDisplaySystem.DrawString(spriteBatch, stateSpaceComponents, messageFont, camera);
         }

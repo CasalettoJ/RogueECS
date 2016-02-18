@@ -12,7 +12,7 @@ namespace ECSRogue.BaseEngine.Interfaces
     public interface IState
     {
         IState UpdateContent(GameTime gameTime, Camera camera, ref GameSettings gameSettings);
-        void DrawContent(SpriteBatch spriteBatch, Camera camera);
+        void DrawContent(SpriteBatch spriteBatch, Camera camera, ref GameSettings gameSettings);
         void DrawUserInterface(SpriteBatch spriteBatch, Camera camera);
         void SetStateSpace(IStateSpace stateSpace, Camera camera, bool createEntities = true);
         void SetPrevInput(KeyboardState prevKey, MouseState prevMouse, GamePadState prevPad);

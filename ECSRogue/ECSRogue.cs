@@ -115,7 +115,7 @@ namespace ECSRogue
             GraphicsDevice.Clear(Color.Black);
             //Draw entities
             spriteBatch.Begin(transformMatrix: gameCamera.GetMatrix(), samplerState: SamplerState.PointClamp);
-            currentState.DrawContent(spriteBatch, gameCamera);
+            currentState.DrawContent(spriteBatch, gameCamera, ref gameSettings);
             spriteBatch.End();
             //Draw UI
             spriteBatch.Begin(samplerState: SamplerState.PointClamp);
