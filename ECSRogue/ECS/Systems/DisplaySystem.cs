@@ -1,6 +1,7 @@
 ﻿using ECSRogue.BaseEngine;
 using ECSRogue.ECS.Components;
 using ECSRogue.ECS.Components.AIComponents;
+using ECSRogue.ECS.Components.GraphicalEffectsComponents;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -33,8 +34,8 @@ namespace ECSRogue.ECS.Systems
                         if (!string.IsNullOrEmpty(spaceComponents.DisplayComponents[id].Symbol))
                         {
                             Vector2 size = font.MeasureString(spaceComponents.DisplayComponents[id].Symbol);
-                            spriteBatch.DrawString(font, display.Symbol, new Vector2((int)(position.X + display.SpriteSource.Center.X), (int)(position.Y + display.SpriteSource.Center.Y)), 
-                                display.SymbolColor, 0f, new Vector2((int)(size.X/2), (int)(size.Y/2)), 1f, SpriteEffects.None, 0f);
+                            spriteBatch.DrawString(font, display.Symbol, new Vector2(((int)position.X + (int)display.SpriteSource.Center.X), ((int)position.Y + (int)display.SpriteSource.Center.Y)), 
+                                display.SymbolColor, 0f, new Vector2((int)(size.X/2), (int)(size.Y/2)-3), 1f, SpriteEffects.None, 0f);
                         }
                     }
                 }
@@ -110,6 +111,35 @@ namespace ECSRogue.ECS.Systems
 
         }
 
+        public static void DrawOutlines(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D rectangleTexture, DungeonTile[,] dungeonGrid)
+        {
+            Matrix cameraMatrix = camera.GetMatrix();
+            foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.DrawableOutline) == ComponentMasks.DrawableOutline).Select(x => x.Id))
+            {
+                OutlineComponent outline = spaceComponents.OutlineComponents[id];
+                PositionComponent position = spaceComponents.PositionComponents[id];
+                Vector2 tile = new Vector2((int)position.Position.X * DevConstants.Grid.CellSize, (int)position.Position.Y * DevConstants.Grid.CellSize);
+
+                Vector2 bottomRight = Vector2.Transform(new Vector2((tile.X + DevConstants.Grid.CellSize), (tile.Y + DevConstants.Grid.CellSize)), cameraMatrix);
+                Vector2 topLeft = Vector2.Transform(tile, cameraMatrix);
+                Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
+
+                if (dungeonGrid[(int)position.Position.X, (int)position.Position.Y].InRange && camera.IsInView(cameraMatrix, cameraBounds))
+                {
+                    if (spaceComponents.SecondaryOutlineComponents.ContainsKey(id))
+                    {
+                        SecondaryOutlineComponent altColorInfo = spaceComponents.SecondaryOutlineComponents[id];
+                        spriteBatch.Draw(rectangleTexture, position: tile, color: Color.Lerp(outline.Color, altColorInfo.AlternateColor, altColorInfo.Seconds / altColorInfo.SwitchAtSeconds) * outline.Opacity, origin: new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize));
+                    }
+                    else
+                    {
+                        //origin is 4,4 because the tile texture is 40x40 and the grid is 32x32.  If size of grid changes, change this -- and then don't hardcode it anymore!!!
+                        spriteBatch.Draw(rectangleTexture, position: tile, color: outline.Color * outline.Opacity, origin: new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize));
+                    }
+                }
+            }
+        }
+
 
         public static void DrawAIFieldOfViews(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D rectangleTexture, int cellSize, DungeonTile[,] dungeonGrid)
         {
@@ -132,12 +162,12 @@ namespace ECSRogue.ECS.Systems
                             if(spaceComponents.AlternateFOVColorChangeComponents.ContainsKey(id))
                             {
                                 AlternateFOVColorChangeComponent altColorInfo = spaceComponents.AlternateFOVColorChangeComponents[id];
-                                spriteBatch.Draw(rectangleTexture, position: tile, color: Color.Lerp(fovInfo.Color,altColorInfo.AlternateColor,altColorInfo.Seconds/altColorInfo.SwitchAtSeconds) * .3f, origin: new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize));
+                                spriteBatch.Draw(rectangleTexture, position: tile, color: Color.Lerp(fovInfo.Color,altColorInfo.AlternateColor,altColorInfo.Seconds/altColorInfo.SwitchAtSeconds) * fovInfo.Opacity, origin: new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize));
                             }
                             else
                             {
                                 //origin is 4,4 because the tile texture is 40x40 and the grid is 32x32.  If size of grid changes, change this -- and then don't hardcode it anymore!!!
-                                spriteBatch.Draw(rectangleTexture, position: tile, color: fovInfo.Color * .3f, origin: new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize));
+                                spriteBatch.Draw(rectangleTexture, position: tile, color: fovInfo.Color * fovInfo.Opacity, origin: new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize));
                             }
                         }
                     }

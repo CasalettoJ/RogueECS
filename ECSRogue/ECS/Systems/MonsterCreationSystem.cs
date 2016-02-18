@@ -12,7 +12,7 @@ namespace ECSRogue.ECS.Systems
     {
         public static void CreateDungeonMonsters(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellsize, List<Vector2> freeTiles)
         {
-            int numberOfSpawns = 15; //Should be a formula based on depth level
+            int numberOfSpawns = 15; //Should be a formula based on depth level once a formula has been decided
             List<MonsterInfo> monsterPossibilities = new List<MonsterInfo>();
             //populate the monster possibility array based on how many slots a monster gets
             foreach (MonsterInfo monster in Monsters.MonsterCatalog.Where(x => x.ValidDepths.Contains(spaceComponents.GameplayInfoComponent.FloorsReached)))

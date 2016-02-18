@@ -169,7 +169,7 @@ namespace ECSRogue.BaseEngine
             spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
             spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
             spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_SLEEPING };
-            spaceComponents.AIFieldOfViewComponents[id] = new AIFieldOfView() { DrawField = false, radius = 2, SeenTiles = new List<Vector2>(), Color = FOVColors.Sleeping };
+            spaceComponents.AIFieldOfViewComponents[id] = new AIFieldOfView() { DrawField = false, Opacity = .3f, radius = 2, SeenTiles = new List<Vector2>(), Color = FOVColors.Sleeping };
             spaceComponents.AISleepComponents[id] = new AISleep() { ChanceToWake = 15, FOVRadiusChangeOnWake = 2 };
             spaceComponents.AIRoamComponents[id] = new AIRoam() { ChanceToDetect = 25 };
             spaceComponents.AIFleeComponents[id] = new AIFlee() { DoesFlee = true, FleeAtHealthPercent = 25, FleeUntilHealthPercent = 30 };
@@ -255,7 +255,7 @@ namespace ECSRogue.BaseEngine
             spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
             spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
             spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_ROAMING };
-            spaceComponents.AIFieldOfViewComponents[id] = new AIFieldOfView() { DrawField = false, radius = 5, SeenTiles = new List<Vector2>(), Color = FOVColors.Roaming };
+            spaceComponents.AIFieldOfViewComponents[id] = new AIFieldOfView() { DrawField = false, Opacity = .3f, radius = 5, SeenTiles = new List<Vector2>(), Color = FOVColors.Roaming };
             spaceComponents.AISleepComponents[id] = new AISleep() { ChanceToWake = 10, FOVRadiusChangeOnWake = 2 };
             spaceComponents.AIRoamComponents[id] = new AIRoam() { ChanceToDetect = 40 };
             spaceComponents.AIFleeComponents[id] = new AIFlee() { DoesFlee = false, FleeAtHealthPercent = 25, FleeUntilHealthPercent = 30 };

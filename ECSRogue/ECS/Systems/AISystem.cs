@@ -118,7 +118,7 @@ namespace ECSRogue.ECS.Systems
                 //Reset seen tiles
                 fieldOfViewInfo.SeenTiles = new List<Vector2>();
 
-                if(fieldOfViewInfo.radius > 0)
+                if(fieldOfViewInfo.radius >= 0)
                 {
                     Vector2 position = spaceComponents.PositionComponents[id].Position;
                     int radius = fieldOfViewInfo.radius;

@@ -21,5 +21,6 @@ namespace ECSRogue.ECS.Components.AIComponents
         public bool DrawField;
         public List<Vector2> SeenTiles;
         public Color Color;
+        public float Opacity;
     }
 }

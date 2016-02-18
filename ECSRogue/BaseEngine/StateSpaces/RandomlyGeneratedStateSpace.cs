@@ -15,6 +15,7 @@ using ECSRogue.ECS.Components;
 using ECSRogue.BaseEngine.IO.Objects;
 using ECSRogue.ECS.Components.AIComponents;
 using ECSRogue.ECS.Components.MeleeMessageComponents;
+using ECSRogue.ECS.Components.GraphicalEffectsComponents;
 
 namespace ECSRogue.BaseEngine.StateSpaces
 {
@@ -76,10 +77,88 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 LevelChangeSystem.CreateGameplayInfo(stateComponents, stateSpaceComponents);
                 MonsterCreationSystem.CreateDungeonMonsters(stateSpaceComponents, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, freeTiles);
                 LevelChangeSystem.LoadPlayerSkillset(stateComponents, stateSpaceComponents);
+                #region Debug
+                CreateItems(stateSpaceComponents);
+                #endregion
             }
             mapToPlayer = new DijkstraMapTile[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
         }
         #endregion
+
+        private void CreateItems(StateSpaceComponents spaceComponents)
+        {
+            for(int i = 0; i < 50; i++)
+            {
+                Guid id = spaceComponents.CreateEntity();
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline;
+                spaceComponents.DisplayComponents[id] = new DisplayComponent()
+                {
+                    AlwaysDraw = false,
+                    Color = Colors.Messages.LootPickup,
+                    Opacity = 1f,
+                    Origin = Vector2.Zero,
+                    Rotation = 0f,
+                    Scale = 1f,
+                    SpriteEffect = SpriteEffects.None,
+                    SpriteSource = new Rectangle(0 * DevConstants.Grid.CellSize, 0 * DevConstants.Grid.CellSize, DevConstants.Grid.CellSize, DevConstants.Grid.CellSize),
+                    Symbol = "{}",
+                    SymbolColor = Color.White
+                };
+                Vector2 position = freeTiles[spaceComponents.random.Next(0, freeTiles.Count)];
+                freeTiles.Remove(position);
+                spaceComponents.PositionComponents[id] = new PositionComponent() { Position = position };
+                spaceComponents.OutlineComponents[id] = new OutlineComponent() { Color = Color.Purple, Opacity = 1f };
+                spaceComponents.SecondaryOutlineComponents[id] = new SecondaryOutlineComponent() { AlternateColor = Color.LightBlue, Seconds = 0f, SwitchAtSeconds = .75f };
+            }
+
+            for (int i = 0; i < 50; i++)
+            {
+                Guid id = spaceComponents.CreateEntity();
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline;
+                spaceComponents.DisplayComponents[id] = new DisplayComponent()
+                {
+                    AlwaysDraw = false,
+                    Color = Colors.Messages.Special,
+                    Opacity = 1f,
+                    Origin = Vector2.Zero,
+                    Rotation = 0f,
+                    Scale = 1f,
+                    SpriteEffect = SpriteEffects.None,
+                    SpriteSource = new Rectangle(0 * DevConstants.Grid.CellSize, 0 * DevConstants.Grid.CellSize, DevConstants.Grid.CellSize, DevConstants.Grid.CellSize),
+                    Symbol = "$",
+                    SymbolColor = Color.White
+                };
+                Vector2 position = freeTiles[spaceComponents.random.Next(0, freeTiles.Count)];
+                freeTiles.Remove(position);
+                spaceComponents.PositionComponents[id] = new PositionComponent() { Position = position };
+                spaceComponents.OutlineComponents[id] = new OutlineComponent() { Color = Color.Purple, Opacity = 1f };
+                spaceComponents.SecondaryOutlineComponents[id] = new SecondaryOutlineComponent() { AlternateColor = Color.LightBlue, Seconds = 0f, SwitchAtSeconds = .75f };
+            }
+
+            for (int i = 0; i < 50; i++)
+            {
+                Guid id = spaceComponents.CreateEntity();
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline;
+                spaceComponents.DisplayComponents[id] = new DisplayComponent()
+                {
+                    AlwaysDraw = false,
+                    Color = Colors.Messages.LootPickup,
+                    Opacity = 1f,
+                    Origin = Vector2.Zero,
+                    Rotation = 0f,
+                    Scale = 1f,
+                    SpriteEffect = SpriteEffects.None,
+                    SpriteSource = new Rectangle(0 * DevConstants.Grid.CellSize, 0 * DevConstants.Grid.CellSize, DevConstants.Grid.CellSize, DevConstants.Grid.CellSize),
+                    Symbol = "!",
+                    SymbolColor = Color.White
+                };
+                Vector2 position = freeTiles[spaceComponents.random.Next(0, freeTiles.Count)];
+                freeTiles.Remove(position);
+                spaceComponents.PositionComponents[id] = new PositionComponent() { Position = position };
+                spaceComponents.OutlineComponents[id] = new OutlineComponent() { Color = Color.Purple, Opacity = 1f };
+                spaceComponents.SecondaryOutlineComponents[id] = new SecondaryOutlineComponent() { AlternateColor = Color.LightBlue, Seconds = 0f, SwitchAtSeconds = .75f };
+            }
+        }
 
         #region Update Logic
         public IStateSpace UpdateSpace(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, ref GameSettings gameSettings)
@@ -106,6 +185,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
             //Non-turn-based
             AnimationSystem.UpdateFovColors(stateSpaceComponents, gameTime);
+            AnimationSystem.UpdateOutlineColors(stateSpaceComponents, gameTime);
             MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
             MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
 
@@ -144,6 +224,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         {
             DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, dungeonSprites, dungeonColorInfo);
             DisplaySystem.DrawAIFieldOfViews(stateSpaceComponents, camera, spriteBatch, UI, DevConstants.Grid.CellSize, dungeonGrid);
+            DisplaySystem.DrawOutlines(stateSpaceComponents, camera, spriteBatch, UI, dungeonGrid);
             DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, DevConstants.Grid.CellSize, dungeonGrid, asciiDisplay);
             LabelDisplaySystem.DrawString(spriteBatch, stateSpaceComponents, messageFont, camera);
         }
