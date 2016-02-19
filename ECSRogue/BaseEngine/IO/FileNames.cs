@@ -22,5 +22,10 @@ namespace ECSRogue.BaseEngine.IO
         public const string GameDataDirectory = @"Saves/";
         public const string GameDataFile = GameDataDirectory + "Statistics.sav";
         #endregion
+
+        #region Error Logging
+        public const string ErrorDirectory = @"Errors/";
+        public const string ErrorFile = ErrorDirectory + "Error.txt";
+        #endregion
     }
 }

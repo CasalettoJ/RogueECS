@@ -91,6 +91,7 @@ namespace ECSRogue
                 }
                 catch (Exception ex)
                 {
+                    FileIO.LogError(ex);
                     Environment.Exit(0); // When laptop is unplugged game.exit() doesn't work...
                 }
                 prevKey = Keyboard.GetState();

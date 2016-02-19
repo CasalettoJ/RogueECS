@@ -47,6 +47,7 @@
     <Compile Include="BaseEngine\IO\FileIO.cs" />
     <Compile Include="BaseEngine\IO\Objects\DungeonInfo.cs" />
     <Compile Include="BaseEngine\IO\Objects\GameSettings.cs" />
+    <Compile Include="BaseEngine\Items.cs" />
     <Compile Include="BaseEngine\Messages.cs" />
     <Compile Include="BaseEngine\Monsters.cs" />
     <Compile Include="BaseEngine\StateSpaces\GameSettingsMenuStateSpace.cs" />

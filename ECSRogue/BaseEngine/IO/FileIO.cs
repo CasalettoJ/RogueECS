@@ -108,5 +108,25 @@ namespace ECSRogue.BaseEngine.IO
             File.WriteAllText(FileNames.DungeonSaveFile, jsonData);
         }
         #endregion
+
+        #region Error Logging
+        public static void LogError(Exception ex)
+        {
+            Directory.CreateDirectory(FileNames.ErrorDirectory);
+            if(!File.Exists(FileNames.ErrorFile))
+            {
+                File.WriteAllText(FileNames.ErrorFile, "=======================================================");
+            }
+            else
+            {
+                File.AppendAllText(FileNames.ErrorFile, "=======================================================");
+            }
+
+            File.AppendAllText(FileNames.ErrorFile, string.Format("Date/Time: ", DateTime.UtcNow));
+            File.AppendAllText(FileNames.ErrorFile, ex.Message);
+            File.AppendAllText(FileNames.ErrorFile, ex.InnerException.Message);
+            File.AppendAllText(FileNames.ErrorFile, ex.StackTrace);
+        }
+        #endregion
     }
 }

@@ -13,10 +13,18 @@ using System.Text;
 
 namespace ECSRogue.BaseEngine
 {
+    public enum MonsterNames
+    {
+        NONE,
+        PLAYER,
+        TESTENEMYNPC,
+        WILDVINES
+    }
+
     public struct MonsterInfo
     {
-        public int[] ValidDepths;
-        public int spawnIndexSlots; // Number of times the monster will be entered into the spawn array, which rolls to see what monster gets added to the floor
+        public MonsterNames Name;
+        public Dictionary<int, int> SpawnDepthsAndChances; //Key: Depths it spawns in, Value: Number of spawn slots in the wheel
         public bool isRequiredSpawn; //Boss monsters, some special entities, might need to ALWAYS be added to a floor
         public Func<StateSpaceComponents, DungeonTile[,], Vector2, int, List<Vector2>, bool> SpawnFunction; // SpaceComponents, World Grid, Dungeon Dimensions, Free tiles list
     }
@@ -28,7 +36,8 @@ namespace ECSRogue.BaseEngine
             //Player
             new MonsterInfo()
             {
-                ValidDepths = new int[] { },
+                Name = MonsterNames.PLAYER,
+                SpawnDepthsAndChances = new Dictionary<int, int>(),
                 isRequiredSpawn = true,
                 SpawnFunction = MonsterSpawners.SpawnPlayer
             },
@@ -36,18 +45,24 @@ namespace ECSRogue.BaseEngine
             //Test Enemy NPC
             new MonsterInfo()
             {
-                ValidDepths = new int[] { 1, 2, 3, 4, 6, 7 },
+                Name = MonsterNames.TESTENEMYNPC,
+                SpawnDepthsAndChances = new Dictionary<int, int>()
+                {
+                    {1, 10}, {2, 8 }, {3, 7 }, {4, 5 }, {6, 4 }, {7, 3 }, {8, 1 }
+                },
                 isRequiredSpawn = false,
-                spawnIndexSlots = 7,
                 SpawnFunction = MonsterSpawners.SpawnTestEnemyNPC
             },
 
             //Wild Vines
             new MonsterInfo()
             {
-                ValidDepths = new int[] { 1, 2, 3, 4, 6, 7, 8 },
+                Name = MonsterNames.WILDVINES,
+                SpawnDepthsAndChances = new Dictionary<int, int>()
+                {
+                    {1, 3}, {2, 3 }, {3, 5 }, {4, 6 }, {6, 6 }, {7, 4 }, {8, 3 }
+                },
                 isRequiredSpawn = false,
-                spawnIndexSlots = 3,
                 SpawnFunction = MonsterSpawners.SpawnWildVines
             }
         };

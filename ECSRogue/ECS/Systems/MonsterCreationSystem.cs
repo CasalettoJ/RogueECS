@@ -15,17 +15,20 @@ namespace ECSRogue.ECS.Systems
             int numberOfSpawns = 15; //Should be a formula based on depth level once a formula has been decided
             List<MonsterInfo> monsterPossibilities = new List<MonsterInfo>();
             //populate the monster possibility array based on how many slots a monster gets
-            foreach (MonsterInfo monster in Monsters.MonsterCatalog.Where(x => x.ValidDepths.Contains(spaceComponents.GameplayInfoComponent.FloorsReached)))
+            foreach (MonsterInfo monster in Monsters.MonsterCatalog.Where(x => x.SpawnDepthsAndChances.ContainsKey(spaceComponents.GameplayInfoComponent.FloorsReached)))
             {
-                for (int i = 0; i < monster.spawnIndexSlots; i++)
+                for (int i = 0; i < monster.SpawnDepthsAndChances[spaceComponents.GameplayInfoComponent.FloorsReached]; i++)
                 {
                     monsterPossibilities.Add(monster);
                 }
             }
             //Roll randomly in the index and add whatever monster it lands on
-            for (int i = 0; i < numberOfSpawns; i++)
+            if(monsterPossibilities.Count > 0)
             {
-                monsterPossibilities[spaceComponents.random.Next(0, monsterPossibilities.Count)].SpawnFunction(spaceComponents, dungeonGrid, dungeonDimensions, cellsize, freeTiles);
+                for (int i = 0; i < numberOfSpawns; i++)
+                {
+                    monsterPossibilities[spaceComponents.random.Next(0, monsterPossibilities.Count)].SpawnFunction(spaceComponents, dungeonGrid, dungeonDimensions, cellsize, freeTiles);
+                }
             }
 
             foreach (MonsterInfo monster in Monsters.MonsterCatalog.Where(x => x.isRequiredSpawn))
