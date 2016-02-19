@@ -7,6 +7,7 @@ using System.Text;
 
 namespace ECSRogue.ECS.Components
 {
+
     public struct DisplayComponent
     {
         public Rectangle SpriteSource;

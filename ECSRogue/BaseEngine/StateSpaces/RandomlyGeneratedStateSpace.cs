@@ -78,11 +78,11 @@ namespace ECSRogue.BaseEngine.StateSpaces
             if(createEntities)
             {
                 LevelChangeSystem.CreateGameplayInfo(stateComponents, stateSpaceComponents);
-                MonsterCreationSystem.CreateDungeonMonsters(stateSpaceComponents, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, freeTiles);
-                LevelChangeSystem.LoadPlayerSkillset(stateComponents, stateSpaceComponents);
                 #region Debug
                 CreateItems(stateSpaceComponents);
                 #endregion
+                MonsterCreationSystem.CreateDungeonMonsters(stateSpaceComponents, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, freeTiles);
+                LevelChangeSystem.LoadPlayerSkillset(stateComponents, stateSpaceComponents);
             }
             mapToPlayer = new DijkstraMapTile[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
         }

@@ -5,7 +5,20 @@ using System.Text;
 
 namespace ECSRogue.BaseEngine
 {
-    class Items
+    public enum ItemNames
+    {
+        NONE,
+        GOLD,
+        TESTCONSUMABLE,
+        TESTARTIFACT
+    }
+
+    public static class ItemInfo
+    {
+
+    }
+
+    public static class Items
     {
     }
 }
