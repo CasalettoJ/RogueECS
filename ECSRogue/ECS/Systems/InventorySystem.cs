@@ -80,8 +80,32 @@ namespace ECSRogue.ECS.Systems
                                     }
                                     break;
                                 case ItemType.CONSUMABLE:
+                                    //If the entity has room in their inventory, place the item in it
+                                    if(collidingEntityInventory.Consumables.Count < collidingEntityInventory.MaxConsumables)
+                                    {
+                                        //Remove the position component flag and add the guid to the inventory of the entity
+                                        collided.ComponentFlags &= ~Component.COMPONENT_POSITION;
+                                        collidingEntityInventory.Consumables.Add(collided.Id);
+                                    }
+                                    //If it can't fit in, and the entity has a message for the situation, display it.
+                                    else if(spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages != null && spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages.Length > 0)
+                                    {
+                                        spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Bad, spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages[spaceComponents.random.Next(0, spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages.Length)]));
+                                    }
                                     break;
                                 case ItemType.ARTIFACT:
+                                    //If the entity has room in their inventory, place the item in it
+                                    if (collidingEntityInventory.Artifacts.Count < collidingEntityInventory.MaxArtifacts)
+                                    {
+                                        //Remove the position component flag and add the guid to the inventory of the entity
+                                        collided.ComponentFlags &= ~Component.COMPONENT_POSITION;
+                                        collidingEntityInventory.Artifacts.Add(collided.Id);
+                                    }
+                                    //If it can't fit in, and the entity has a message for the situation, display it.
+                                    else if (spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages != null && spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages.Length > 0)
+                                    {
+                                        spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Bad, spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages[spaceComponents.random.Next(0, spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages.Length)]));
+                                    }
                                     break;
                             }
                         }

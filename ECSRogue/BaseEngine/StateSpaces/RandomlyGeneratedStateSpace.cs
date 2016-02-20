@@ -273,6 +273,24 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
         {
+            #region Debug Items
+            InventoryComponent playerInvo = stateSpaceComponents.InventoryComponents[stateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id];
+            spriteBatch.DrawString(messageFont, "DEBUG INVENTORY INFO", Vector2.Zero, Color.CornflowerBlue);
+            spriteBatch.DrawString(messageFont, "ARTIFACTS:", new Vector2(0, 20), Color.CornflowerBlue);
+            int number = 0;
+            foreach(Guid item in playerInvo.Artifacts)
+            {
+                spriteBatch.DrawString(messageFont, stateSpaceComponents.NameComponents[item].Name, new Vector2(0, 40 + (20 * number)), Color.NavajoWhite);
+                number++;
+            }
+            spriteBatch.DrawString(messageFont, "CONSUMABLES (q and e to use): ", new Vector2(0, 60 + (20 * number)), Color.CornflowerBlue);
+            number++;
+            foreach (Guid item in playerInvo.Consumables)
+            {
+                spriteBatch.DrawString(messageFont, stateSpaceComponents.NameComponents[item].Name, new Vector2(0, 60 + (20 * number)), Color.NavajoWhite);
+                number++;
+            }
+            #endregion
             ObserverSystem.PrintObserversFindings(stateSpaceComponents, messageFont, spriteBatch, dungeonGrid, camera, UI);
             spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.Black);
             //spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .3f);

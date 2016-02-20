@@ -93,7 +93,8 @@ namespace ECSRogue.BaseEngine
                 SpriteEffect = SpriteEffects.None,
                 Scale = 1f,
                 Rotation = 0f,
-                Opacity = 1f
+                Opacity = 1f,
+                AlwaysDraw = true
             };
             //Set Sightradius
             stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { CurrentRadius = 15, MaxRadius = 15, DrawRadius = true };
