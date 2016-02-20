@@ -5,13 +5,6 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using ECSRogue.BaseEngine;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using ECSRogue.ECS;
-using ECSRogue.ECS.Systems;
-using ECSRogue.ECS.Components;
-using ECSRogue.ECS.Components.AIComponents;
-using ECSRogue.ECS.Components.MeleeMessageComponents;
 
 namespace ECSRogue.ProceduralGeneration
 {

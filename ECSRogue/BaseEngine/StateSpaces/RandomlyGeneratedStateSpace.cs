@@ -13,8 +13,6 @@ using ECSRogue.ProceduralGeneration.Interfaces;
 using ECSRogue.ECS.Systems;
 using ECSRogue.ECS.Components;
 using ECSRogue.BaseEngine.IO.Objects;
-using ECSRogue.ECS.Components.AIComponents;
-using ECSRogue.ECS.Components.MeleeMessageComponents;
 using ECSRogue.ECS.Components.GraphicalEffectsComponents;
 
 namespace ECSRogue.BaseEngine.StateSpaces

@@ -1,7 +1,6 @@
 ﻿using ECSRogue.ECS;
 using ECSRogue.ECS.Components;
 using ECSRogue.ECS.Components.AIComponents;
-using ECSRogue.ECS.Components.MeleeMessageComponents;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -110,7 +109,7 @@ namespace ECSRogue.BaseEngine
             //Set health regeneration
             stateSpaceComponents.HealthRegenerationComponents[id] = new HealthRegenerationComponent() { HealthRegain = 1, RegenerateTurnRate = 1, TurnsSinceLastHeal = 0 };
             //Set combat messages
-            stateSpaceComponents.DodgeMeleeMessageComponents[id] = new DodgeMeleeMessageComponent()
+            stateSpaceComponents.MeleeMessageComponents[id] = new MeleeMessageComponent()
             {
                 NormalDodgeMessages = new string[]
                 {
@@ -126,10 +125,7 @@ namespace ECSRogue.BaseEngine
                     " and you laugh at the attempt.",
                     " but you easily dodge it again.",
                     " and misses you. Again!"
-                }
-            };
-            stateSpaceComponents.MeleeAttackNPCMessageComponents[id] = new MeleeAttackNPCMessageComponent()
-            {
+                },
                 AttackNPCMessages = new string[]
                 {
                     "{0} attack the {1}",
@@ -137,10 +133,7 @@ namespace ECSRogue.BaseEngine
                     "{0} swipe at {1}",
                     "{0} try to damage the {1}",
                     "{0} slash viciously at the {1}"
-                }
-            };
-            stateSpaceComponents.TakeMeleeDamageMesageComponents[id] = new TakeMeleeDamageMesageComponent()
-            {
+                },
                 NormalTakeDamageMessages = new string[]
                 {
                     " and you take {0} damage.",
@@ -156,6 +149,7 @@ namespace ECSRogue.BaseEngine
                     "! {0} damage taken! Don't get cocky..."
                 }
             };
+
             return true;
         }
         public static bool SpawnTestEnemyNPC(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, List<Vector2> freeTiles)
@@ -188,7 +182,7 @@ namespace ECSRogue.BaseEngine
             spaceComponents.AISleepComponents[id] = new AISleep() { ChanceToWake = 15, FOVRadiusChangeOnWake = 2 };
             spaceComponents.AIRoamComponents[id] = new AIRoam() { ChanceToDetect = 25 };
             spaceComponents.AIFleeComponents[id] = new AIFlee() { DoesFlee = true, FleeAtHealthPercent = 25, FleeUntilHealthPercent = 30 };
-            spaceComponents.MeleeAttackNPCMessageComponents[id] = new MeleeAttackNPCMessageComponent()
+            spaceComponents.MeleeMessageComponents[id] = new MeleeMessageComponent()
             {
                 AttackNPCMessages = new string[]
                 {
@@ -196,19 +190,13 @@ namespace ECSRogue.BaseEngine
                         "{0} applies fury to the {1}'s face",
                         "{0} attempts brute force against {1}",
                         "{0} uses a walking attack fearlessly at {1}"
-                }
-            };
-            spaceComponents.MeleeAttackPlayerMessageComponents[id] = new MeleeAttackPlayerMessageComponent()
-            {
+                },
                 AttackPlayerMessages = new string[]
                 {
                         "{0} tests a mighty attack on you",
                         "The {0} glitches out against you",
                         "Watch out! {0} tries to attack you"
-                }
-            };
-            spaceComponents.DodgeMeleeMessageComponents[id] = new DodgeMeleeMessageComponent()
-            {
+                },
                 NormalDodgeMessages = new string[]
                 {
                         " but the attack missed!",
@@ -223,10 +211,7 @@ namespace ECSRogue.BaseEngine
                         " and it misses again!",
                         " and shows how advanced its AI is by dodging again.",
                         " and taunts at the attack. \"Give up!\""
-                }
-            };
-            spaceComponents.TakeMeleeDamageMesageComponents[id] = new TakeMeleeDamageMesageComponent()
-            {
+                },
                 NormalTakeDamageMessages = new string[]
                 {
                         " and it takes {0} damage.",
@@ -242,6 +227,7 @@ namespace ECSRogue.BaseEngine
                         " and the test is broken! It takes {0} damage!"
                 }
             };
+
             return true;
         }
         public static bool SpawnWildVines(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, List<Vector2> freeTiles)
@@ -274,7 +260,7 @@ namespace ECSRogue.BaseEngine
             spaceComponents.AISleepComponents[id] = new AISleep() { ChanceToWake = 10, FOVRadiusChangeOnWake = 2 };
             spaceComponents.AIRoamComponents[id] = new AIRoam() { ChanceToDetect = 40 };
             spaceComponents.AIFleeComponents[id] = new AIFlee() { DoesFlee = false, FleeAtHealthPercent = 25, FleeUntilHealthPercent = 30 };
-            spaceComponents.MeleeAttackNPCMessageComponents[id] = new MeleeAttackNPCMessageComponent()
+            spaceComponents.MeleeMessageComponents[id] = new MeleeMessageComponent()
             {
                 AttackNPCMessages = new string[]
                 {
@@ -282,19 +268,13 @@ namespace ECSRogue.BaseEngine
                         "{0} applies fury to the {1}'s face",
                         "{0} attempts brute force against {1}",
                         "{0} uses a walking attack fearlessly at {1}"
-                }
-            };
-            spaceComponents.MeleeAttackPlayerMessageComponents[id] = new MeleeAttackPlayerMessageComponent()
-            {
+                },
                 AttackPlayerMessages = new string[]
                 {
                         "{0} wiggles its tentacles at you",
                         "The {0} swipes at you multiple times",
                         "Gross.. the tentacles of {0} smear around you"
-                }
-            };
-            spaceComponents.DodgeMeleeMessageComponents[id] = new DodgeMeleeMessageComponent()
-            {
+                },
                 NormalDodgeMessages = new string[]
                 {
                         " but the attack missed!",
@@ -309,10 +289,7 @@ namespace ECSRogue.BaseEngine
                         " and it misses again!",
                         " and it slithers around, cackling",
                         " and taunts at the attack. \"Give up!\""
-                }
-            };
-            spaceComponents.TakeMeleeDamageMesageComponents[id] = new TakeMeleeDamageMesageComponent()
-            {
+                },
                 NormalTakeDamageMessages = new string[]
                 {
                         " and it takes {0} damage.",
@@ -328,6 +305,7 @@ namespace ECSRogue.BaseEngine
                         " and the test is broken! It takes {0} damage!"
                 }
             };
+
             return true;
         }
     }
