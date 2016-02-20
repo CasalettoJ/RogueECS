@@ -14,6 +14,7 @@ using ECSRogue.ECS.Systems;
 using ECSRogue.ECS.Components;
 using ECSRogue.BaseEngine.IO.Objects;
 using ECSRogue.ECS.Components.GraphicalEffectsComponents;
+using ECSRogue.ECS.Components.ItemizationComponents;
 
 namespace ECSRogue.BaseEngine.StateSpaces
 {
@@ -91,7 +92,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             for(int i = 0; i < 50; i++)
             {
                 Guid id = spaceComponents.CreateEntity();
-                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline;
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem
+                    | Component.COMPONENT_STAT_MODIFICATION;
                 spaceComponents.DisplayComponents[id] = new DisplayComponent()
                 {
                     AlwaysDraw = false,
@@ -110,12 +112,30 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 spaceComponents.PositionComponents[id] = new PositionComponent() { Position = position };
                 spaceComponents.OutlineComponents[id] = new OutlineComponent() { Color = Color.Purple, Opacity = 1f };
                 spaceComponents.SecondaryOutlineComponents[id] = new SecondaryOutlineComponent() { AlternateColor = Color.LightBlue, Seconds = 0f, SwitchAtSeconds = .75f };
+                spaceComponents.PickupComponents[id] = new PickupComponent() { PickupType = ItemType.ARTIFACT };
+                spaceComponents.ValueComponents[id] = new ValueComponent() { Gold = 10 };
+                spaceComponents.StatModificationComponents[id] = new StatModificationComponent()
+                {
+                    AccuracyChange = 10,
+                    DefenseChange = 25,
+                    DieNumberChange = 1,
+                    HealthChange = 50,
+                    MaximumDamageChange = 5,
+                    MinimumDamageChange = -2,
+                    PowerChange = -1
+                };
+                spaceComponents.NameComponents[id] = new NameComponent()
+                {
+                    Name = "Test Artifact",
+                    Description = "FORGED IN THE FIREY PITS OF HELL, THIS MESH OF STEEL AND MAGIC HAS ONLY ONE PURPOSE: THE UTTER DECIMATION OF ALL WHO WAGE WAR AGAINST ITS OWNER.  AS YOU EQUIP THIS ITEM YOU FEEL A FORBODING PULSE ALONG YOUR SPINE WHICH RIPPLES OUTWARD INTO EVERY INCH OF YOUR FLESH.  IS IT MADNESS THAT SEEKS A NEW HOME, OR SIMPLY THE GUILT OF DONNING SUCH AN EVIL DEFENSE?"
+                };
+                spaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = false };
             }
 
             for (int i = 0; i < 50; i++)
             {
                 Guid id = spaceComponents.CreateEntity();
-                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline;
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem;
                 spaceComponents.DisplayComponents[id] = new DisplayComponent()
                 {
                     AlwaysDraw = false,
@@ -134,12 +154,20 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 spaceComponents.PositionComponents[id] = new PositionComponent() { Position = position };
                 spaceComponents.OutlineComponents[id] = new OutlineComponent() { Color = Color.Purple, Opacity = 1f };
                 spaceComponents.SecondaryOutlineComponents[id] = new SecondaryOutlineComponent() { AlternateColor = Color.LightBlue, Seconds = 0f, SwitchAtSeconds = .75f };
+                spaceComponents.PickupComponents[id] = new PickupComponent() { PickupType = ItemType.GOLD };
+                spaceComponents.ValueComponents[id] = new ValueComponent() { Gold = stateSpaceComponents.random.Next(0,231) };
+                spaceComponents.NameComponents[id] = new NameComponent()
+                {
+                    Name = "Gold",
+                    Description = "Some people try and use fancy names for this mass of wealth. Credits, Stardust, Gil... it buys shelter and women all the same."
+                };
+                spaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = false };
             }
 
             for (int i = 0; i < 50; i++)
             {
                 Guid id = spaceComponents.CreateEntity();
-                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline;
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem | ComponentMasks.Consumable;
                 spaceComponents.DisplayComponents[id] = new DisplayComponent()
                 {
                     AlwaysDraw = false,
@@ -158,6 +186,15 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 spaceComponents.PositionComponents[id] = new PositionComponent() { Position = position };
                 spaceComponents.OutlineComponents[id] = new OutlineComponent() { Color = Color.Purple, Opacity = 1f };
                 spaceComponents.SecondaryOutlineComponents[id] = new SecondaryOutlineComponent() { AlternateColor = Color.LightBlue, Seconds = 0f, SwitchAtSeconds = .75f };
+                spaceComponents.PickupComponents[id] = new PickupComponent() { PickupType = ItemType.CONSUMABLE };
+                spaceComponents.ValueComponents[id] = new ValueComponent() { Gold = stateSpaceComponents.random.Next(0, 231) };
+                spaceComponents.NameComponents[id] = new NameComponent()
+                {
+                    Name = "Test Potion",
+                    Description = "It is... green."
+                };
+                spaceComponents.ItemFunctionsComponents[id] = new ItemFunctionsComponent() { Ranged = false, UseFunctionValue = ItemUseFunctions.TESTUSE };
+                spaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = false };
             }
         }
 
@@ -201,6 +238,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             //AI and Combat
             AISystem.AICheckDetection(stateSpaceComponents);
             AISystem.AIMovement(stateSpaceComponents, dungeonGrid, dungeonDimensions, mapToPlayer);
+            InventorySystem.TryPickupItems(stateSpaceComponents, dungeonGrid);
             AISystem.AIUpdateVision(stateSpaceComponents, dungeonGrid, dungeonDimensions);
             CombatSystem.HandleMeleeCombat(stateSpaceComponents, DevConstants.Grid.CellSize);
             AISystem.AICheckFleeing(stateSpaceComponents);

@@ -1,6 +1,7 @@
 ﻿using ECSRogue.ECS.Components;
 using ECSRogue.ECS.Components.AIComponents;
 using ECSRogue.ECS.Components.GraphicalEffectsComponents;
+using ECSRogue.ECS.Components.ItemizationComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace ECSRogue.ECS
         COMPONENT_AI_COMBAT = 1 << 18,
         COMPONENT_AI_ALIGNMENT = 1 << 19,
         COMPONENT_AI_STATE = 1 << 20,
-        COMPONENT_MELEE_ATTACK_MESSAGES = 1 << 21,
+        COMPONENT_ENTITY_MESSAGES = 1 << 21,
         COMPONENT_AI_FIELDOFVIEW = 1 << 22,
         COMPONENT_ALTERNATE_FOV_COLOR = 1 << 23,
         COMPONENT_AI_SLEEP = 1 << 24,
@@ -40,13 +41,13 @@ namespace ECSRogue.ECS
         COMPONENT_AI_FLEE = 1 << 26,
         COMPONENT_HEALTH_REGENERATION = 1 << 27,
         COMPONENT_OUTLINE = 1 << 28,
-        COMPONENT_OUTLINE_SECONDARY = 1 << 29
-    }
-
-    [Flags]
-    public enum AbilityComponents : ulong
-    {
-        NONE = 0
+        COMPONENT_OUTLINE_SECONDARY = 1 << 29,
+        COMPONENT_PICKUP = 1 << 30,
+        COMPONENT_STAT_MODIFICATION = 1ul << 31,
+        COMPONENT_INVENTORY = 1ul << 32,
+        COMPONENT_VALUE = 1ul << 33,
+        COMPONENT_ITEM_FUNCTIONS = 1ul << 34,
+        COMPONENT_PASSIVES = 1ul << 35
     }
 
     public struct ComponentMasks
@@ -54,16 +55,27 @@ namespace ECSRogue.ECS
         //Actors and AI
         public const Component Player = Component.COMPONENT_POSITION | Component.COMPONENT_DISPLAY | Component.COMPONENT_SIGHTRADIUS
             | Component.COMPONENT_GAMEPLAY_INFO | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_COLLISION | Component.COMPONENT_NAME
-            | Component.COMPONENT_PLAYER | Component.COMPONENT_AI_ALIGNMENT | Component.COMPONENT_MELEE_ATTACK_MESSAGES;
+            | Component.COMPONENT_PLAYER | Component.COMPONENT_AI_ALIGNMENT | Component.COMPONENT_ENTITY_MESSAGES;
 
         public const Component CombatReadyAI = Component.COMPONENT_AI_ALIGNMENT | Component.COMPONENT_AI_COMBAT | Component.COMPONENT_AI_STATE
             | Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_COLLISION | Component.COMPONENT_AI_SLEEP | Component.COMPONENT_AI_ROAM | Component.COMPONENT_AI_FLEE
-            | Component.COMPONENT_NAME | Component.COMPONENT_POSITION | Component.COMPONENT_MELEE_ATTACK_MESSAGES;
+            | Component.COMPONENT_NAME | Component.COMPONENT_POSITION | Component.COMPONENT_ENTITY_MESSAGES;
 
         public const Component Observer = Component.COMPONENT_POSITION | Component.COMPONENT_COLLISION | Component.COMPONENT_DISPLAY | Component.COMPONENT_INPUTMOVEMENT | Component.COMPONENT_OBSERVER;
         public const Component AIView = Component.COMPONENT_AI_FIELDOFVIEW | Component.COMPONENT_POSITION;
         public const Component Collidable = Component.COMPONENT_POSITION | Component.COMPONENT_COLLISION;
         public const Component InputMoveable = Component.COMPONENT_POSITION | Component.COMPONENT_INPUTMOVEMENT;
+
+        //Items
+        public const Component PickupItem = Component.COMPONENT_PICKUP | Component.COMPONENT_VALUE | Component.COMPONENT_NAME | Component.COMPONENT_COLLISION;
+        public const Component ObservableItem = Component.COMPONENT_POSITION | Component.COMPONENT_NAME | Component.COMPONENT_PICKUP;
+        public const Component ObservableSkillModifications = Component.COMPONENT_POSITION | Component.COMPONENT_STAT_MODIFICATION;
+        public const Component ObservableValue = Component.COMPONENT_POSITION | Component.COMPONENT_VALUE;
+
+        //Inventory
+        public const Component Consumable = ComponentMasks.PickupItem | Component.COMPONENT_ITEM_FUNCTIONS;
+        public const Component Artifact = ComponentMasks.PickupItem | Component.COMPONENT_STAT_MODIFICATION | Component.COMPONENT_PASSIVES;
+        public const Component InventoryPickup = Component.COMPONENT_INVENTORY | Component.COMPONENT_ENTITY_MESSAGES | Component.COMPONENT_NAME | Component.COMPONENT_POSITION;
 
         //Animations
         public const Component MovingEntity = Component.COMPONENT_POSITION | Component.COMPONENT_VELOCITY | Component.COMPONENT_TARGET_POSITION;
@@ -74,7 +86,7 @@ namespace ECSRogue.ECS
         //Drawable
         public const Component Drawable = Component.COMPONENT_DISPLAY | Component.COMPONENT_POSITION;
         public const Component DrawableLabel = Component.COMPONENT_LABEL | Component.COMPONENT_POSITION;
-        public const Component DrawableName = Component.COMPONENT_NAME | Component.COMPONENT_POSITION;
+        public const Component DrawableAIName = Component.COMPONENT_NAME | Component.COMPONENT_POSITION | Component.COMPONENT_AI_ALIGNMENT;
         public const Component DrawableAIState = Component.COMPONENT_AI_STATE | Component.COMPONENT_POSITION | Component.COMPONENT_AI_ALIGNMENT;
         public const Component DrawableSkills = Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_POSITION | Component.COMPONENT_AI_ALIGNMENT;
         public const Component FOVColorChange = Component.COMPONENT_ALTERNATE_FOV_COLOR | Component.COMPONENT_AI_FIELDOFVIEW;
@@ -118,11 +130,17 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, AIRoam> AIRoamComponents { get; private set; }
         public Dictionary<Guid, AIFlee> AIFleeComponents { get; private set; }
         public Dictionary<Guid, InputMovementComponent> InputMovementComponents { get; private set; }
-        public Dictionary<Guid, MeleeMessageComponent> MeleeMessageComponents { get; private set; }
+        public Dictionary<Guid, EntityMessageComponent> EntityMessageComponents { get; private set; }
         public Dictionary<Guid, AlternateFOVColorChangeComponent> AlternateFOVColorChangeComponents { get; private set; }
         public Dictionary<Guid, HealthRegenerationComponent> HealthRegenerationComponents { get; private set; }
         public Dictionary<Guid, OutlineComponent> OutlineComponents { get; private set; }
         public Dictionary<Guid, SecondaryOutlineComponent> SecondaryOutlineComponents { get; private set; }
+        public Dictionary<Guid, InventoryComponent> InventoryComponents { get; private set; }
+        public Dictionary<Guid, PickupComponent> PickupComponents { get; private set; }
+        public Dictionary<Guid, StatModificationComponent> StatModificationComponents { get; private set; }
+        public Dictionary<Guid, ValueComponent> ValueComponents { get; private set; }
+        public Dictionary<Guid, ItemFunctionsComponent> ItemFunctionsComponents { get; private set; }
+        public Dictionary<Guid, PassivesComponent> PassivesComponents { get; private set; }
 
         public List<Action> DelayedActions { get; private set; }
         public PlayerComponent PlayerComponent { get; set; }
@@ -155,11 +173,17 @@ namespace ECSRogue.ECS
             AIRoamComponents = new Dictionary<Guid, AIRoam>();
             AIFleeComponents = new Dictionary<Guid, AIFlee>();
             InputMovementComponents = new Dictionary<Guid, InputMovementComponent>();
-            MeleeMessageComponents = new Dictionary<Guid, MeleeMessageComponent>();
+            EntityMessageComponents = new Dictionary<Guid, EntityMessageComponent>();
             AlternateFOVColorChangeComponents = new Dictionary<Guid, AlternateFOVColorChangeComponent>();
             HealthRegenerationComponents = new Dictionary<Guid, HealthRegenerationComponent>();
             OutlineComponents = new Dictionary<Guid, OutlineComponent>();
             SecondaryOutlineComponents = new Dictionary<Guid, SecondaryOutlineComponent>();
+            InventoryComponents = new Dictionary<Guid, InventoryComponent>();
+            PickupComponents = new Dictionary<Guid, PickupComponent>();
+            StatModificationComponents = new Dictionary<Guid, StatModificationComponent>();
+            ValueComponents = new Dictionary<Guid, ValueComponent>();
+            ItemFunctionsComponents = new Dictionary<Guid, ItemFunctionsComponent>();
+            PassivesComponents = new Dictionary<Guid, PassivesComponent>();
 
             GlobalCollisionComponent = new GlobalCollisionComponent() { EntitiesThatCollided = new List<Guid>() };
             PlayerComponent = new PlayerComponent();
@@ -202,11 +226,17 @@ namespace ECSRogue.ECS
                 AIRoamComponents.Remove(id);
                 AIFleeComponents.Remove(id);
                 InputMovementComponents.Remove(id);
-                MeleeMessageComponents.Remove(id);
+                EntityMessageComponents.Remove(id);
                 AlternateFOVColorChangeComponents.Remove(id);
                 HealthRegenerationComponents.Remove(id);
                 OutlineComponents.Remove(id);
                 SecondaryOutlineComponents.Remove(id);
+                InventoryComponents.Remove(id);
+                PickupComponents.Remove(id);
+                StatModificationComponents.Remove(id);
+                ValueComponents.Remove(id);
+                ItemFunctionsComponents.Remove(id);
+                PassivesComponents.Remove(id);
             }
         }
 

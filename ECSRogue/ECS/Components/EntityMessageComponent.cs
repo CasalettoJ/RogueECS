@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ECSRogue.ECS.Components
 {
-    public struct MeleeMessageComponent
+    public struct EntityMessageComponent
     {
         public string[] NormalDodgeMessages;
         public string[] StreakDodgeMessages;
@@ -13,5 +13,8 @@ namespace ECSRogue.ECS.Components
         public string[] AttackPlayerMessages;
         public string[] NormalTakeDamageMessages;
         public string[] BrokenDodgeStreakTakeDamageMessages;
+        public string[] PickupItemMessages;
+        public string[] ConsumablesFullMessages;
+        public string[] ArtifactsFullMessages;
     }
 }

@@ -32,8 +32,8 @@ namespace ECSRogue.ECS.Systems
                         int damageDone = 0;
                         SkillLevelsComponent collidedStats = spaceComponents.SkillLevelsComponents[collidedEntity];
                         SkillLevelsComponent attackingStats = spaceComponents.SkillLevelsComponents[id];
-                        MeleeMessageComponent collidedMessages = spaceComponents.MeleeMessageComponents[collidedEntity];
-                        MeleeMessageComponent attackingMessages = spaceComponents.MeleeMessageComponents[id];
+                        EntityMessageComponent collidedMessages = spaceComponents.EntityMessageComponents[collidedEntity];
+                        EntityMessageComponent attackingMessages = spaceComponents.EntityMessageComponents[id];
                         bool isPlayerAttacking = ((spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER);
                         bool isPlayerBeingAttacked = ((spaceComponents.Entities.Where(x => x.Id == collidedEntity).First().ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER);
 
@@ -59,6 +59,7 @@ namespace ECSRogue.ECS.Systems
                                 {
                                     combatString += string.Format(collidedMessages.NormalTakeDamageMessages[spaceComponents.random.Next(0, collidedMessages.NormalTakeDamageMessages.Count())], damageDone);
                                 }
+                                attackingStats.TimesHit += 1;
                                 attackingStats.TimesMissed = 0;
                                 Color messageColor = (spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_HOSTILE) ? Colors.Messages.Bad : Colors.Messages.Good;
                                 spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Microsoft.Xna.Framework.Color, string>(messageColor, combatString));
@@ -75,6 +76,7 @@ namespace ECSRogue.ECS.Systems
                                 {
                                     combatString += string.Format(collidedMessages.NormalDodgeMessages[spaceComponents.random.Next(0, collidedMessages.NormalDodgeMessages.Count())], damageDone);
                                 }
+                                attackingStats.TimesHit = 0;
                                 Color messageColor = (spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_HOSTILE) ? Colors.Messages.Good : Colors.Messages.Bad;
                                 spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Microsoft.Xna.Framework.Color, string>(messageColor, combatString));
                             }

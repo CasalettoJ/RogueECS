@@ -1,6 +1,7 @@
 ﻿using ECSRogue.ECS;
 using ECSRogue.ECS.Components;
 using ECSRogue.ECS.Components.AIComponents;
+using ECSRogue.ECS.Components.ItemizationComponents;
 using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -72,7 +73,7 @@ namespace ECSRogue.BaseEngine
         public static bool SpawnPlayer(StateSpaceComponents stateSpaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, List<Vector2> freeTiles)
         {
             Guid id = stateSpaceComponents.CreateEntity();
-            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Player | Component.COMPONENT_INPUTMOVEMENT | Component.COMPONENT_HEALTH_REGENERATION;
+            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Player | Component.COMPONENT_INPUTMOVEMENT | ComponentMasks.InventoryPickup;
             //Set Position
             int X = 0;
             int Y = 0;
@@ -106,10 +107,8 @@ namespace ECSRogue.BaseEngine
             stateSpaceComponents.InputMovementComponents[id] = new InputMovementComponent() { TimeIntervalBetweenMovements = .09f, TimeSinceLastMovement = 0f, InitialWait = .5f, TotalTimeButtonDown = 0f, LastKeyPressed = Keys.None };
             //Set an alignment for AI to communicate with
             stateSpaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_FRIENDLY };
-            //Set health regeneration
-            stateSpaceComponents.HealthRegenerationComponents[id] = new HealthRegenerationComponent() { HealthRegain = 1, RegenerateTurnRate = 1, TurnsSinceLastHeal = 0 };
             //Set combat messages
-            stateSpaceComponents.MeleeMessageComponents[id] = new MeleeMessageComponent()
+            stateSpaceComponents.EntityMessageComponents[id] = new EntityMessageComponent()
             {
                 NormalDodgeMessages = new string[]
                 {
@@ -147,15 +146,35 @@ namespace ECSRogue.BaseEngine
                     " and this time you lose {0} health! Ow!",
                     " and hits you for {0} THIS time.",
                     "! {0} damage taken! Don't get cocky..."
+                },
+                PickupItemMessages = new string[]
+                {
+                    "{0} pick up the {1}.",
+                    "{0} find a {1}.",
+                    "{0} got a {1}!"
+                },
+                ConsumablesFullMessages = new string[]
+                {
+                    "You cannot carry any more consumables.",
+                    "Your consumable slots are full!",
+                    "You don't have any place to store this consumable."
+                },
+                ArtifactsFullMessages = new string[]
+                {
+                    "Your artifact slots are too full for another.",
+                    "Drop or scrap one of your artifacts to pick this up.",
+                    "You can't pick up this artifact; you already have enough."
                 }
             };
+            //Inventory
+            stateSpaceComponents.InventoryComponents[id] = new InventoryComponent() { Artifacts = new List<Guid>(), Consumables = new List<Guid>(), MaxArtifacts = 3, MaxConsumables = 2 };
 
             return true;
         }
         public static bool SpawnTestEnemyNPC(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, List<Vector2> freeTiles)
         {
             Guid id = spaceComponents.CreateEntity();
-            spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.CombatReadyAI | ComponentMasks.AIView;
+            spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.CombatReadyAI | ComponentMasks.AIView | ComponentMasks.InventoryPickup;
 
             int tileIndex = spaceComponents.random.Next(0, freeTiles.Count);
             spaceComponents.PositionComponents[id] = new PositionComponent() { Position = freeTiles[tileIndex] };
@@ -182,7 +201,7 @@ namespace ECSRogue.BaseEngine
             spaceComponents.AISleepComponents[id] = new AISleep() { ChanceToWake = 15, FOVRadiusChangeOnWake = 2 };
             spaceComponents.AIRoamComponents[id] = new AIRoam() { ChanceToDetect = 25 };
             spaceComponents.AIFleeComponents[id] = new AIFlee() { DoesFlee = true, FleeAtHealthPercent = 25, FleeUntilHealthPercent = 30 };
-            spaceComponents.MeleeMessageComponents[id] = new MeleeMessageComponent()
+            spaceComponents.EntityMessageComponents[id] = new EntityMessageComponent()
             {
                 AttackNPCMessages = new string[]
                 {
@@ -227,13 +246,14 @@ namespace ECSRogue.BaseEngine
                         " and the test is broken! It takes {0} damage!"
                 }
             };
+            spaceComponents.InventoryComponents[id] = new InventoryComponent() { Artifacts = new List<Guid>(), Consumables = new List<Guid>(), MaxArtifacts = 0, MaxConsumables = 0 };
 
             return true;
         }
         public static bool SpawnWildVines(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, List<Vector2> freeTiles)
         {
             Guid id = spaceComponents.CreateEntity();
-            spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.CombatReadyAI | ComponentMasks.AIView;
+            spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.CombatReadyAI | ComponentMasks.AIView | ComponentMasks.InventoryPickup;
 
             int tileIndex = spaceComponents.random.Next(0, freeTiles.Count);
             spaceComponents.PositionComponents[id] = new PositionComponent() { Position = freeTiles[tileIndex] };
@@ -260,7 +280,7 @@ namespace ECSRogue.BaseEngine
             spaceComponents.AISleepComponents[id] = new AISleep() { ChanceToWake = 10, FOVRadiusChangeOnWake = 2 };
             spaceComponents.AIRoamComponents[id] = new AIRoam() { ChanceToDetect = 40 };
             spaceComponents.AIFleeComponents[id] = new AIFlee() { DoesFlee = false, FleeAtHealthPercent = 25, FleeUntilHealthPercent = 30 };
-            spaceComponents.MeleeMessageComponents[id] = new MeleeMessageComponent()
+            spaceComponents.EntityMessageComponents[id] = new EntityMessageComponent()
             {
                 AttackNPCMessages = new string[]
                 {
@@ -305,6 +325,7 @@ namespace ECSRogue.BaseEngine
                         " and the test is broken! It takes {0} damage!"
                 }
             };
+            spaceComponents.InventoryComponents[id] = new InventoryComponent() { Artifacts = new List<Guid>(), Consumables = new List<Guid>(), MaxArtifacts = 0, MaxConsumables = 0 };
 
             return true;
         }

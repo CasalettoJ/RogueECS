@@ -75,8 +75,14 @@
     <Compile Include="ECS\Components\GraphicalEffectsComponents\OutlineComponent.cs" />
     <Compile Include="ECS\Components\GraphicalEffectsComponents\SecondaryOutlineComponent.cs" />
     <Compile Include="ECS\Components\InputMovementComponent.cs" />
+    <Compile Include="ECS\Components\ItemizationComponents\InventoryComponent.cs" />
+    <Compile Include="ECS\Components\ItemizationComponents\ItemFunctionsComponent.cs" />
+    <Compile Include="ECS\Components\ItemizationComponents\PassivesComponent.cs" />
+    <Compile Include="ECS\Components\ItemizationComponents\PickupComponent.cs" />
+    <Compile Include="ECS\Components\ItemizationComponents\StatModificationComponent.cs" />
+    <Compile Include="ECS\Components\ItemizationComponents\ValueComponent.cs" />
     <Compile Include="ECS\Components\LabelComponent.cs" />
-    <Compile Include="ECS\Components\MeleeMessageComponent.cs" />
+    <Compile Include="ECS\Components\EntityMessageComponent.cs" />
     <Compile Include="ECS\Components\HealthRegenerationComponent.cs" />
     <Compile Include="ECS\Components\NameComponent.cs" />
     <Compile Include="ECS\Components\PlayerComponent.cs" />
@@ -97,6 +103,7 @@
     <Compile Include="ECS\Systems\DisplaySystem.cs" />
     <Compile Include="ECS\Systems\DungeonMappingSystem.cs" />
     <Compile Include="ECS\Systems\InputMovementSystem.cs" />
+    <Compile Include="ECS\Systems\InventorySystem.cs" />
     <Compile Include="ECS\Systems\LabelDisplaySystem.cs" />
     <Compile Include="ECS\Systems\LevelChangeSystem.cs" />
     <Compile Include="ECS\Systems\MessageDisplaySystem.cs" />

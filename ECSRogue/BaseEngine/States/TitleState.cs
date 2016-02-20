@@ -129,7 +129,7 @@ namespace ECSRogue.BaseEngine.States
                         break;
                     case (int)Options.LOAD_GAME:
                         RandomlyGeneratedStateSpace nextSpace = new RandomlyGeneratedStateSpace(DungeonInfo);
-                        nextState = new PlayingState(nextSpace, camera, Content, Graphics, saveInfo: DungeonInfo);
+                        nextState = new PlayingState(nextSpace, camera, Content, Graphics, saveInfo: DungeonInfo, keyboardState: keyState);
                         break;
                     case (int)Options.OPTIONS:
                         GameSettingsMenuStateSpace nextMenu = new GameSettingsMenuStateSpace(ref gameSettings);
