@@ -146,8 +146,8 @@ namespace ECSRogue.ECS.Systems
                             observersFindings.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Health: {0} / {1}", skills.CurrentHealth, skills.Health)));
                             if(alignment.Alignment != AIAlignments.ALIGNMENT_FRIENDLY)
                             {
-                                observersFindings.Add(new Tuple<Color, string>(Colors.Messages.Good, string.Format("You have a {0}% chance to hit.", Math.Ceiling(CombatSystem.CalculateAccuracy(spaceComponents.SkillLevelsComponents[player.Id], skills)))));
-                                observersFindings.Add(new Tuple<Color, string>(Colors.Messages.Bad, string.Format("It has a {0}% chance of hitting you for a maximum of {1}.", Math.Ceiling(CombatSystem.CalculateAccuracy(skills, spaceComponents.SkillLevelsComponents[player.Id])), skills.MaximumDamage)));
+                                observersFindings.Add(new Tuple<Color, string>(Colors.Messages.Good, string.Format("You have a {0}% chance to hit.", Math.Ceiling(CombatSystem.CalculateAccuracy(spaceComponents, spaceComponents.SkillLevelsComponents[player.Id], player.Id, skills, id)))));
+                                observersFindings.Add(new Tuple<Color, string>(Colors.Messages.Bad, string.Format("It has a {0}% chance of hitting you for a maximum of {1}.", Math.Ceiling(CombatSystem.CalculateAccuracy(spaceComponents, skills, id, spaceComponents.SkillLevelsComponents[player.Id], player.Id)), skills.MaximumDamage)));
                             }
                         }
                     }
@@ -208,12 +208,6 @@ namespace ECSRogue.ECS.Systems
                                 string sign = stats.HealthChange > 0 ? "+" : string.Empty;
                                 Color color = stats.HealthChange > 0 ? Colors.Messages.Good : Colors.Messages.Bad;
                                 observersFindings.Add(new Tuple<Color, string>(color, string.Format("Maximum Health {0}{1}", sign, stats.HealthChange)));
-                            }
-                            if (stats.PowerChange != 0)
-                            {
-                                string sign = stats.PowerChange > 0 ? "+" : string.Empty;
-                                Color color = stats.PowerChange > 0 ? Colors.Messages.Good : Colors.Messages.Bad;
-                                observersFindings.Add(new Tuple<Color, string>(color, string.Format("Power {0}{1}", sign, stats.PowerChange)));
                             }
                             if (stats.DieNumberChange != 0)
                             {

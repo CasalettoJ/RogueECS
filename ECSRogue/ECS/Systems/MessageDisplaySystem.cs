@@ -57,7 +57,7 @@ namespace ECSRogue.ECS.Systems
                 statsToPrint.Add(string.Format("Kills: {0}", gameplayInfo.Kills));
             foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER).Select(x => x.Id))
             {
-                SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
+                SkillLevelsComponent skills = InventorySystem.ApplyStatModifications(spaceComponents, id, spaceComponents.SkillLevelsComponents[id]);
                 statsToPrint.Add(System.Environment.NewLine);
                 statsToPrint.Add(string.Format("Health:  {0} / {1}", skills.CurrentHealth, skills.Health));
                 statsToPrint.Add(string.Format("Wealth: {0}", skills.Wealth));

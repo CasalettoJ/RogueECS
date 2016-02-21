@@ -93,7 +93,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             {
                 Guid id = spaceComponents.CreateEntity();
                 spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem
-                    | Component.COMPONENT_STAT_MODIFICATION;
+                    | ComponentMasks.Artifact;
                 spaceComponents.DisplayComponents[id] = new DisplayComponent()
                 {
                     AlwaysDraw = false,
@@ -122,7 +122,6 @@ namespace ECSRogue.BaseEngine.StateSpaces
                     HealthChange = 50,
                     MaximumDamageChange = 5,
                     MinimumDamageChange = -2,
-                    PowerChange = -1
                 };
                 spaceComponents.NameComponents[id] = new NameComponent()
                 {
@@ -135,7 +134,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             for (int i = 0; i < 50; i++)
             {
                 Guid id = spaceComponents.CreateEntity();
-                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem;
+                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem | ComponentMasks.Consumable;
                 spaceComponents.DisplayComponents[id] = new DisplayComponent()
                 {
                     AlwaysDraw = false,

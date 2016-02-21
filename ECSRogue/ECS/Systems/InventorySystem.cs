@@ -41,9 +41,31 @@ namespace ECSRogue.ECS.Systems
             }
         }
 
-        public static void ApplyStatModifications(StateSpaceComponents spaceComponents)
+        public static SkillLevelsComponent ApplyStatModifications(StateSpaceComponents spaceComponents, Guid entity, SkillLevelsComponent originalStats)
         {
+            SkillLevelsComponent newStats = originalStats;
+            //See if the entity has an inventory to check for artifact modifications
+            if(spaceComponents.InventoryComponents.ContainsKey(entity))
+            {
+                InventoryComponent entityInventory = spaceComponents.InventoryComponents[entity];
+                //For each artifact in the entity' inventory, look for the statmodificationcomponent, and modify stats accordingly.
+                foreach (Guid id in  entityInventory.Artifacts)
+                {
+                    Entity inventoryItem = spaceComponents.Entities.Where(x => x.Id == id).FirstOrDefault();
+                    if (inventoryItem != null && (inventoryItem.ComponentFlags & ComponentMasks.Artifact) == ComponentMasks.Artifact)
+                    {
+                        StatModificationComponent statsMods = spaceComponents.StatModificationComponents[id];
+                        newStats.Accuracy = (newStats.Accuracy + statsMods.AccuracyChange < 0) ? 0 : newStats.Accuracy + statsMods.AccuracyChange;
+                        newStats.Defense = (newStats.Defense + statsMods.DefenseChange < 0) ? 0 : newStats.Defense + statsMods.DefenseChange;
+                        newStats.DieNumber = (newStats.DieNumber + statsMods.DieNumberChange < 1) ? 1 : newStats.DieNumber + statsMods.DieNumberChange;
+                        newStats.Health = (newStats.Health + statsMods.HealthChange < 0) ? 0 : newStats.Health + statsMods.HealthChange;
+                        newStats.MaximumDamage = (newStats.MaximumDamage + statsMods.MaximumDamageChange < 1) ? 1 : newStats.MaximumDamage + statsMods.MaximumDamageChange;
+                        newStats.MinimumDamage = (newStats.MinimumDamage + statsMods.MinimumDamageChange < 1) ? 1 : newStats.MinimumDamage + statsMods.MinimumDamageChange;
+                    }
+                }
+            }
 
+            return newStats;
         }
 
         public static void TryPickupItems(StateSpaceComponents spaceComponents, DungeonTile[,] dungeongrid)

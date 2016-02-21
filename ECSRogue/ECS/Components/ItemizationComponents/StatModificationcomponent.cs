@@ -8,8 +8,7 @@ namespace ECSRogue.ECS.Components.ItemizationComponents
     public struct StatModificationComponent
     {
         public int HealthChange;
-
-        public int PowerChange;
+        
         public int AccuracyChange;
         public int DefenseChange;
 

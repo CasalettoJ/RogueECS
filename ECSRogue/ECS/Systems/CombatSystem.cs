@@ -46,10 +46,10 @@ namespace ECSRogue.ECS.Systems
                                 : string.Format(attackingMessages.AttackNPCMessages[spaceComponents.random.Next(0, attackingMessages.AttackNPCMessages.Count())], spaceComponents.NameComponents[id].Name, spaceComponents.NameComponents[collidedEntity].Name);
 
                             //Hit
-                            if (CombatSystem.WillMeleeAttackHit(spaceComponents.random, CombatSystem.CalculateAccuracy(attackingStats, collidedStats)))
+                            if (CombatSystem.WillMeleeAttackHit(spaceComponents.random, CombatSystem.CalculateAccuracy(spaceComponents, attackingStats, id, collidedStats, collidedEntity)))
                             {
                                 //Determine weapon strength and die numbers here, then...
-                                damageDone = CombatSystem.CalculateMeleeDamage(spaceComponents.random, attackingStats.MinimumDamage, attackingStats.MaximumDamage, attackingStats.DieNumber);
+                                damageDone = CombatSystem.CalculateMeleeDamage(spaceComponents, attackingStats, id);
                                 collidedStats.CurrentHealth -= damageDone;
                                 if (attackingStats.TimesMissed > 5)
                                 {
@@ -125,17 +125,21 @@ namespace ECSRogue.ECS.Systems
             return random.NextDouble()*100 <= accuracy;
         }
 
-        public static double CalculateAccuracy(SkillLevelsComponent attacker, SkillLevelsComponent defender)
+        public static double CalculateAccuracy(StateSpaceComponents spaceComponents, SkillLevelsComponent attacker, Guid attackerId, SkillLevelsComponent defender, Guid defenderId)
         {
+            attacker = InventorySystem.ApplyStatModifications(spaceComponents, attackerId, attacker);
+            defender = InventorySystem.ApplyStatModifications(spaceComponents, defenderId, defender);
             return attacker.Accuracy * (Math.Pow(.95, defender.Defense));
         }
 
-        public static int CalculateMeleeDamage(Random random, int minDamage, int maxDamage, int diceNum)
+        public static int CalculateMeleeDamage(StateSpaceComponents spaceComponents, SkillLevelsComponent attackingStats, Guid attacker)
         {
+            attackingStats = InventorySystem.ApplyStatModifications(spaceComponents, attacker, attackingStats);
+
             int damage = 0;
-            for(int i = 0; i < diceNum; i++)
+            for(int i = 0; i < attackingStats.DieNumber; i++)
             {
-                damage += random.Next((int)(minDamage / diceNum), (int)(maxDamage / diceNum) + 1);
+                damage += spaceComponents.random.Next((int)(attackingStats.MinimumDamage / attackingStats.DieNumber), (int)(attackingStats.MaximumDamage / attackingStats.DieNumber) + 1);
             }
             return damage;
         }
