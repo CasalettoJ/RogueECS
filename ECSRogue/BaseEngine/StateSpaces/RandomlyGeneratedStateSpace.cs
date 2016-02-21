@@ -76,8 +76,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             if(createEntities)
             {
                 LevelChangeSystem.CreateGameplayInfo(stateComponents, stateSpaceComponents);
-                DungeonCreationSystem.CreateDungeonMonsters(stateSpaceComponents, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, freeTiles);
                 DungeonCreationSystem.CreateDungeonDrops(stateSpaceComponents, dungeonGrid, dungeonDimensions, freeTiles);
+                DungeonCreationSystem.CreateDungeonMonsters(stateSpaceComponents, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, freeTiles);
                 LevelChangeSystem.LoadPlayerSkillset(stateComponents, stateSpaceComponents);
                 LevelChangeSystem.CreateMessageLog(stateSpaceComponents);
             }

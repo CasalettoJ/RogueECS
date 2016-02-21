@@ -70,7 +70,7 @@ namespace ECSRogue.ECS.Systems
 
         public static void TryPickupItems(StateSpaceComponents spaceComponents, DungeonTile[,] dungeongrid)
         {
-            IEnumerable<Guid> entitiesThatCollided = spaceComponents.GlobalCollisionComponent.EntitiesThatCollided;
+            IEnumerable<Guid> entitiesThatCollided = spaceComponents.GlobalCollisionComponent.EntitiesThatCollided.Distinct();
             foreach(Guid collidingEntity in entitiesThatCollided)
             {
                 Entity colliding = spaceComponents.Entities.Where(x => x.Id == collidingEntity).FirstOrDefault();
