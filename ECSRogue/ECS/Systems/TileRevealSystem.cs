@@ -242,11 +242,11 @@ namespace ECSRogue.ECS.Systems
                         {
                             if (dungeonGrid[i, j].Occupiable)
                             {
-                                dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 8;
+                                dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 6;
                             }
                             else
                             {
-                                dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 6;
+                                dungeonGrid[i, j].Opacity += (float)gameTime.ElapsedGameTime.TotalSeconds * 4;
                             }
                         }
                     }

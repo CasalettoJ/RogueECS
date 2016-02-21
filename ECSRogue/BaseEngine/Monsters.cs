@@ -25,7 +25,7 @@ namespace ECSRogue.BaseEngine
     {
         public MonsterNames Name;
         public Dictionary<int, int> SpawnDepthsAndChances; //Key: Depths it spawns in, Value: Number of spawn slots in the wheel
-        public bool isRequiredSpawn; //Boss monsters, some special entities, might need to ALWAYS be added to a floor
+        public bool IsRequiredSpawn; //Boss monsters, some special entities, might need to ALWAYS be added to a floor
         public Func<StateSpaceComponents, DungeonTile[,], Vector2, int, List<Vector2>, bool> SpawnFunction; // SpaceComponents, World Grid, Dungeon Dimensions, Free tiles list
     }
 
@@ -38,7 +38,7 @@ namespace ECSRogue.BaseEngine
             {
                 Name = MonsterNames.PLAYER,
                 SpawnDepthsAndChances = new Dictionary<int, int>(),
-                isRequiredSpawn = true,
+                IsRequiredSpawn = true,
                 SpawnFunction = MonsterSpawners.SpawnPlayer
             },
 
@@ -50,7 +50,7 @@ namespace ECSRogue.BaseEngine
                 {
                     {1, 10}, {2, 8 }, {3, 7 }, {4, 5 }, {6, 4 }, {7, 3 }, {8, 1 }
                 },
-                isRequiredSpawn = false,
+                IsRequiredSpawn = false,
                 SpawnFunction = MonsterSpawners.SpawnTestEnemyNPC
             },
 
@@ -62,7 +62,7 @@ namespace ECSRogue.BaseEngine
                 {
                     {1, 3}, {2, 3 }, {3, 5 }, {4, 6 }, {6, 6 }, {7, 4 }, {8, 3 }
                 },
-                isRequiredSpawn = false,
+                IsRequiredSpawn = false,
                 SpawnFunction = MonsterSpawners.SpawnWildVines
             }
         };

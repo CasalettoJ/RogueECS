@@ -76,126 +76,14 @@ namespace ECSRogue.BaseEngine.StateSpaces
             if(createEntities)
             {
                 LevelChangeSystem.CreateGameplayInfo(stateComponents, stateSpaceComponents);
-                #region Debug
-                CreateItems(stateSpaceComponents);
-                #endregion
-                MonsterCreationSystem.CreateDungeonMonsters(stateSpaceComponents, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, freeTiles);
+                DungeonCreationSystem.CreateDungeonMonsters(stateSpaceComponents, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, freeTiles);
+                DungeonCreationSystem.CreateDungeonDrops(stateSpaceComponents, dungeonGrid, dungeonDimensions, freeTiles);
                 LevelChangeSystem.LoadPlayerSkillset(stateComponents, stateSpaceComponents);
                 LevelChangeSystem.CreateMessageLog(stateSpaceComponents);
             }
             mapToPlayer = new DijkstraMapTile[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
         }
         #endregion
-
-        private void CreateItems(StateSpaceComponents spaceComponents)
-        {
-            for(int i = 0; i < 50; i++)
-            {
-                Guid id = spaceComponents.CreateEntity();
-                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem
-                    | ComponentMasks.Artifact;
-                spaceComponents.DisplayComponents[id] = new DisplayComponent()
-                {
-                    AlwaysDraw = false,
-                    Color = Colors.Messages.LootPickup,
-                    Opacity = 1f,
-                    Origin = Vector2.Zero,
-                    Rotation = 0f,
-                    Scale = 1f,
-                    SpriteEffect = SpriteEffects.None,
-                    SpriteSource = new Rectangle(0 * DevConstants.Grid.CellSize, 0 * DevConstants.Grid.CellSize, DevConstants.Grid.CellSize, DevConstants.Grid.CellSize),
-                    Symbol = "{}",
-                    SymbolColor = Color.White
-                };
-                Vector2 position = freeTiles[spaceComponents.random.Next(0, freeTiles.Count)];
-                freeTiles.Remove(position);
-                spaceComponents.PositionComponents[id] = new PositionComponent() { Position = position };
-                spaceComponents.OutlineComponents[id] = new OutlineComponent() { Color = Color.Purple, Opacity = 1f };
-                spaceComponents.SecondaryOutlineComponents[id] = new SecondaryOutlineComponent() { AlternateColor = Color.LightBlue, Seconds = 0f, SwitchAtSeconds = .75f };
-                spaceComponents.PickupComponents[id] = new PickupComponent() { PickupType = ItemType.ARTIFACT };
-                spaceComponents.ValueComponents[id] = new ValueComponent() { Gold = 10 };
-                spaceComponents.StatModificationComponents[id] = new StatModificationComponent()
-                {
-                    AccuracyChange = 10,
-                    DefenseChange = 25,
-                    DieNumberChange = 1,
-                    HealthChange = 50,
-                    MaximumDamageChange = 5,
-                    MinimumDamageChange = -2,
-                };
-                spaceComponents.NameComponents[id] = new NameComponent()
-                {
-                    Name = "Test Artifact",
-                    Description = "FORGED IN THE FIREY PITS OF HELL, THIS MESH OF STEEL AND MAGIC HAS ONLY ONE PURPOSE: THE UTTER DECIMATION OF ALL WHO WAGE WAR AGAINST ITS OWNER.  AS YOU EQUIP THIS ITEM YOU FEEL A FORBODING PULSE ALONG YOUR SPINE WHICH RIPPLES OUTWARD INTO EVERY INCH OF YOUR FLESH.  IS IT MADNESS THAT SEEKS A NEW HOME, OR SIMPLY THE GUILT OF DONNING SUCH AN EVIL DEFENSE?"
-                };
-                spaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = false };
-            }
-
-            for (int i = 0; i < 50; i++)
-            {
-                Guid id = spaceComponents.CreateEntity();
-                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem | ComponentMasks.Consumable;
-                spaceComponents.DisplayComponents[id] = new DisplayComponent()
-                {
-                    AlwaysDraw = false,
-                    Color = Colors.Messages.Special,
-                    Opacity = 1f,
-                    Origin = Vector2.Zero,
-                    Rotation = 0f,
-                    Scale = 1f,
-                    SpriteEffect = SpriteEffects.None,
-                    SpriteSource = new Rectangle(0 * DevConstants.Grid.CellSize, 0 * DevConstants.Grid.CellSize, DevConstants.Grid.CellSize, DevConstants.Grid.CellSize),
-                    Symbol = "$",
-                    SymbolColor = Color.White
-                };
-                Vector2 position = freeTiles[spaceComponents.random.Next(0, freeTiles.Count)];
-                freeTiles.Remove(position);
-                spaceComponents.PositionComponents[id] = new PositionComponent() { Position = position };
-                spaceComponents.OutlineComponents[id] = new OutlineComponent() { Color = Color.Purple, Opacity = 1f };
-                spaceComponents.SecondaryOutlineComponents[id] = new SecondaryOutlineComponent() { AlternateColor = Color.LightBlue, Seconds = 0f, SwitchAtSeconds = .75f };
-                spaceComponents.PickupComponents[id] = new PickupComponent() { PickupType = ItemType.GOLD };
-                spaceComponents.ValueComponents[id] = new ValueComponent() { Gold = stateSpaceComponents.random.Next(0,231) };
-                spaceComponents.NameComponents[id] = new NameComponent()
-                {
-                    Name = "Gold",
-                    Description = "Some people try and use fancy names for this mass of wealth. Credits, Stardust, Gil... it buys shelter and women all the same."
-                };
-                spaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = false };
-            }
-
-            for (int i = 0; i < 50; i++)
-            {
-                Guid id = spaceComponents.CreateEntity();
-                spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem | ComponentMasks.Consumable;
-                spaceComponents.DisplayComponents[id] = new DisplayComponent()
-                {
-                    AlwaysDraw = false,
-                    Color = Colors.Messages.LootPickup,
-                    Opacity = 1f,
-                    Origin = Vector2.Zero,
-                    Rotation = 0f,
-                    Scale = 1f,
-                    SpriteEffect = SpriteEffects.None,
-                    SpriteSource = new Rectangle(0 * DevConstants.Grid.CellSize, 0 * DevConstants.Grid.CellSize, DevConstants.Grid.CellSize, DevConstants.Grid.CellSize),
-                    Symbol = "!",
-                    SymbolColor = Color.White
-                };
-                Vector2 position = freeTiles[spaceComponents.random.Next(0, freeTiles.Count)];
-                freeTiles.Remove(position);
-                spaceComponents.PositionComponents[id] = new PositionComponent() { Position = position };
-                spaceComponents.OutlineComponents[id] = new OutlineComponent() { Color = Color.Purple, Opacity = 1f };
-                spaceComponents.SecondaryOutlineComponents[id] = new SecondaryOutlineComponent() { AlternateColor = Color.LightBlue, Seconds = 0f, SwitchAtSeconds = .75f };
-                spaceComponents.PickupComponents[id] = new PickupComponent() { PickupType = ItemType.CONSUMABLE };
-                spaceComponents.ValueComponents[id] = new ValueComponent() { Gold = stateSpaceComponents.random.Next(0, 231) };
-                spaceComponents.NameComponents[id] = new NameComponent()
-                {
-                    Name = "Test Potion",
-                    Description = "It is... green."
-                };
-                spaceComponents.ItemFunctionsComponents[id] = new ItemFunctionsComponent() { Ranged = false, UseFunctionValue = ItemUseFunctions.TESTUSE };
-                spaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = false };
-            }
-        }
 
         #region Update Logic
         public IStateSpace UpdateSpace(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, ref GameSettings gameSettings)
