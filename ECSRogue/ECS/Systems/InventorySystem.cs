@@ -34,10 +34,23 @@ namespace ECSRogue.ECS.Systems
             Func<StateSpaceComponents, DungeonTile[,], Vector2, Guid, Guid, Vector2, bool> useFunction = ItemUseFunctionLookup.GetUseFunction(itemInfo.UseFunctionValue);
             if (!cancelledCast && useFunction!= null && useFunction(spaceComponents, dungeonGrid, dungeonDimensions, item, user, target))
             {
-                InventoryComponent inventory = spaceComponents.InventoryComponents[user];
-                inventory.Consumables.Remove(item);
-                spaceComponents.InventoryComponents[user] = inventory;
-                spaceComponents.EntitiesToDelete.Add(item);
+                NameComponent itemName = spaceComponents.NameComponents[item];
+                itemInfo.Uses -= 1;
+                //If the items' out of uses, remove it
+                if(itemInfo.Uses <= 0)
+                {
+                    InventoryComponent inventory = spaceComponents.InventoryComponents[user];
+                    inventory.Consumables.Remove(item);
+                    spaceComponents.InventoryComponents[user] = inventory;
+                    spaceComponents.EntitiesToDelete.Add(item);
+                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Bad, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + "{0} has used the last of the {1}", spaceComponents.NameComponents[user].Name, spaceComponents.NameComponents[item].Name)));
+                }
+                //otherwise, just report how many uses it has left.
+                else
+                {
+                    spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Bad, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + "{0} has {1} charge(s) left.", spaceComponents.NameComponents[item].Name, itemInfo.Uses)));
+                }
+                spaceComponents.ItemFunctionsComponents[item] = itemInfo;
             }
         }
 
@@ -102,7 +115,7 @@ namespace ECSRogue.ECS.Systems
                                         spaceComponents.SkillLevelsComponents[collidingEntity] = skills;
                                         if(dungeongrid[(int)collidingEntityPosition.Position.X, (int)collidingEntityPosition.Position.Y].InRange)
                                         {
-                                            spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format("{0} picked up {1} gold.", collidingEntityName.Name, itemValue.Gold)));
+                                            spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + " { 0} picked up {1} gold.", collidingEntityName.Name, itemValue.Gold)));
                                         }
                                         spaceComponents.EntitiesToDelete.Add(collidedEntity);
                                     }
@@ -117,13 +130,13 @@ namespace ECSRogue.ECS.Systems
                                         if(dungeongrid[(int)collidingEntityPosition.Position.X, (int)collidingEntityPosition.Position.Y].InRange && collidingEntityMessages.PickupItemMessages.Length > 0)
                                         {
                                             spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.LootPickup,
-                                                string.Format(collidingEntityMessages.PickupItemMessages[spaceComponents.random.Next(0, collidingEntityMessages.PickupItemMessages.Length)], collidingEntityName.Name, itemName.Name)));
+                                                string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + collidingEntityMessages.PickupItemMessages[spaceComponents.random.Next(0, collidingEntityMessages.PickupItemMessages.Length)], collidingEntityName.Name, itemName.Name)));
                                         }
                                     }
                                     //If it can't fit in, and the entity has a message for the situation, display it.
                                     else if(spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages != null && spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages.Length > 0)
                                     {
-                                        spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Bad, spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages[spaceComponents.random.Next(0, spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages.Length)]));
+                                        spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Bad, "[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " +  spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages[spaceComponents.random.Next(0, spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages.Length)]));
                                     }
                                     break;
                                 case ItemType.ARTIFACT:
@@ -136,13 +149,13 @@ namespace ECSRogue.ECS.Systems
                                         if (dungeongrid[(int)collidingEntityPosition.Position.X, (int)collidingEntityPosition.Position.Y].InRange && collidingEntityMessages.PickupItemMessages.Length > 0)
                                         {
                                             spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.LootPickup,
-                                                string.Format(collidingEntityMessages.PickupItemMessages[spaceComponents.random.Next(0, collidingEntityMessages.PickupItemMessages.Length)], collidingEntityName.Name, itemName.Name)));
+                                                string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + collidingEntityMessages.PickupItemMessages[spaceComponents.random.Next(0, collidingEntityMessages.PickupItemMessages.Length)], collidingEntityName.Name, itemName.Name)));
                                         }
                                     }
                                     //If it can't fit in, and the entity has a message for the situation, display it.
                                     else if (spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages != null && spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages.Length > 0)
                                     {
-                                        spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Bad, spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages[spaceComponents.random.Next(0, spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages.Length)]));
+                                        spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Bad, "[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages[spaceComponents.random.Next(0, spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages.Length)]));
                                     }
                                     break;
                             }
