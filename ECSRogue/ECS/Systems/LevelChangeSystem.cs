@@ -32,7 +32,6 @@ namespace ECSRogue.ECS.Systems
                 {
                     CurrentHealth = 100,
                     Health = 100,
-                    Power = 10,
                     Defense = 50,
                     Accuracy = 100,
                     Wealth = 0

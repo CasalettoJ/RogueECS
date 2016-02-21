@@ -190,47 +190,47 @@ namespace ECSRogue.ECS.Systems
                         if (pos.Position == observerPosition.Position && dungeonGrid[(int)observerPosition.Position.X, (int)observerPosition.Position.Y].InRange)
                         {
                             StatModificationComponent stats = spaceComponents.StatModificationComponents[id];
-                            observersFindings.Add(new Tuple<Color, string>(Colors.Messages.Good, "This artifact affects the following stats: "));
+                            observersFindings.Add(new Tuple<Color, string>(Colors.Messages.Normal, "This artifact affects the following stats: "));
                             if(stats.AccuracyChange != 0)
                             {
                                 string sign = stats.AccuracyChange > 0 ? "+" : string.Empty;
-                                Color color = stats.AccuracyChange > 0 ? Colors.Messages.Normal : Colors.Messages.Bad;
+                                Color color = stats.AccuracyChange > 0 ? Colors.Messages.Good : Colors.Messages.Bad;
                                 observersFindings.Add(new Tuple<Color, string>(color, string.Format("Accuracy {0}{1}", sign, stats.AccuracyChange)));
                             }
                             if (stats.DefenseChange != 0)
                             {
                                 string sign = stats.DefenseChange > 0 ? "+" : string.Empty;
-                                Color color = stats.DefenseChange > 0 ? Colors.Messages.Normal : Colors.Messages.Bad;
+                                Color color = stats.DefenseChange > 0 ? Colors.Messages.Good : Colors.Messages.Bad;
                                 observersFindings.Add(new Tuple<Color, string>(color, string.Format("Defense {0}{1}", sign, stats.DefenseChange)));
                             }
                             if (stats.HealthChange != 0)
                             {
                                 string sign = stats.HealthChange > 0 ? "+" : string.Empty;
-                                Color color = stats.HealthChange > 0 ? Colors.Messages.Normal : Colors.Messages.Bad;
+                                Color color = stats.HealthChange > 0 ? Colors.Messages.Good : Colors.Messages.Bad;
                                 observersFindings.Add(new Tuple<Color, string>(color, string.Format("Maximum Health {0}{1}", sign, stats.HealthChange)));
                             }
                             if (stats.PowerChange != 0)
                             {
                                 string sign = stats.PowerChange > 0 ? "+" : string.Empty;
-                                Color color = stats.PowerChange > 0 ? Colors.Messages.Normal : Colors.Messages.Bad;
+                                Color color = stats.PowerChange > 0 ? Colors.Messages.Good : Colors.Messages.Bad;
                                 observersFindings.Add(new Tuple<Color, string>(color, string.Format("Power {0}{1}", sign, stats.PowerChange)));
                             }
                             if (stats.DieNumberChange != 0)
                             {
                                 string sign = stats.DieNumberChange > 0 ? "+" : string.Empty;
-                                Color color = stats.DieNumberChange > 0 ? Colors.Messages.Normal : Colors.Messages.Bad;
+                                Color color = stats.DieNumberChange > 0 ? Colors.Messages.Good : Colors.Messages.Bad;
                                 observersFindings.Add(new Tuple<Color, string>(color, string.Format("Dice Number on Attack {0}{1}", sign, stats.DieNumberChange)));
                             }
                             if (stats.MinimumDamageChange != 0)
                             {
                                 string sign = stats.MinimumDamageChange > 0 ? "+" : string.Empty;
-                                Color color = stats.MinimumDamageChange < 0 ? Colors.Messages.Normal : Colors.Messages.Bad;
+                                Color color = stats.MinimumDamageChange > 0 ? Colors.Messages.Good : Colors.Messages.Bad;
                                 observersFindings.Add(new Tuple<Color, string>(color, string.Format("Minimum Damage {0}{1}", sign, stats.MinimumDamageChange)));
                             }
                             if (stats.MaximumDamageChange != 0)
                             {
                                 string sign = stats.MaximumDamageChange > 0 ? "+" : string.Empty;
-                                Color color = stats.MaximumDamageChange > 0 ? Colors.Messages.Normal : Colors.Messages.Bad;
+                                Color color = stats.MaximumDamageChange > 0 ? Colors.Messages.Good : Colors.Messages.Bad;
                                 observersFindings.Add(new Tuple<Color, string>(color, string.Format("Maximum Damage {0}{1}", sign, stats.MaximumDamageChange)));
                             }
                         }

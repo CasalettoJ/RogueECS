@@ -47,7 +47,6 @@ namespace ECSRogue.BaseEngine.StateSpaces
             dungeonDimensions = dungeonGeneration.GenerateDungeon(ref dungeonGrid, worldMin, worldMax, stateSpaceComponents.random, freeTiles);
             dungeonSpriteFile = dungeonGeneration.GetDungeonSpritesheetFileName();
             dungeonColorInfo = dungeonGeneration.GetColorInfo();
-            LevelChangeSystem.CreateMessageLog(stateSpaceComponents);
         }
 
         public RandomlyGeneratedStateSpace(DungeonInfo data)
@@ -82,6 +81,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 #endregion
                 MonsterCreationSystem.CreateDungeonMonsters(stateSpaceComponents, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, freeTiles);
                 LevelChangeSystem.LoadPlayerSkillset(stateComponents, stateSpaceComponents);
+                LevelChangeSystem.CreateMessageLog(stateSpaceComponents);
             }
             mapToPlayer = new DijkstraMapTile[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
         }

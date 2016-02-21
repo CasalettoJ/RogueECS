@@ -30,7 +30,7 @@ namespace ECSRogue.BaseEngine
         public static class Messages
         {
             public static readonly Color Normal = Color.White;
-            public static readonly Color LootPickup = new Color(80, 58, 150);
+            public static readonly Color LootPickup = new Color(156, 1, 114);
             public static readonly Color Good = new Color(9, 125, 9);
             public static readonly Color Bad = new Color(191, 32, 32);
             public static readonly Color StatusChange = Color.OrangeRed;

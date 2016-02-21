@@ -60,10 +60,9 @@ namespace ECSRogue.ECS.Systems
                 SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
                 statsToPrint.Add(System.Environment.NewLine);
                 statsToPrint.Add(string.Format("Health:  {0} / {1}", skills.CurrentHealth, skills.Health));
-                statsToPrint.Add(string.Format("Hunger:  {0} / {1}", skills.CurrentHunger, skills.Hunger));
                 statsToPrint.Add(string.Format("Wealth: {0}", skills.Wealth));
                 statsToPrint.Add(System.Environment.NewLine);
-                statsToPrint.Add(string.Format("Power: {0}", skills.Power));
+                statsToPrint.Add(string.Format("Damage: {0}-{1}", skills.MinimumDamage, skills.MaximumDamage));
                 statsToPrint.Add(string.Format("Accuracy: {0}", skills.Accuracy));
                 statsToPrint.Add(string.Format("Defense: {0}", skills.Defense));
             }

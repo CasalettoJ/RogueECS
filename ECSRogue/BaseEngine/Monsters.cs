@@ -87,7 +87,7 @@ namespace ECSRogue.BaseEngine
             //Set Display
             stateSpaceComponents.DisplayComponents[id] = new DisplayComponent()
             {
-                Color = Color.Wheat,
+                Color = Color.White,
                 SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize),
                 Origin = Vector2.Zero,
                 SpriteEffect = SpriteEffects.None,
@@ -192,7 +192,7 @@ namespace ECSRogue.BaseEngine
                 SymbolColor = Color.White,
                 Opacity = 1f
             };
-            spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 25, DieNumber = 1, Health = 25, Power = 5, Defense = 1, Accuracy = 100, Wealth = 25, MinimumDamage = 1, MaximumDamage = 2 };
+            spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 25, DieNumber = 1, Health = 25, Defense = 1, Accuracy = 100, Wealth = 25, MinimumDamage = 1, MaximumDamage = 2 };
             spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
             spaceComponents.NameComponents[id] = new NameComponent() { Name = "TEST ENEMY NPC", Description = "It seems harmless enough.  How dangerous could a red square be?" };
             spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
@@ -271,7 +271,7 @@ namespace ECSRogue.BaseEngine
                 SymbolColor = Color.White,
                 Opacity = 1f
             };
-            spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 45, DieNumber = 2, Health = 45, Power = 5, Defense = 10, Accuracy = 135, Wealth = 25, MinimumDamage = 5, MaximumDamage = 14 };
+            spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 45, DieNumber = 2, Health = 45, Defense = 10, Accuracy = 135, Wealth = 25, MinimumDamage = 5, MaximumDamage = 14 };
             spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
             spaceComponents.NameComponents[id] = new NameComponent() { Name = "WILD ROOTS", Description = "Imported fresh from Japan." };
             spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };

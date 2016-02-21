@@ -21,7 +21,7 @@ namespace ECSRogue.ECS.Systems
 {
     public static class InventorySystem
     {
-        public static void UseItem(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions,List<Vector2> freeTiles, Guid item, Guid user)
+        public static void UseItem(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, Guid item, Guid user)
         {
             ItemFunctionsComponent itemInfo = spaceComponents.ItemFunctionsComponents[item];
             Vector2 target = spaceComponents.PositionComponents[user].Position;
@@ -31,8 +31,8 @@ namespace ECSRogue.ECS.Systems
                 //Call a function to get the target position.  If they cancel during this part, set cancelledCast to true.
             }
             //If the item use is successful, remove the item from inventory and delete the item
-            Func<StateSpaceComponents, DungeonTile[,], Vector2, List<Vector2>, Guid, Guid, Vector2, bool> useFunction = ItemUseFunctionLookup.GetUseFunction(itemInfo.UseFunctionValue);
-            if (!cancelledCast && useFunction!= null && useFunction(spaceComponents, dungeonGrid, dungeonDimensions, freeTiles, item, user, target))
+            Func<StateSpaceComponents, DungeonTile[,], Vector2, Guid, Guid, Vector2, bool> useFunction = ItemUseFunctionLookup.GetUseFunction(itemInfo.UseFunctionValue);
+            if (!cancelledCast && useFunction!= null && useFunction(spaceComponents, dungeonGrid, dungeonDimensions, item, user, target))
             {
                 InventoryComponent inventory = spaceComponents.InventoryComponents[user];
                 inventory.Consumables.Remove(item);
@@ -41,6 +41,10 @@ namespace ECSRogue.ECS.Systems
             }
         }
 
+        public static void ApplyStatModifications(StateSpaceComponents spaceComponents)
+        {
+
+        }
 
         public static void TryPickupItems(StateSpaceComponents spaceComponents, DungeonTile[,] dungeongrid)
         {
@@ -55,6 +59,7 @@ namespace ECSRogue.ECS.Systems
                     InventoryComponent collidingEntityInventory = spaceComponents.InventoryComponents[collidingEntity];
                     NameComponent collidingEntityName = spaceComponents.NameComponents[collidingEntity];
                     PositionComponent collidingEntityPosition = spaceComponents.PositionComponents[collidingEntity];
+                    EntityMessageComponent collidingEntityMessages = spaceComponents.EntityMessageComponents[collidingEntity];
                     foreach(Guid collidedEntity in collidingEntityCollisions.CollidedObjects)
                     {
                         //Check to see if the collidedEntity is a pickup item, if it is, try to place it in the inventory if it fits.
@@ -64,6 +69,7 @@ namespace ECSRogue.ECS.Systems
                         {
                             PickupComponent itemPickup = spaceComponents.PickupComponents[collidedEntity];
                             ValueComponent itemValue = spaceComponents.ValueComponents[collidedEntity];
+                            NameComponent itemName = spaceComponents.NameComponents[collidedEntity];
                             switch(itemPickup.PickupType)
                             {
                                 case ItemType.GOLD:
@@ -86,6 +92,11 @@ namespace ECSRogue.ECS.Systems
                                         //Remove the position component flag and add the guid to the inventory of the entity
                                         collided.ComponentFlags &= ~Component.COMPONENT_POSITION;
                                         collidingEntityInventory.Consumables.Add(collided.Id);
+                                        if(dungeongrid[(int)collidingEntityPosition.Position.X, (int)collidingEntityPosition.Position.Y].InRange && collidingEntityMessages.PickupItemMessages.Length > 0)
+                                        {
+                                            spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.LootPickup,
+                                                string.Format(collidingEntityMessages.PickupItemMessages[spaceComponents.random.Next(0, collidingEntityMessages.PickupItemMessages.Length)], collidingEntityName.Name, itemName.Name)));
+                                        }
                                     }
                                     //If it can't fit in, and the entity has a message for the situation, display it.
                                     else if(spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages != null && spaceComponents.EntityMessageComponents[collidingEntity].ConsumablesFullMessages.Length > 0)
@@ -100,6 +111,11 @@ namespace ECSRogue.ECS.Systems
                                         //Remove the position component flag and add the guid to the inventory of the entity
                                         collided.ComponentFlags &= ~Component.COMPONENT_POSITION;
                                         collidingEntityInventory.Artifacts.Add(collided.Id);
+                                        if (dungeongrid[(int)collidingEntityPosition.Position.X, (int)collidingEntityPosition.Position.Y].InRange && collidingEntityMessages.PickupItemMessages.Length > 0)
+                                        {
+                                            spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.LootPickup,
+                                                string.Format(collidingEntityMessages.PickupItemMessages[spaceComponents.random.Next(0, collidingEntityMessages.PickupItemMessages.Length)], collidingEntityName.Name, itemName.Name)));
+                                        }
                                     }
                                     //If it can't fit in, and the entity has a message for the situation, display it.
                                     else if (spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages != null && spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages.Length > 0)
