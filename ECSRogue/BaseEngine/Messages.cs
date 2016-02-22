@@ -17,6 +17,15 @@ namespace ECSRogue.BaseEngine
             public static readonly string Rock = "Impenetrable rock that has hardened over thousands of years.";
         }
 
+        public static readonly string InventoryHeader = "MY TREASURE HOARD";
+        public static readonly string InventoryConsumables = "CONSUMABLE TREASURES";
+        public static readonly string InventoryArtifacts = "ARTIFACT TREASURES";
+        public static readonly string Use = "[U]SE";
+        public static readonly string Throw = "[T]HROW";
+        public static readonly string Drop = "DR[O]P";
+        public static readonly string Scrap = "[S]CRAP";
+        public static readonly string Upgrade = "[U]PGRADE";
+
         public static readonly string[] WallCollisionMessages =
         {
             "You run face-first into a wall.",

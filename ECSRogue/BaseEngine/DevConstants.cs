@@ -11,6 +11,8 @@ namespace ECSRogue.BaseEngine
         {
             public static readonly string SpriteSheet = "Sprites/Ball2";
             public static readonly string MessageFont = "Fonts/InfoText";
+            public static readonly string OptionFont = "Fonts/OptionText";
+            public static readonly string TitleText = "Fonts/TitleText";
             public static readonly string AsciiFont = "Fonts/DisplayText";
             public static readonly string UISheet = "Sprites/Ball2";
             public static readonly string CavesSpriteSheet = "Sprites/Ball2";

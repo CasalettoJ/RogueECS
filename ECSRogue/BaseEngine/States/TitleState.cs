@@ -58,8 +58,8 @@ namespace ECSRogue.BaseEngine.States
             PrevGamepadState = gamePadState;
             PrevKeyboardState = keyboardState;
             StateComponents = new StateComponents();
-            titleText = content.Load<SpriteFont>("Fonts/TitleText");
-            optionText = content.Load<SpriteFont>("Fonts/OptionText");
+            titleText = content.Load<SpriteFont>(DevConstants.Graphics.TitleText);
+            optionText = content.Load<SpriteFont>(DevConstants.Graphics.OptionFont);
             optionSelection = 0;
             menuOptions = new Option[optionsAmount];
             Title = "PLACEHOLDER TITLE";

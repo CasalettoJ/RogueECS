@@ -149,7 +149,7 @@ namespace ECSRogue.BaseEngine
                 Name = "Test Potion",
                 Description = "It is... green."
             };
-            spaceComponents.ItemFunctionsComponents[id] = new ItemFunctionsComponent() { Ranged = false, UseFunctionValue = ItemUseFunctions.TESTUSE, Uses = 3 };
+            spaceComponents.ItemFunctionsComponents[id] = new ItemFunctionsComponent() { Ranged = false, UseFunctionValue = ItemUseFunctions.TESTUSE, Uses = 3, CostToUse = 20 };
             spaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = false };
             return true;
         }

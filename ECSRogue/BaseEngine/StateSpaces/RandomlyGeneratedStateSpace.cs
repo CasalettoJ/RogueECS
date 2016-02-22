@@ -31,12 +31,14 @@ namespace ECSRogue.BaseEngine.StateSpaces
         private Texture2D UI;
         private SpriteFont messageFont;
         private SpriteFont asciiDisplay;
+        private SpriteFont optionFont;
         private Vector2 dungeonDimensions;
         private DungeonTile[,] dungeonGrid = null;
         private List<Vector2> freeTiles;
         private string dungeonSpriteFile;
         private DungeonColorInfo dungeonColorInfo;
         private DijkstraMapTile[,] mapToPlayer;
+        private bool showInventory = false;
         #endregion
 
         #region Constructors
@@ -71,6 +73,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             dungeonSprites = content.Load<Texture2D>(dungeonSpriteFile);
             messageFont = content.Load<SpriteFont>(DevConstants.Graphics.MessageFont);
             asciiDisplay = content.Load<SpriteFont>(DevConstants.Graphics.AsciiFont);
+            optionFont = content.Load<SpriteFont>(DevConstants.Graphics.OptionFont);
             UI = content.Load<Texture2D>(DevConstants.Graphics.UISheet);
             camera.AttachedToPlayer = true;
             if(createEntities)
@@ -97,50 +100,65 @@ namespace ECSRogue.BaseEngine.StateSpaces
             }
             #endregion
 
-            //Deletion and Cleanup
-            if (stateSpaceComponents.EntitiesToDelete.Count > 0)
+            //Toggle Inventory Menu
+            if (Keyboard.GetState().IsKeyDown(Keys.I) && prevKeyboardState.IsKeyUp(Keys.I))
             {
-                foreach(Guid entity in stateSpaceComponents.EntitiesToDelete)
+                showInventory = !showInventory;
+            }
+
+            //Actions to complete if the inventory is open
+            if(showInventory)
+            {
+                InventorySystem.HandleInventoryInput(stateSpaceComponents, gameTime, prevKeyboardState, Keyboard.GetState());
+            }
+            //Actions to complete if inventory is not open
+            else
+            {
+                //Deletion and Cleanup
+                if (stateSpaceComponents.EntitiesToDelete.Count > 0)
                 {
-                    stateSpaceComponents.DestroyEntity(entity);
+                    foreach (Guid entity in stateSpaceComponents.EntitiesToDelete)
+                    {
+                        stateSpaceComponents.DestroyEntity(entity);
+                    }
+                    stateSpaceComponents.EntitiesToDelete.Clear();
                 }
-                stateSpaceComponents.EntitiesToDelete.Clear();
+                DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
+
+                //Non-turn-based
+                AnimationSystem.UpdateFovColors(stateSpaceComponents, gameTime);
+                AnimationSystem.UpdateOutlineColors(stateSpaceComponents, gameTime);
+                MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
+                MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
+
+                //Movement and Reaction
+                InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, dungeonDimensions);
+                CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
+                TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
+                TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
+                MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
+                DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
+
+                //AI and Combat
+                AISystem.AICheckDetection(stateSpaceComponents);
+                AISystem.AIMovement(stateSpaceComponents, dungeonGrid, dungeonDimensions, mapToPlayer);
+                InventorySystem.TryPickupItems(stateSpaceComponents, dungeonGrid);
+                AISystem.AIUpdateVision(stateSpaceComponents, dungeonGrid, dungeonDimensions);
+                CombatSystem.HandleMeleeCombat(stateSpaceComponents, DevConstants.Grid.CellSize);
+                AISystem.AICheckFleeing(stateSpaceComponents);
+                CombatSystem.RegenerateHealth(stateSpaceComponents);
+
+                //Resetting Systems
+                if (stateSpaceComponents.PlayerComponent.PlayerJustLoaded || stateSpaceComponents.PlayerComponent.PlayerTookTurn)
+                {
+                    PlayerComponent player = stateSpaceComponents.PlayerComponent;
+                    player.PlayerJustLoaded = false;
+                    player.PlayerTookTurn = false;
+                    stateSpaceComponents.PlayerComponent = player;
+                }
+                CollisionSystem.ResetCollision(stateSpaceComponents);
+                stateSpaceComponents.InvokeDelayedActions();
             }
-            DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
-
-            //Non-turn-based
-            AnimationSystem.UpdateFovColors(stateSpaceComponents, gameTime);
-            AnimationSystem.UpdateOutlineColors(stateSpaceComponents, gameTime);
-            MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
-            MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
-
-            //Movement and Reaction
-            InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, dungeonDimensions);
-            CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
-            TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
-            TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
-            MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
-            DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
-
-            //AI and Combat
-            AISystem.AICheckDetection(stateSpaceComponents);
-            AISystem.AIMovement(stateSpaceComponents, dungeonGrid, dungeonDimensions, mapToPlayer);
-            InventorySystem.TryPickupItems(stateSpaceComponents, dungeonGrid);
-            AISystem.AIUpdateVision(stateSpaceComponents, dungeonGrid, dungeonDimensions);
-            CombatSystem.HandleMeleeCombat(stateSpaceComponents, DevConstants.Grid.CellSize);
-            AISystem.AICheckFleeing(stateSpaceComponents);
-            CombatSystem.RegenerateHealth(stateSpaceComponents);
-
-            //Resetting Systems
-            if (stateSpaceComponents.PlayerComponent.PlayerJustLoaded || stateSpaceComponents.PlayerComponent.PlayerTookTurn)
-            {
-                PlayerComponent player = stateSpaceComponents.PlayerComponent;
-                player.PlayerJustLoaded = false;
-                player.PlayerTookTurn = false;
-                stateSpaceComponents.PlayerComponent = player;
-            }
-            CollisionSystem.ResetCollision(stateSpaceComponents);
-            stateSpaceComponents.InvokeDelayedActions();
             return nextStateSpace;
         }  
         #endregion
@@ -160,34 +178,24 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
         {
-            #region Debug Items
-            InventoryComponent playerInvo = stateSpaceComponents.InventoryComponents[stateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id];
-            spriteBatch.DrawString(messageFont, "DEBUG INVENTORY INFO", Vector2.Zero, Color.CornflowerBlue);
-            spriteBatch.DrawString(messageFont, "ARTIFACTS:", new Vector2(0, 20), Color.CornflowerBlue);
-            int number = 0;
-            foreach(Guid item in playerInvo.Artifacts)
+            if(showInventory)
             {
-                spriteBatch.DrawString(messageFont, stateSpaceComponents.NameComponents[item].Name, new Vector2(0, 40 + (20 * number)), Color.NavajoWhite);
-                number++;
+                InventorySystem.ShowInventoryMenu(stateSpaceComponents, spriteBatch, camera, messageFont, optionFont, UI);
             }
-            spriteBatch.DrawString(messageFont, "CONSUMABLES (q and e to use): ", new Vector2(0, 60 + (20 * number)), Color.CornflowerBlue);
-            number++;
-            foreach (Guid item in playerInvo.Consumables)
+            //Don't show observer findings if the inventory screen is open
+            else
             {
-                spriteBatch.DrawString(messageFont, stateSpaceComponents.NameComponents[item].Name, new Vector2(0, 60 + (20 * number)), Color.NavajoWhite);
-                number++;
+                ObserverSystem.PrintObserversFindings(stateSpaceComponents, messageFont, spriteBatch, dungeonGrid, camera, UI);
+                spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.Black);
+                //spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .3f);
+                //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewport.Bounds.X, camera.DungeonUIViewport.Bounds.Y), new Point(camera.DungeonUIViewport.Bounds.Width, 3)), Color.DarkSlateBlue);
+                //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewport.Bounds.X, camera.DungeonUIViewport.Bounds.Y+5), new Point(camera.DungeonUIViewport.Bounds.Width, camera.DungeonUIViewport.Bounds.Height - 5)), Color.DarkSlateBlue * .3f);
+                spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.Black);
+                //spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.DarkOrange * .15f);
+                //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewportLeft.Bounds.X, camera.DungeonUIViewportLeft.Bounds.Y), new Point(3, camera.DungeonUIViewportLeft.Bounds.Height - camera.DungeonUIViewport.Bounds.Height + 3)), Color.DarkSlateBlue);
+                //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewportLeft.Bounds.X, camera.DungeonUIViewportLeft.Bounds.Y), new Point(camera.DungeonUIViewportLeft.Bounds.Width, camera.DungeonUIViewportLeft.Bounds.Height)), Color.DarkSlateBlue * .3f);
+                MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont);
             }
-            #endregion
-            ObserverSystem.PrintObserversFindings(stateSpaceComponents, messageFont, spriteBatch, dungeonGrid, camera, UI);
-            spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.Black);
-            //spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .3f);
-            //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewport.Bounds.X, camera.DungeonUIViewport.Bounds.Y), new Point(camera.DungeonUIViewport.Bounds.Width, 3)), Color.DarkSlateBlue);
-            //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewport.Bounds.X, camera.DungeonUIViewport.Bounds.Y+5), new Point(camera.DungeonUIViewport.Bounds.Width, camera.DungeonUIViewport.Bounds.Height - 5)), Color.DarkSlateBlue * .3f);
-            spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.Black);
-            //spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.DarkOrange * .15f);
-            //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewportLeft.Bounds.X, camera.DungeonUIViewportLeft.Bounds.Y), new Point(3, camera.DungeonUIViewportLeft.Bounds.Height - camera.DungeonUIViewport.Bounds.Height + 3)), Color.DarkSlateBlue);
-            //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewportLeft.Bounds.X, camera.DungeonUIViewportLeft.Bounds.Y), new Point(camera.DungeonUIViewportLeft.Bounds.Width, camera.DungeonUIViewportLeft.Bounds.Height)), Color.DarkSlateBlue * .3f);
-            MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont);
         }
         #endregion
 

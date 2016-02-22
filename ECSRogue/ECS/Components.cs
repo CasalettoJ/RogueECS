@@ -147,6 +147,7 @@ namespace ECSRogue.ECS
         public GameMessageComponent GameMessageComponent { get; set; }
         public GameplayInfoComponent GameplayInfoComponent { get; set; }
         public GlobalCollisionComponent GlobalCollisionComponent { get; set; }
+        public InventoryMenuComponent InventoryMenuComponent { get; set; }
         public Random random { get; private set; }
 
         public StateSpaceComponents()
@@ -189,6 +190,7 @@ namespace ECSRogue.ECS
             PlayerComponent = new PlayerComponent();
             GameMessageComponent = new GameMessageComponent();
             GameplayInfoComponent = new GameplayInfoComponent();
+            InventoryMenuComponent = new InventoryMenuComponent();
             DelayedActions = new List<Action>();
             random = new Random();
         }

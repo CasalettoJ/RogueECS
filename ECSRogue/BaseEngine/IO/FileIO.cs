@@ -115,11 +115,11 @@ namespace ECSRogue.BaseEngine.IO
             Directory.CreateDirectory(FileNames.ErrorDirectory);
             if(!File.Exists(FileNames.ErrorFile))
             {
-                File.WriteAllText(FileNames.ErrorFile, "=======================================================" + System.Environment.NewLine);
+                File.WriteAllText(FileNames.ErrorFile, System.Environment.NewLine + "=======================================================" + System.Environment.NewLine);
             }
             else
             {
-                File.AppendAllText(FileNames.ErrorFile, "=======================================================" + System.Environment.NewLine);
+                File.AppendAllText(FileNames.ErrorFile, System.Environment.NewLine + " =======================================================" + System.Environment.NewLine);
             }
 
             File.AppendAllText(FileNames.ErrorFile, string.Format("Date/Time: {0}" + System.Environment.NewLine, DateTime.UtcNow));

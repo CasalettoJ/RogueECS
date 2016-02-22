@@ -10,6 +10,7 @@ namespace ECSRogue.ECS.Components.ItemizationComponents
 {
     public struct ItemFunctionsComponent
     {
+        public int CostToUse;
         public int Uses;
         public bool Ranged;
         public ItemUseFunctions UseFunctionValue; 
