@@ -66,13 +66,16 @@ namespace ECSRogue.ECS
         public const Component Collidable = Component.COMPONENT_POSITION | Component.COMPONENT_COLLISION;
         public const Component InputMoveable = Component.COMPONENT_POSITION | Component.COMPONENT_INPUTMOVEMENT;
 
-        //Items
-        public const Component PickupItem = Component.COMPONENT_PICKUP | Component.COMPONENT_VALUE | Component.COMPONENT_NAME | Component.COMPONENT_COLLISION;
+        //Observer
+        public const Component Observable = Component.COMPONENT_POSITION | Component.COMPONENT_NAME;
         public const Component ObservableItem = Component.COMPONENT_POSITION | Component.COMPONENT_NAME | Component.COMPONENT_PICKUP;
         public const Component ObservableSkillModifications = Component.COMPONENT_POSITION | Component.COMPONENT_STAT_MODIFICATION;
         public const Component ObservableValue = Component.COMPONENT_POSITION | Component.COMPONENT_VALUE;
+        public const Component ObservableUsage = Component.COMPONENT_POSITION | Component.COMPONENT_ITEM_FUNCTIONS;
+        public const Component ObservableAI = Component.COMPONENT_POSITION | Component.COMPONENT_NAME | ComponentMasks.CombatReadyAI;
 
         //Inventory
+        public const Component PickupItem = Component.COMPONENT_PICKUP | Component.COMPONENT_VALUE | Component.COMPONENT_NAME | Component.COMPONENT_COLLISION;
         public const Component Consumable = ComponentMasks.PickupItem | Component.COMPONENT_ITEM_FUNCTIONS;
         public const Component Artifact = ComponentMasks.PickupItem | Component.COMPONENT_STAT_MODIFICATION | Component.COMPONENT_PASSIVES;
         public const Component InventoryPickup = Component.COMPONENT_INVENTORY | Component.COMPONENT_ENTITY_MESSAGES | Component.COMPONENT_NAME | Component.COMPONENT_POSITION;
@@ -86,9 +89,6 @@ namespace ECSRogue.ECS
         //Drawable
         public const Component Drawable = Component.COMPONENT_DISPLAY | Component.COMPONENT_POSITION;
         public const Component DrawableLabel = Component.COMPONENT_LABEL | Component.COMPONENT_POSITION;
-        public const Component DrawableAIName = Component.COMPONENT_NAME | Component.COMPONENT_POSITION | Component.COMPONENT_AI_ALIGNMENT;
-        public const Component DrawableAIState = Component.COMPONENT_AI_STATE | Component.COMPONENT_POSITION | Component.COMPONENT_AI_ALIGNMENT;
-        public const Component DrawableSkills = Component.COMPONENT_SKILL_LEVELS | Component.COMPONENT_POSITION | Component.COMPONENT_AI_ALIGNMENT;
         public const Component FOVColorChange = Component.COMPONENT_ALTERNATE_FOV_COLOR | Component.COMPONENT_AI_FIELDOFVIEW;
         public const Component DrawableOutline = Component.COMPONENT_OUTLINE | Component.COMPONENT_POSITION;
 
@@ -147,6 +147,7 @@ namespace ECSRogue.ECS
         public GameMessageComponent GameMessageComponent { get; set; }
         public GameplayInfoComponent GameplayInfoComponent { get; set; }
         public GlobalCollisionComponent GlobalCollisionComponent { get; set; }
+        public ObserverComponent ObserverComponent { get; set; }
         public InventoryMenuComponent InventoryMenuComponent { get; set; }
         public Random random { get; private set; }
 
@@ -190,6 +191,7 @@ namespace ECSRogue.ECS
             PlayerComponent = new PlayerComponent();
             GameMessageComponent = new GameMessageComponent();
             GameplayInfoComponent = new GameplayInfoComponent();
+            ObserverComponent = new ObserverComponent() { Observed = new List<Guid>() };
             InventoryMenuComponent = new InventoryMenuComponent();
             DelayedActions = new List<Action>();
             random = new Random();

@@ -90,14 +90,6 @@ namespace ECSRogue.ECS.Systems
                 //    spaceComponents.SightRadiusComponents[id] = (radius.CurrentRadius > spaceComponents.SightRadiusComponents[id].MaxRadius) ? spaceComponents.SightRadiusComponents[id] : radius;
                 //    movement = true;
                 //}
-                else if (keyState.IsKeyDown(Keys.Enter) && prevKeyboardState.IsKeyUp(Keys.Enter))
-                {
-                    //If observer exists, remove it and add input component to player(s), otherwise, remove input component from all players and create an observer.
-                    if(ObserverSystem.CreateOrDestroyObserver(spaceComponents, pos))
-                    {
-                        break;
-                    }
-                }
                 else
                 {
                     movementComponent.IsButtonDown = false;

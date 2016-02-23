@@ -39,6 +39,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         private DungeonColorInfo dungeonColorInfo;
         private DijkstraMapTile[,] mapToPlayer;
         private bool showInventory = false;
+        private bool showObserver = false;
         #endregion
 
         #region Constructors
@@ -101,17 +102,39 @@ namespace ECSRogue.BaseEngine.StateSpaces
             #endregion
 
             //Toggle Inventory Menu
-            if (Keyboard.GetState().IsKeyDown(Keys.I) && prevKeyboardState.IsKeyUp(Keys.I))
+            if (Keyboard.GetState().IsKeyDown(Keys.I) && prevKeyboardState.IsKeyUp(Keys.I) && !showObserver)
             {
                 showInventory = !showInventory;
             }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Enter) && prevKeyboardState.IsKeyUp(Keys.Enter) && !showInventory)
+            {
+                //If observer exists, remove it and add input component to player(s), otherwise, remove input component from all players and create an observer.
+                if (ObserverSystem.CreateOrDestroyObserver(stateSpaceComponents))
+                {
+                    showObserver = true;
+                }
+                else
+                {
+                    showObserver = false;
+                }
+            }
 
             //Actions to complete if the inventory is open
-            if(showInventory)
+            if (showInventory)
             {
                 InventorySystem.HandleInventoryInput(stateSpaceComponents, gameTime, prevKeyboardState, Keyboard.GetState());
             }
             //Actions to complete if inventory is not open
+            if (showObserver)
+            {
+                ObserverComponent observer = stateSpaceComponents.ObserverComponent;
+                observer.Observed = new List<Guid>();
+                stateSpaceComponents.ObserverComponent = observer;
+                InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, dungeonDimensions);
+                CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
+                ObserverSystem.HandleObserverFindings(stateSpaceComponents, Keyboard.GetState(), prevKeyboardState, dungeonGrid);
+                stateSpaceComponents.InvokeDelayedActions();
+            }
             else
             {
                 //Deletion and Cleanup
@@ -185,7 +208,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             //Don't show observer findings if the inventory screen is open
             else
             {
-                ObserverSystem.PrintObserversFindings(stateSpaceComponents, messageFont, spriteBatch, dungeonGrid, camera, UI);
+                ObserverSystem.PrintObserver(stateSpaceComponents, messageFont, spriteBatch, dungeonGrid, camera, UI);
                 spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.Black);
                 //spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .3f);
                 //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewport.Bounds.X, camera.DungeonUIViewport.Bounds.Y), new Point(camera.DungeonUIViewport.Bounds.Width, 3)), Color.DarkSlateBlue);

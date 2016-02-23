@@ -369,11 +369,11 @@ namespace ECSRogue.ECS.Systems
                         }
                         if(consumableInfo.Ranged)
                         {
-                            centerMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("This is a ranged item.")));
+                            centerMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("This item is cast at a range.")));
                         }
                         else
                         {
-                            centerMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("This item is used at your location.")));
+                            centerMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("This item is used where you stand.")));
                         }
                         break;
                 }

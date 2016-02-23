@@ -91,7 +91,7 @@ namespace ECSRogue.BaseEngine
         public static bool SpawnGold(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, List<Vector2> freeTiles)
         {
             Guid id = spaceComponents.CreateEntity();
-            spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem | ComponentMasks.Consumable;
+            spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem;
             spaceComponents.DisplayComponents[id] = new DisplayComponent()
             {
                 AlwaysDraw = false,

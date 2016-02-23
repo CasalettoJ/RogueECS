@@ -86,6 +86,7 @@
     <Compile Include="ECS\Components\EntityMessageComponent.cs" />
     <Compile Include="ECS\Components\HealthRegenerationComponent.cs" />
     <Compile Include="ECS\Components\NameComponent.cs" />
+    <Compile Include="ECS\Components\ObserverComponent.cs" />
     <Compile Include="ECS\Components\PlayerComponent.cs" />
     <Compile Include="ECS\Components\PositionComponent.cs" />
     <Compile Include="ECS\Components\SightRadiusComponent.cs" />

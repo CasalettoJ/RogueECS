@@ -18,7 +18,7 @@ namespace ECSRogue.ECS.Systems
             IEnumerable<Guid> entities = spaceComponents.GlobalCollisionComponent.EntitiesThatCollided.Distinct();
             foreach (Guid id in entities)
             {
-                Entity collidingObject = spaceComponents.Entities.Where(x => x.Id == id).First();
+                Entity collidingObject = spaceComponents.Entities.Where(x => x.Id == id).FirstOrDefault();
                 if(collidingObject == null || (((collidingObject.ComponentFlags & ComponentMasks.CombatReadyAI) != ComponentMasks.CombatReadyAI) && (collidingObject.ComponentFlags & Component.COMPONENT_PLAYER) != Component.COMPONENT_PLAYER))
                 {
                     //If the colliding object isn't a combat ready AI or a player, don't try to do combat with it.
@@ -26,7 +26,7 @@ namespace ECSRogue.ECS.Systems
                 }
                 foreach(Guid collidedEntity in spaceComponents.CollisionComponents[id].CollidedObjects)
                 {
-                    Entity collidedObject = spaceComponents.Entities.Where(x => x.Id == collidedEntity).First();
+                    Entity collidedObject = spaceComponents.Entities.Where(x => x.Id == collidedEntity).FirstOrDefault();
                     if (collidedObject != null && (((collidedObject.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI) || (collidedObject.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER))
                     {
                         int damageDone = 0;
