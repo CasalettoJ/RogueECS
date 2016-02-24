@@ -190,9 +190,10 @@ namespace ECSRogue.BaseEngine
             spaceComponents.NameComponents[id] = new NameComponent()
             {
                 Name = "Test Artifact",
-                Description = "FORGED IN THE FIREY PITS OF HELL, THIS MESH OF STEEL AND MAGIC HAS ONLY ONE PURPOSE: THE UTTER DECIMATION OF ALL WHO WAGE WAR AGAINST ITS OWNER.  AS YOU EQUIP THIS ITEM YOU FEEL A FORBODING PULSE ALONG YOUR SPINE WHICH RIPPLES OUTWARD INTO EVERY INCH OF YOUR FLESH.  IS IT MADNESS THAT SEEKS A NEW HOME, OR SIMPLY THE GUILT OF DONNING SUCH AN EVIL DEFENSE?"
+                Description = "FORGED IN THE FIERY PITS OF HELL, THIS MESH OF STEEL AND MAGIC HAS ONLY ONE PURPOSE: THE UTTER DECIMATION OF ALL WHO WAGE WAR AGAINST ITS OWNER.  AS YOU EQUIP THIS ITEM YOU FEEL A FORBODING PULSE ALONG YOUR SPINE WHICH RIPPLES OUTWARD INTO EVERY INCH OF YOUR FLESH.  IS IT MADNESS THAT SEEKS A NEW HOME, OR SIMPLY THE GUILT OF DONNING SUCH AN EVIL DEFENSE?"
             };
             spaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = false };
+            spaceComponents.ArtifactStatsComponents[id] = new ArtifactStatsComponent() { UpgradeLevel = 1, FloorFound = spaceComponents.GameplayInfoComponent.FloorsReached };
             return true;
         }
 

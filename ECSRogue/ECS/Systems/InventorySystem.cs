@@ -299,7 +299,7 @@ namespace ECSRogue.ECS.Systems
                 //Draw item selection panel
                 spriteBatch.DrawString(messageFont, string.Format("Wealth: {0}", playerSkills.Wealth), new Vector2(messageSpacing, beginningHeight), Colors.Messages.Special);
                 messageNumberLeft += 2;
-                spriteBatch.DrawString(messageFont, string.Format(Messages.InventoryArtifacts + "({0}/{1})", playerInvo.Artifacts.Count, playerInvo.MaxArtifacts), new Vector2(messageSpacing, beginningHeight + (messageSpacing * messageNumberLeft)), Color.CornflowerBlue);
+                spriteBatch.DrawString(messageFont, string.Format(Messages.InventoryArtifacts + " ({0}/{1})", playerInvo.Artifacts.Count, playerInvo.MaxArtifacts), new Vector2(messageSpacing, beginningHeight + (messageSpacing * messageNumberLeft)), Color.CornflowerBlue);
                 messageNumberLeft += 1;
                 foreach (Guid item in playerInvo.Artifacts)
                 {
@@ -308,7 +308,7 @@ namespace ECSRogue.ECS.Systems
                     spriteBatch.DrawString(messageFont, prepend + spaceComponents.NameComponents[item].Name, new Vector2(messageSpacing, (messageSpacing * messageNumberLeft) + beginningHeight), color);
                     messageNumberLeft += 1;
                 }
-                spriteBatch.DrawString(messageFont, string.Format(Messages.InventoryConsumables + "({0}/{1})", playerInvo.Consumables.Count, playerInvo.MaxConsumables), new Vector2(messageSpacing, (messageSpacing * 3) + (messageSpacing * messageNumberLeft) + beginningHeight), Color.CornflowerBlue);
+                spriteBatch.DrawString(messageFont, string.Format(Messages.InventoryConsumables + " ({0}/{1})", playerInvo.Consumables.Count, playerInvo.MaxConsumables), new Vector2(messageSpacing, (messageSpacing * 3) + (messageSpacing * messageNumberLeft) + beginningHeight), Color.CornflowerBlue);
                 messageNumberLeft += 1;
                 foreach (Guid item in playerInvo.Consumables)
                 {
@@ -337,12 +337,19 @@ namespace ECSRogue.ECS.Systems
                     {
                         case ItemType.ARTIFACT:
                             //Collect item use stats for right panel
-                            //PLACEHOLDER
-
+                            //Artifact Stats
+                            ArtifactStatsComponent artifactStats = spaceComponents.ArtifactStatsComponents[menu.SelectedItem];
                             rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, System.Environment.NewLine));
-                            rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, "You found this on Depth: 1"));
+                            rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format("Upgrade Level: {0}", artifactStats.UpgradeLevel)));
+                            rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format("Depth found: {0}", artifactStats.FloorFound)));
                             rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, System.Environment.NewLine));
-                            rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, "You have killed 0 monsters with this item equipped."));
+                            rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Good, "STATISTICS WHILE EQUIPPED:"));
+                            rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Kills: {0}", artifactStats.KillsWith)));
+                            rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Maximum hit combo: {0}", artifactStats.MaximumComboWith)));
+                            rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Damage given: {0}", artifactStats.DamageGivenWith)));
+                            rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Damage taken: {0}", artifactStats.DamageTakenWith)));
+                            rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Times dodged: {0}", artifactStats.DodgesWith)));
+                            rightMessages.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Times missed: {0}", artifactStats.MissesWith)));
 
                             //Draw commands for artifact on the left panel
                             spriteBatch.DrawString(messageFont, "Commands: ", new Vector2(messageSpacing, (messageSpacing * 3) + (messageSpacing * messageNumberLeft++) + beginningHeight), Colors.Messages.Normal);
@@ -450,13 +457,102 @@ namespace ECSRogue.ECS.Systems
 
                         float textHeight = messageFont.MeasureString(message.Item2).Y;
                         spriteBatch.DrawString(messageFont, text, new Vector2(messageSpacing * 3 + panelWidth * 2, (int)beginningHeight + (int)textHeight + 10 + (messageNumberRight * messageSpacing)), message.Item1);
-                        messageNumberRight += Regex.Matches(text, System.Environment.NewLine).Count;
+                        if(text != System.Environment.NewLine)
+                        {
+                            messageNumberRight += Regex.Matches(text, System.Environment.NewLine).Count;
+                        }
                         messageNumberRight += 1;
                     }
                 }
 
             }
         }
+
+        #region artifact stats update functions
+        public static void IncrementKillsWithArtifact(StateSpaceComponents spaceComponents, Guid entityWithInventory)
+        {
+            if(spaceComponents.InventoryComponents.ContainsKey(entityWithInventory))
+            {
+                InventoryComponent inventory = spaceComponents.InventoryComponents[entityWithInventory];
+                foreach(Guid id in inventory.Artifacts)
+                {
+                    ArtifactStatsComponent stats = spaceComponents.ArtifactStatsComponents[id];
+                    stats.KillsWith += 1;
+                    spaceComponents.ArtifactStatsComponents[id] = stats;
+                }
+            }
+        }
+
+        public static void IncrementDamageGivenWithArtifact(StateSpaceComponents spaceComponents, Guid entityWithInventory, int damage)
+        {
+            if (spaceComponents.InventoryComponents.ContainsKey(entityWithInventory))
+            {
+                InventoryComponent inventory = spaceComponents.InventoryComponents[entityWithInventory];
+                foreach (Guid id in inventory.Artifacts)
+                {
+                    ArtifactStatsComponent stats = spaceComponents.ArtifactStatsComponents[id];
+                    stats.DamageGivenWith += damage;
+                    spaceComponents.ArtifactStatsComponents[id] = stats;
+                }
+            }
+        }
+
+        public static void IncrementDamageTakenWithArtifact(StateSpaceComponents spaceComponents, Guid entityWithInventory, int damage)
+        {
+            if (spaceComponents.InventoryComponents.ContainsKey(entityWithInventory))
+            {
+                InventoryComponent inventory = spaceComponents.InventoryComponents[entityWithInventory];
+                foreach (Guid id in inventory.Artifacts)
+                {
+                    ArtifactStatsComponent stats = spaceComponents.ArtifactStatsComponents[id];
+                    stats.DamageTakenWith += damage;
+                    spaceComponents.ArtifactStatsComponents[id] = stats;
+                }
+            }
+        }
+
+        public static void IncrementTimesDodgedWithArtifact(StateSpaceComponents spaceComponents, Guid entityWithInventory)
+        {
+            if (spaceComponents.InventoryComponents.ContainsKey(entityWithInventory))
+            {
+                InventoryComponent inventory = spaceComponents.InventoryComponents[entityWithInventory];
+                foreach (Guid id in inventory.Artifacts)
+                {
+                    ArtifactStatsComponent stats = spaceComponents.ArtifactStatsComponents[id];
+                    stats.DodgesWith += 1;
+                    spaceComponents.ArtifactStatsComponents[id] = stats;
+                }
+            }
+        }
+
+        public static void IncrementTimesMissesWithArtifact(StateSpaceComponents spaceComponents, Guid entityWithInventory)
+        {
+            if (spaceComponents.InventoryComponents.ContainsKey(entityWithInventory))
+            {
+                InventoryComponent inventory = spaceComponents.InventoryComponents[entityWithInventory];
+                foreach (Guid id in inventory.Artifacts)
+                {
+                    ArtifactStatsComponent stats = spaceComponents.ArtifactStatsComponents[id];
+                    stats.MissesWith += 1;
+                    spaceComponents.ArtifactStatsComponents[id] = stats;
+                }
+            }
+        }
+
+        public static void UpdateMaxCombo(StateSpaceComponents spaceComponents, Guid entityWithInventory, int hitCombo)
+        {
+            if (spaceComponents.InventoryComponents.ContainsKey(entityWithInventory))
+            {
+                InventoryComponent inventory = spaceComponents.InventoryComponents[entityWithInventory];
+                foreach (Guid id in inventory.Artifacts)
+                {
+                    ArtifactStatsComponent stats = spaceComponents.ArtifactStatsComponents[id];
+                    stats.MaximumComboWith = (stats.MaximumComboWith >= hitCombo) ? stats.MaximumComboWith : hitCombo;
+                    spaceComponents.ArtifactStatsComponents[id] = stats;
+                }
+            }
+        }
+        #endregion
 
 
     }

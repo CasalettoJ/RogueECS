@@ -63,6 +63,9 @@ namespace ECSRogue.ECS.Systems
                                 attackingStats.TimesMissed = 0;
                                 Color messageColor = (spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_HOSTILE) ? Colors.Messages.Bad : Colors.Messages.Good;
                                 spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Microsoft.Xna.Framework.Color, string>(messageColor, combatString));
+                                InventorySystem.IncrementDamageGivenWithArtifact(spaceComponents, id, damageDone);
+                                InventorySystem.UpdateMaxCombo(spaceComponents, id, (int)attackingStats.TimesHit);
+                                InventorySystem.IncrementDamageTakenWithArtifact(spaceComponents, collidedEntity, damageDone);
                             }
                             //Miss
                             else
@@ -79,11 +82,14 @@ namespace ECSRogue.ECS.Systems
                                 attackingStats.TimesHit = 0;
                                 Color messageColor = (spaceComponents.AIAlignmentComponents[id].Alignment == AIAlignments.ALIGNMENT_HOSTILE) ? Colors.Messages.Good : Colors.Messages.Bad;
                                 spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Microsoft.Xna.Framework.Color, string>(messageColor, combatString));
+                                InventorySystem.IncrementTimesDodgedWithArtifact(spaceComponents, collidedEntity);
+                                InventorySystem.IncrementTimesMissesWithArtifact(spaceComponents, id);
                             }
 
 
                             if (collidedStats.CurrentHealth <= 0)
                             {
+                                InventorySystem.IncrementKillsWithArtifact(spaceComponents, id);
                                 spaceComponents.EntitiesToDelete.Add(collidedEntity);
                                 if (isPlayerAttacking)
                                 {

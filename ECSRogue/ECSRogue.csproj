@@ -75,6 +75,7 @@
     <Compile Include="ECS\Components\GraphicalEffectsComponents\OutlineComponent.cs" />
     <Compile Include="ECS\Components\GraphicalEffectsComponents\SecondaryOutlineComponent.cs" />
     <Compile Include="ECS\Components\InputMovementComponent.cs" />
+    <Compile Include="ECS\Components\ItemizationComponents\ArtifactStatsComponent.cs" />
     <Compile Include="ECS\Components\ItemizationComponents\InventoryComponent.cs" />
     <Compile Include="ECS\Components\ItemizationComponents\InventoryMenuComponent.cs" />
     <Compile Include="ECS\Components\ItemizationComponents\ItemFunctionsComponent.cs" />

@@ -47,7 +47,8 @@ namespace ECSRogue.ECS
         COMPONENT_INVENTORY = 1ul << 32,
         COMPONENT_VALUE = 1ul << 33,
         COMPONENT_ITEM_FUNCTIONS = 1ul << 34,
-        COMPONENT_PASSIVES = 1ul << 35
+        COMPONENT_PASSIVES = 1ul << 35,
+        COMPONENT_ARTIFACT_STATS = 1ul << 36
     }
 
     public struct ComponentMasks
@@ -77,7 +78,7 @@ namespace ECSRogue.ECS
         //Inventory
         public const Component PickupItem = Component.COMPONENT_PICKUP | Component.COMPONENT_VALUE | Component.COMPONENT_NAME | Component.COMPONENT_COLLISION;
         public const Component Consumable = ComponentMasks.PickupItem | Component.COMPONENT_ITEM_FUNCTIONS;
-        public const Component Artifact = ComponentMasks.PickupItem | Component.COMPONENT_STAT_MODIFICATION | Component.COMPONENT_PASSIVES;
+        public const Component Artifact = ComponentMasks.PickupItem | Component.COMPONENT_STAT_MODIFICATION | Component.COMPONENT_PASSIVES | Component.COMPONENT_ARTIFACT_STATS;
         public const Component InventoryPickup = Component.COMPONENT_INVENTORY | Component.COMPONENT_ENTITY_MESSAGES | Component.COMPONENT_NAME | Component.COMPONENT_POSITION;
 
         //Animations
@@ -141,6 +142,7 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, ValueComponent> ValueComponents { get; private set; }
         public Dictionary<Guid, ItemFunctionsComponent> ItemFunctionsComponents { get; private set; }
         public Dictionary<Guid, PassivesComponent> PassivesComponents { get; private set; }
+        public Dictionary<Guid, ArtifactStatsComponent> ArtifactStatsComponents { get; private set; }
 
         public List<Action> DelayedActions { get; private set; }
         public PlayerComponent PlayerComponent { get; set; }
@@ -186,6 +188,7 @@ namespace ECSRogue.ECS
             ValueComponents = new Dictionary<Guid, ValueComponent>();
             ItemFunctionsComponents = new Dictionary<Guid, ItemFunctionsComponent>();
             PassivesComponents = new Dictionary<Guid, PassivesComponent>();
+            ArtifactStatsComponents = new Dictionary<Guid, ArtifactStatsComponent>();
 
             GlobalCollisionComponent = new GlobalCollisionComponent() { EntitiesThatCollided = new List<Guid>() };
             PlayerComponent = new PlayerComponent();
@@ -241,6 +244,7 @@ namespace ECSRogue.ECS
                 ValueComponents.Remove(id);
                 ItemFunctionsComponents.Remove(id);
                 PassivesComponents.Remove(id);
+                ArtifactStatsComponents.Remove(id);
             }
         }
 
