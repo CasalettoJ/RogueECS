@@ -122,7 +122,16 @@ namespace ECSRogue.BaseEngine.StateSpaces
             //Actions to complete if the inventory is open
             if (showInventory)
             {
-                InventorySystem.HandleInventoryInput(stateSpaceComponents, gameTime, prevKeyboardState, Keyboard.GetState());
+                //Deletion and Cleanup
+                if (stateSpaceComponents.EntitiesToDelete.Count > 0)
+                {
+                    foreach (Guid entity in stateSpaceComponents.EntitiesToDelete)
+                    {
+                        stateSpaceComponents.DestroyEntity(entity);
+                    }
+                    stateSpaceComponents.EntitiesToDelete.Clear();
+                }
+                showInventory = InventorySystem.HandleInventoryInput(stateSpaceComponents, gameTime, prevKeyboardState, Keyboard.GetState());
             }
             //Actions to complete if inventory is not open
             if (showObserver)
@@ -135,7 +144,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 ObserverSystem.HandleObserverFindings(stateSpaceComponents, Keyboard.GetState(), prevKeyboardState, dungeonGrid);
                 stateSpaceComponents.InvokeDelayedActions();
             }
-            else
+            else if (!showInventory && !showObserver)
             {
                 //Deletion and Cleanup
                 if (stateSpaceComponents.EntitiesToDelete.Count > 0)
