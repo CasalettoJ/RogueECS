@@ -256,7 +256,7 @@ namespace ECSRogue.ECS.Systems
                                 break;
                         }
 
-                        if((selectedEntity.ComponentFlags & ComponentMasks.ObservableValue) == ComponentMasks.ObservableValue)
+                        if((selectedEntity.ComponentFlags & ComponentMasks.ObservableValue) == ComponentMasks.ObservableValue && pickup.PickupType != ItemType.DOWNSTAIRS)
                         {
                             ValueComponent value = spaceComponents.ValueComponents[selectedEntity.Id];
                             rightFindings.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format("This item is worth {0} gold.", value.Gold)));

@@ -100,7 +100,12 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
             }
             #endregion
-
+            //Check to see if the next level needs to be loaded
+            if(stateSpaceComponents.PlayerComponent.GoToNextFloor)
+            {
+                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
+                LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
+            }
             //Toggle Inventory Menu
             if (Keyboard.GetState().IsKeyDown(Keys.I) && prevKeyboardState.IsKeyUp(Keys.I) && !showObserver)
             {

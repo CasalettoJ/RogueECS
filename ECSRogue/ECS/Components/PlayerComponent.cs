@@ -9,5 +9,6 @@ namespace ECSRogue.ECS.Components
     {
         public bool PlayerTookTurn;
         public bool PlayerJustLoaded;
+        public bool GoToNextFloor;
     }
 }

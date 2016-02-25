@@ -10,7 +10,8 @@ namespace ECSRogue.ECS.Components.ItemizationComponents
         NONE,
         CONSUMABLE,
         ARTIFACT,
-        GOLD
+        GOLD,
+        DOWNSTAIRS
     }
 
     public struct PickupComponent

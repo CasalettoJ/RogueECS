@@ -122,7 +122,7 @@ namespace ECSRogue.ECS.Systems
                                         spaceComponents.SkillLevelsComponents[collidingEntity] = skills;
                                         if(dungeongrid[(int)collidingEntityPosition.Position.X, (int)collidingEntityPosition.Position.Y].InRange)
                                         {
-                                            spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + " {0} picked up {1} gold.", collidingEntityName.Name, itemValue.Gold)));
+                                            spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + "{0} picked up {1} gold.", collidingEntityName.Name, itemValue.Gold)));
                                         }
                                         spaceComponents.EntitiesToDelete.Add(collidedEntity);
                                     }
@@ -164,6 +164,12 @@ namespace ECSRogue.ECS.Systems
                                     {
                                         spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Bad, "[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages[spaceComponents.random.Next(0, spaceComponents.EntityMessageComponents[collidingEntity].ArtifactsFullMessages.Length)]));
                                     }
+                                    break;
+                                case ItemType.DOWNSTAIRS:
+                                    //Tell the game to go to the next level
+                                    PlayerComponent player = spaceComponents.PlayerComponent;
+                                    player.GoToNextFloor = true;
+                                    spaceComponents.PlayerComponent = player;
                                     break;
                             }
                         }

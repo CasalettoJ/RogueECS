@@ -15,6 +15,7 @@ namespace ECSRogue.BaseEngine
     public enum ItemNames
     {
         NONE,
+        DOWNSTAIRS,
         GOLD,
         TESTCONSUMABLE,
         TESTARTIFACT
@@ -41,6 +42,17 @@ namespace ECSRogue.BaseEngine
     {
         public static readonly List<ItemInfo> ItemCatalog = new List<ItemInfo>()
         {
+            //DownStairs
+            new ItemInfo()
+            {
+                Name = ItemNames.DOWNSTAIRS,
+                DropType = ItemType.DOWNSTAIRS,
+                IsRequiredSpawn = true,
+                RequiredSpawnAmount = 1,
+                SpawnDepthsAndChances = new Dictionary<int, int>(),
+                SpawnFunction = ItemSpawners.SpawnDownStairway
+            },
+
             //Gold
             new ItemInfo()
             {
@@ -118,6 +130,38 @@ namespace ECSRogue.BaseEngine
                 Description = "Some people try and use fancy names for this mass of wealth. Credits, Stardust, Gil... it buys shelter and women all the same."
             };
             spaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = false };
+            return true;
+        }
+        public static bool SpawnDownStairway(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, List<Vector2> freeTiles)
+        {
+            Guid id = spaceComponents.CreateEntity();
+            spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem;
+            spaceComponents.DisplayComponents[id] = new DisplayComponent()
+            {
+                AlwaysDraw = false,
+                Color = Color.Black,
+                Opacity = 1f,
+                Origin = Vector2.Zero,
+                Rotation = 0f,
+                Scale = 1f,
+                SpriteEffect = SpriteEffects.None,
+                SpriteSource = new Rectangle(0 * DevConstants.Grid.CellSize, 0 * DevConstants.Grid.CellSize, DevConstants.Grid.CellSize, DevConstants.Grid.CellSize),
+                Symbol = "<",
+                SymbolColor = Color.White
+            };
+            Vector2 position = freeTiles[spaceComponents.random.Next(0, freeTiles.Count)];
+            freeTiles.Remove(position);
+            spaceComponents.PositionComponents[id] = new PositionComponent() { Position = position };
+            spaceComponents.OutlineComponents[id] = new OutlineComponent() { Color = Color.Goldenrod, Opacity = 1f };
+            spaceComponents.SecondaryOutlineComponents[id] = new SecondaryOutlineComponent() { AlternateColor = Color.White, Seconds = 0f, SwitchAtSeconds = 2f };
+            spaceComponents.PickupComponents[id] = new PickupComponent() { PickupType = ItemType.DOWNSTAIRS };
+            spaceComponents.ValueComponents[id] = new ValueComponent() { Gold = spaceComponents.random.Next(0, 231) };
+            spaceComponents.NameComponents[id] = new NameComponent()
+            {
+                Name = "A Path Downward",
+                Description = "A small passageway leading deeper into this cave system.  There's no telling what waits at the other end, but you have a feeling there's no going back once you descend."
+            };
+            spaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = true };
             return true;
         }
         public static bool SpawnTestConsumable(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, List<Vector2> freeTiles)

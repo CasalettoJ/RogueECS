@@ -81,6 +81,11 @@ namespace ECSRogue.ECS.Systems
                 }
             }
 
+            foreach (ItemInfo item in Items.ItemCatalog.Where(x => x.IsRequiredSpawn))
+            {
+                item.SpawnFunction(spaceComponents, dungeonGrid, dungeonDimensions, freeTiles);
+            }
+
         }
 
 
