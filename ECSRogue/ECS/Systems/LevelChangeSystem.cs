@@ -1,5 +1,6 @@
 ﻿using ECSRogue.BaseEngine;
 using ECSRogue.ECS.Components;
+using ECSRogue.ECS.Components.ItemizationComponents;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -19,23 +20,48 @@ namespace ECSRogue.ECS.Systems
             stateComponents.PlayerSkillLevels = skills;
         }
 
+        public static void RetainNecessaryComponents(StateComponents stateComponents, StateSpaceComponents spaceComponents)
+        {
+            //Transfer components, then delete all AI-related components and all item related components that aren't in the players' inventories.
+            stateComponents.StateSpaceComponents = spaceComponents;
+            foreach(Guid id in stateComponents.StateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI).Select(x => x.Id))
+            {
+                //Change this to only hostile AI when allies need to be implemented.
+                stateComponents.StateSpaceComponents.EntitiesToDelete.Add(id);
+            }
+            foreach (Guid id in stateComponents.StateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.PickupItem) == ComponentMasks.PickupItem).Select(x => x.Id))
+            {
+                foreach(Guid player in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER).Select(x => x.Id))
+                {
+                    InventoryComponent inventory = stateComponents.StateSpaceComponents.InventoryComponents[player];
+                    if(!inventory.Artifacts.Contains(id) && !inventory.Consumables.Contains(id))
+                    {
+                        stateComponents.StateSpaceComponents.EntitiesToDelete.Add(id);
+                        break;
+                    }
+                }
+            }
+        }
+
         public static void LoadPlayerSkillset(StateComponents stateComponents, StateSpaceComponents spaceComponents)
         {
             foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER).Select(x => x.Id))
-            if (stateComponents != null)
             {
-                spaceComponents.SkillLevelsComponents[id] = stateComponents.PlayerSkillLevels;
-            }
-            else
-            {
-                spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent()
+                if (stateComponents != null)
                 {
-                    CurrentHealth = 100,
-                    Health = 100,
-                    Defense = 50,
-                    Accuracy = 100,
-                    Wealth = 0
-                };
+                    spaceComponents.SkillLevelsComponents[id] = stateComponents.PlayerSkillLevels;
+                }
+                else
+                {
+                    spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent()
+                    {
+                        CurrentHealth = 100,
+                        Health = 100,
+                        Defense = 50,
+                        Accuracy = 100,
+                        Wealth = 0
+                    };
+                }
             }
         }
 
@@ -56,8 +82,6 @@ namespace ECSRogue.ECS.Systems
 
         public static void CreateMessageLog(StateSpaceComponents spaceComponents)
         {
-            Guid id = spaceComponents.CreateEntity();
-            spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = Component.COMPONENT_GAMEMESSAGE;
             spaceComponents.GameMessageComponent = new GameMessageComponent()
             {
                 GlobalColor = Color.White,

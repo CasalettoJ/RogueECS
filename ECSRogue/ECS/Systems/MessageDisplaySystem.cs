@@ -80,10 +80,7 @@ namespace ECSRogue.ECS.Systems
 
         public static void GenerateRandomGameMessage(StateSpaceComponents spaceComponents, string[] messageList, Color color)
         {
-            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_GAMEMESSAGE) == Component.COMPONENT_GAMEMESSAGE).Select(x => x.Id))
-            {
                 spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(color, "[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + messageList[spaceComponents.random.Next(0, messageList.Count())]));
-            }
         }
 
         public static void SetRandomGlobalMessage(StateSpaceComponents spaceComponents, string[] messageList)

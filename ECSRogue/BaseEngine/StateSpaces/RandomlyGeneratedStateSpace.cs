@@ -70,6 +70,10 @@ namespace ECSRogue.BaseEngine.StateSpaces
         public void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera, StateComponents stateComponents, bool createEntities = true)
         {
             this.stateComponents = stateComponents;
+            if(stateComponents.StateSpaceComponents != null)
+            {
+                this.stateSpaceComponents = stateComponents.StateSpaceComponents;
+            }
             sprites = content.Load<Texture2D>(DevConstants.Graphics.SpriteSheet);
             dungeonSprites = content.Load<Texture2D>(dungeonSpriteFile);
             messageFont = content.Load<SpriteFont>(DevConstants.Graphics.MessageFont);
@@ -98,13 +102,23 @@ namespace ECSRogue.BaseEngine.StateSpaces
             {
                 nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
                 LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
+                LevelChangeSystem.RetainNecessaryComponents(stateComponents, stateSpaceComponents);
+                PlayerComponent player = stateSpaceComponents.PlayerComponent;
+                player.GoToNextFloor = false;
+                player.PlayerJustLoaded = true;
+                stateSpaceComponents.PlayerComponent = player;
             }
             #endregion
             //Check to see if the next level needs to be loaded
             if(stateSpaceComponents.PlayerComponent.GoToNextFloor)
             {
                 nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
+                PlayerComponent player = stateSpaceComponents.PlayerComponent;
+                player.GoToNextFloor = false;
+                player.PlayerJustLoaded = true;
+                stateSpaceComponents.PlayerComponent = player;
                 LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
+                LevelChangeSystem.RetainNecessaryComponents(stateComponents, stateSpaceComponents);
             }
             //Toggle Inventory Menu
             if (Keyboard.GetState().IsKeyDown(Keys.I) && prevKeyboardState.IsKeyUp(Keys.I) && !showObserver)

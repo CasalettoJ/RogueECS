@@ -72,103 +72,111 @@ namespace ECSRogue.BaseEngine
     {
         public static bool SpawnPlayer(StateSpaceComponents stateSpaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, List<Vector2> freeTiles)
         {
-            Guid id = stateSpaceComponents.CreateEntity();
-            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Player | Component.COMPONENT_INPUTMOVEMENT | ComponentMasks.InventoryPickup;
-            //Set Position
-            int X = 0;
-            int Y = 0;
-            do
+            Entity player = stateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
+            if(player == null)
             {
-                X = stateSpaceComponents.random.Next(0, (int)dungeonDimensions.X);
-                Y = stateSpaceComponents.random.Next(0, (int)dungeonDimensions.Y);
-            } while (dungeonGrid[X, Y].Type != TileType.TILE_FLOOR);
-            stateSpaceComponents.PositionComponents[id] = new PositionComponent() { Position = new Vector2(X, Y) };
-            dungeonGrid[X, Y].Occupiable = true;
-            //Set Display
-            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent()
-            {
-                Color = Color.White,
-                SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize),
-                Origin = Vector2.Zero,
-                SpriteEffect = SpriteEffects.None,
-                Scale = 1f,
-                Rotation = 0f,
-                Opacity = 1f,
-                AlwaysDraw = true
-            };
-            //Set Sightradius
-            stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { CurrentRadius = 15, MaxRadius = 15, DrawRadius = true };
-            //Set first turn
-            stateSpaceComponents.PlayerComponent = new PlayerComponent() { PlayerJustLoaded = true };
-            //Collision information
-            stateSpaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = true };
-            //Set name of player
-            stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "You", Description = "This is me.  I came to these caves to find my fortune." };
-            //Set Input of the player
-            stateSpaceComponents.InputMovementComponents[id] = new InputMovementComponent() { TimeIntervalBetweenMovements = .09f, TimeSinceLastMovement = 0f, InitialWait = .5f, TotalTimeButtonDown = 0f, LastKeyPressed = Keys.None };
-            //Set an alignment for AI to communicate with
-            stateSpaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_FRIENDLY };
-            //Set combat messages
-            stateSpaceComponents.EntityMessageComponents[id] = new EntityMessageComponent()
-            {
-                NormalDodgeMessages = new string[]
+                Guid id = stateSpaceComponents.CreateEntity();
+                stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Player | Component.COMPONENT_INPUTMOVEMENT | ComponentMasks.InventoryPickup;
+                //Set Position
+                int tileIndex = stateSpaceComponents.random.Next(0, freeTiles.Count);
+                stateSpaceComponents.PositionComponents[id] = new PositionComponent() { Position = freeTiles[tileIndex] };
+                freeTiles.RemoveAt(tileIndex);
+                dungeonGrid[(int)stateSpaceComponents.PositionComponents[id].Position.X, (int)stateSpaceComponents.PositionComponents[id].Position.Y].Occupiable = true;
+                //Set Display
+                stateSpaceComponents.DisplayComponents[id] = new DisplayComponent()
                 {
+                    Color = Color.White,
+                    SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize),
+                    Origin = Vector2.Zero,
+                    SpriteEffect = SpriteEffects.None,
+                    Scale = 1f,
+                    Rotation = 0f,
+                    Opacity = 1f,
+                    AlwaysDraw = true
+                };
+                //Set Sightradius
+                stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { CurrentRadius = 15, MaxRadius = 15, DrawRadius = true };
+                //Set first turn
+                stateSpaceComponents.PlayerComponent = new PlayerComponent() { PlayerJustLoaded = true };
+                //Collision information
+                stateSpaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = true };
+                //Set name of player
+                stateSpaceComponents.NameComponents[id] = new NameComponent() { Name = "You", Description = "This is me.  I came to these caves to find my fortune." };
+                //Set Input of the player
+                stateSpaceComponents.InputMovementComponents[id] = new InputMovementComponent() { TimeIntervalBetweenMovements = .09f, TimeSinceLastMovement = 0f, InitialWait = .5f, TotalTimeButtonDown = 0f, LastKeyPressed = Keys.None };
+                //Set an alignment for AI to communicate with
+                stateSpaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_FRIENDLY };
+                //Set combat messages
+                stateSpaceComponents.EntityMessageComponents[id] = new EntityMessageComponent()
+                {
+                    NormalDodgeMessages = new string[]
+                    {
                     " and the attack misses you!",
                     " but nothing happened.",
                     " ... but it failed!",
                     " and your defense protects you.",
                     " but it fails to connect."
-                },
-                StreakDodgeMessages = new string[]
-                {
+                    },
+                    StreakDodgeMessages = new string[]
+                    {
                     " but you don't even notice.",
                     " and you laugh at the attempt.",
                     " but you easily dodge it again.",
                     " and misses you. Again!"
-                },
-                AttackNPCMessages = new string[]
-                {
+                    },
+                    AttackNPCMessages = new string[]
+                    {
                     "{0} attack the {1}",
                     "{0} take a swing at the {1}",
                     "{0} swipe at {1}",
                     "{0} try to damage the {1}",
                     "{0} slash viciously at the {1}"
-                },
-                NormalTakeDamageMessages = new string[]
-                {
+                    },
+                    NormalTakeDamageMessages = new string[]
+                    {
                     " and you take {0} damage.",
                     " and it hurts! You take {0} damage.",
                     "! Ow. You lose {0} health.",
                     " and hits you for {0} damage."
-                },
-                BrokenDodgeStreakTakeDamageMessages = new string[]
-                {
+                    },
+                    BrokenDodgeStreakTakeDamageMessages = new string[]
+                    {
                     " and you finally take {0} damage.",
                     " and this time you lose {0} health! Ow!",
                     " and hits you for {0} THIS time.",
                     "! {0} damage taken! Don't get cocky..."
-                },
-                PickupItemMessages = new string[]
-                {
+                    },
+                    PickupItemMessages = new string[]
+                    {
                     "{0} pick up the {1}.",
                     "{0} find a {1}.",
                     "{0} got a {1}!"
-                },
-                ConsumablesFullMessages = new string[]
-                {
+                    },
+                    ConsumablesFullMessages = new string[]
+                    {
                     "You cannot carry any more consumables.",
                     "Your consumable slots are full!",
                     "You don't have any place to store this consumable."
-                },
-                ArtifactsFullMessages = new string[]
-                {
+                    },
+                    ArtifactsFullMessages = new string[]
+                    {
                     "Your artifact slots are too full for another.",
                     "Drop or scrap one of your artifacts to pick this up.",
                     "You can't pick up this artifact; you already have enough."
-                }
-            };
-            //Inventory
-            stateSpaceComponents.InventoryComponents[id] = new InventoryComponent() { Artifacts = new List<Guid>(), Consumables = new List<Guid>(), MaxArtifacts = 3, MaxConsumables = 2 };
+                    }
+                };
+                //Inventory
+                stateSpaceComponents.InventoryComponents[id] = new InventoryComponent() { Artifacts = new List<Guid>(), Consumables = new List<Guid>(), MaxArtifacts = 3, MaxConsumables = 2 };
+            }
+            else
+            {
+                //If there's already a player, just make a new starting location on the floor
+                //Set Position
+                int tileIndex = stateSpaceComponents.random.Next(0, freeTiles.Count);
+                stateSpaceComponents.PositionComponents[player.Id] = new PositionComponent() { Position = freeTiles[tileIndex] };
+                freeTiles.RemoveAt(tileIndex);
+                dungeonGrid[(int)stateSpaceComponents.PositionComponents[player.Id].Position.X, (int)stateSpaceComponents.PositionComponents[player.Id].Position.Y].Occupiable = true;
+            }
 
             return true;
         }

@@ -20,7 +20,7 @@ namespace ECSRogue.ECS
         COMPONENT_ANIMATION = 1 << 4,
         COMPONENT_INPUTMOVEMENT = 1 << 6,
         COMPONENT_SIGHTRADIUS = 1 << 7,
-        COMPONENT_GAMEMESSAGE = 1 << 8,
+        //8: FREE SLOT
         COMPONENT_GAMEPLAY_INFO = 1 << 9,
         COMPONENT_SKILL_LEVELS = 1 << 10,
         COMPONENT_TARGET_POSITION = 1 << 11,
@@ -104,6 +104,7 @@ namespace ECSRogue.ECS
     {
         public GameplayInfoComponent GameplayInfo { get; set; }
         public SkillLevelsComponent PlayerSkillLevels { get; set; }
+        public StateSpaceComponents StateSpaceComponents { get; set; }
     }
 
     public class StateSpaceComponents
