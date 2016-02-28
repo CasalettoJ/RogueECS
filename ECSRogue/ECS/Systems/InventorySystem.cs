@@ -415,8 +415,6 @@ namespace ECSRogue.ECS.Systems
                         case ItemType.CONSUMABLE:
                             //Draw command info on left panel
                             spriteBatch.DrawString(messageFont, "Commands: ", new Vector2(messageSpacing, (messageSpacing * 3) + (messageSpacing * messageNumberLeft++) + beginningHeight), Colors.Messages.Normal);
-                            spriteBatch.DrawString(messageFont, Messages.Use, new Vector2(messageSpacing, (messageSpacing * 3) + (messageSpacing * messageNumberLeft++) + beginningHeight), Colors.Messages.Normal);
-                            spriteBatch.DrawString(messageFont, Messages.Throw, new Vector2(messageSpacing, (messageSpacing * 3) + (messageSpacing * messageNumberLeft++) + beginningHeight), Colors.Messages.Normal);
                             spriteBatch.DrawString(messageFont, Messages.Scrap, new Vector2(messageSpacing, (messageSpacing * 3) + (messageSpacing * messageNumberLeft++) + beginningHeight), Colors.Messages.Normal);
                             spriteBatch.DrawString(messageFont, Messages.Drop, new Vector2(messageSpacing, (messageSpacing * 3) + (messageSpacing * messageNumberLeft++) + beginningHeight), Colors.Messages.Normal);
 

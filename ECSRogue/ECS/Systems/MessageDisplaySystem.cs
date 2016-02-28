@@ -1,6 +1,7 @@
 ﻿using ECSRogue.BaseEngine;
 using ECSRogue.BaseEngine.IO.Objects;
 using ECSRogue.ECS.Components;
+using ECSRogue.ECS.Components.ItemizationComponents;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -17,9 +18,9 @@ namespace ECSRogue.ECS.Systems
         public static void WriteMessages(StateSpaceComponents spaceComponents, SpriteBatch spriteBatch, Camera camera, SpriteFont font)
         {
             float opacity = 1.15f;
-            float decrement = .12f;
+            float decrement = .1f;
             int messageNumber = 0;
-            int messageSpacing = 20;
+            int messageSpacing = (int)font.MeasureString("g").Y + 1; ;
             //Draw message log
             if(spaceComponents.GameMessageComponent.IndexBegin > 0)
             {
@@ -55,9 +56,11 @@ namespace ECSRogue.ECS.Systems
                 statsToPrint.Add(string.Format("Floor {0}", gameplayInfo.FloorsReached));
                 statsToPrint.Add(string.Format("Steps: {0}", gameplayInfo.StepsTaken));
                 statsToPrint.Add(string.Format("Kills: {0}", gameplayInfo.Kills));
-            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER).Select(x => x.Id))
+            Entity player = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
+            if (player != null)
             {
-                SkillLevelsComponent skills = InventorySystem.ApplyStatModifications(spaceComponents, id, spaceComponents.SkillLevelsComponents[id]);
+                SkillLevelsComponent skills = InventorySystem.ApplyStatModifications(spaceComponents, player.Id, spaceComponents.SkillLevelsComponents[player.Id]);
+                InventoryComponent inventory = spaceComponents.InventoryComponents[player.Id];
                 statsToPrint.Add(System.Environment.NewLine);
                 statsToPrint.Add(string.Format("Health:  {0} / {1}", skills.CurrentHealth, skills.Health));
                 statsToPrint.Add(string.Format("Wealth: {0}", skills.Wealth));
@@ -65,15 +68,46 @@ namespace ECSRogue.ECS.Systems
                 statsToPrint.Add(string.Format("Damage: {0}-{1}", skills.MinimumDamage, skills.MaximumDamage));
                 statsToPrint.Add(string.Format("Accuracy: {0}", skills.Accuracy));
                 statsToPrint.Add(string.Format("Defense: {0}", skills.Defense));
+                statsToPrint.Add(System.Environment.NewLine);
+                statsToPrint.Add(string.Format(Messages.InventoryArtifacts + " ({0}/{1})", inventory.Artifacts.Count, inventory.MaxArtifacts));
+                foreach (Guid id in inventory.Artifacts)
+                {
+                    NameComponent name = spaceComponents.NameComponents[id];
+                    ArtifactStatsComponent artifactStats = spaceComponents.ArtifactStatsComponents[id];
+                    statsToPrint.Add(string.Format("{0} Lv{1}", name.Name, artifactStats.UpgradeLevel));
+                }
+
+                statsToPrint.Add(System.Environment.NewLine);
+                statsToPrint.Add(string.Format(Messages.InventoryConsumables + " ({0}/{1})", inventory.Consumables.Count, inventory.MaxConsumables));
+                if(inventory.Consumables.Count > 0)
+                {
+                    statsToPrint.Add(System.Environment.NewLine);
+                    NameComponent name = spaceComponents.NameComponents[inventory.Consumables[0]];
+                    ItemFunctionsComponent funcs = spaceComponents.ItemFunctionsComponents[inventory.Consumables[0]];
+                    statsToPrint.Add(string.Format("{0}({1})", name.Name, funcs.Uses));
+                    statsToPrint.Add("Q - Use");
+                    statsToPrint.Add("X - Throw");
+                    statsToPrint.Add(System.Environment.NewLine);
+                    if (inventory.Consumables.Count > 1)
+                    {
+                        name = spaceComponents.NameComponents[inventory.Consumables[1]];
+                        funcs = spaceComponents.ItemFunctionsComponents[inventory.Consumables[1]];
+                        statsToPrint.Add(string.Format("{0}({1})", name.Name, funcs.Uses));
+                        statsToPrint.Add("E - Use");
+                        statsToPrint.Add("C - Throw");
+                    }
+                }
             }
 
             if (font != null)
                 {
                     foreach (string stat in statsToPrint)
                     {
+                        string text = MessageDisplaySystem.WordWrap(font, stat, camera.DungeonUIViewportLeft.Width - messageSpacing);
                         Vector2 messageSize = font.MeasureString(stat);
-                        spriteBatch.DrawString(font, stat, new Vector2(camera.DungeonUIViewportLeft.X + 10, 10 + (messageSpacing * messageNumber)), Colors.Messages.Special);
+                        spriteBatch.DrawString(font, text, new Vector2(camera.DungeonUIViewportLeft.X + 10, 10 + (messageSpacing * messageNumber)), Colors.Messages.Special);
                         messageNumber += 1;
+                        messageNumber += Regex.Matches(text, System.Environment.NewLine).Count;
                     }
                 }
         }

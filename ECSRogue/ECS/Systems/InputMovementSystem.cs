@@ -59,18 +59,30 @@ namespace ECSRogue.ECS.Systems
                 {
                     movement = InputMovementSystem.CalculateMovement(ref pos, 1, 1, ref movementComponent, gameTime, Keys.NumPad3);
                 }
-                #region Debug Item
+                #region Item
                 else if (keyState.IsKeyDown(Keys.Q) && prevKeyboardState.IsKeyUp(Keys.Q))
                 {
-                    InventoryComponent invo = spaceComponents.InventoryComponents[id];
-                    ItemFunctionsComponent funcs = spaceComponents.ItemFunctionsComponents[invo.Consumables[0]];
-                    InventorySystem.UseItem(spaceComponents, dungeonGrid, dungeonDimensions, invo.Consumables[0], id);
+                    if(spaceComponents.InventoryComponents.ContainsKey(id))
+                    { 
+                        InventoryComponent invo = spaceComponents.InventoryComponents[id];
+                        if (invo.Consumables.Count > 0)
+                        {
+                            ItemFunctionsComponent funcs = spaceComponents.ItemFunctionsComponents[invo.Consumables[0]];
+                            InventorySystem.UseItem(spaceComponents, dungeonGrid, dungeonDimensions, invo.Consumables[0], id);
+                        }
+                    }
                 }
                 else if (keyState.IsKeyDown(Keys.E) && prevKeyboardState.IsKeyUp(Keys.E))
                 {
-                    InventoryComponent invo = spaceComponents.InventoryComponents[id];
-                    ItemFunctionsComponent funcs = spaceComponents.ItemFunctionsComponents[invo.Consumables[1]];
-                    InventorySystem.UseItem(spaceComponents, dungeonGrid, dungeonDimensions, invo.Consumables[1], id);
+                    if (spaceComponents.InventoryComponents.ContainsKey(id))
+                    {
+                        InventoryComponent invo = spaceComponents.InventoryComponents[id];
+                        if(invo.Consumables.Count > 1)
+                        {
+                            ItemFunctionsComponent funcs = spaceComponents.ItemFunctionsComponents[invo.Consumables[1]];
+                            InventorySystem.UseItem(spaceComponents, dungeonGrid, dungeonDimensions, invo.Consumables[1], id);
+                        }
+                    }
                 }
 
                 #endregion
