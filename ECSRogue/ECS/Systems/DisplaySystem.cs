@@ -42,7 +42,7 @@ namespace ECSRogue.ECS.Systems
             }
         }
 
-        public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo)
+        public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo, DijkstraMapTile[,] mapToPlayer)
         {
             Matrix cameraMatrix = camera.GetMatrix();
             Vector2 origin = new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize);
@@ -74,13 +74,16 @@ namespace ECSRogue.ECS.Systems
                         }
                         else if (dungeonGrid[i, j].InRange && !dungeonGrid[i, j].NewlyFound)
                         {
+                            int weight = mapToPlayer[i, j].Weight;
+                            double opacity = 1 - (.035 * weight);
+                            opacity = (opacity < .4) ? .4 : opacity;
                             switch (dungeonGrid[i, j].Type)
                             {
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.FloorInRange *.85f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.FloorInRange * (float)opacity, origin: origin);
                                     break;
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.WallInRange *.85f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.WallInRange * .85f, origin: origin);
                                     break;
                             }
                         }

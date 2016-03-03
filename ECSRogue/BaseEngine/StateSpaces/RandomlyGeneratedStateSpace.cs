@@ -217,7 +217,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         #region Draw Logic
         public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera, ref GameSettings gameSettings)
         {
-            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, dungeonSprites, dungeonColorInfo);
+            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, dungeonSprites, dungeonColorInfo, mapToPlayer);
             DisplaySystem.DrawAIFieldOfViews(stateSpaceComponents, camera, spriteBatch, UI, DevConstants.Grid.CellSize, dungeonGrid);
             if(gameSettings.ShowGlow)
             {
