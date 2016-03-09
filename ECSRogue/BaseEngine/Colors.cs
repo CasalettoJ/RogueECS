@@ -16,6 +16,12 @@ namespace ECSRogue.BaseEngine
             public static readonly Color FloorInRange = Color.Green;
             public static readonly Color Water = new Color(11, 56, 89);
             public static readonly Color WaterInRange = new Color(28, 144, 227);
+            public static readonly Color DeepWater = new Color(3, 26, 80);
+            public static readonly Color DeepWaterInRange = new Color(7, 38, 109);
+            public static readonly Color TallGrass = new Color(20, 73, 0);
+            public static readonly Color TallGrassInRange = new Color(43, 109, 18);
+            public static readonly Color Spikes = new Color(103, 112, 85);
+            public static readonly Color SpikesInRange = new Color(170, 187, 138);
             //Alternate Wall Color:
             //new Color(127, 157, 175);
             //Alternate Wall Inrange Color:

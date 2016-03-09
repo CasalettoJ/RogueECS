@@ -32,7 +32,7 @@ namespace ECSRogue.ECS.Systems
                     }
                     //Guid entity = player.Id;
                     Vector2 position = spaceComponents.PositionComponents[entity].Position;
-                    int radius = spaceComponents.SightRadiusComponents[entity].CurrentRadius;
+                    int radius =  dungeonGrid[(int)position.X, (int)position.Y].Type == TileType.TILE_TALLGRASS ? (int)spaceComponents.SightRadiusComponents[entity].CurrentRadius / 2 : spaceComponents.SightRadiusComponents[entity].CurrentRadius;
                     int initialX, x0, initialY, y0;
                     initialX = x0 = (int)position.X;
                     initialY = y0 = (int)position.Y;

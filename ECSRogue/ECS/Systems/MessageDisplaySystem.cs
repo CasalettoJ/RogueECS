@@ -18,7 +18,7 @@ namespace ECSRogue.ECS.Systems
         public static void WriteMessages(StateSpaceComponents spaceComponents, SpriteBatch spriteBatch, Camera camera, SpriteFont font)
         {
             float opacity = 1.15f;
-            float decrement = .1f;
+            float decrement = .09f;
             int messageNumber = 0;
             int messageSpacing = (int)font.MeasureString("g").Y + 1; ;
             //Draw message log

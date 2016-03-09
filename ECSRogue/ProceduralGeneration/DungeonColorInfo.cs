@@ -12,5 +12,13 @@ namespace ECSRogue.ProceduralGeneration
         public Color FloorInRange;
         public Color Wall;
         public Color Floor;
+        public Color Water;
+        public Color WaterInRange;
+        public Color DeepWater;
+        public Color DeepWaterInRange;
+        public Color TallGrass;
+        public Color TallGrassInRange;
+        public Color Spikes;
+        public Color SpikesInRange;
     }
 }

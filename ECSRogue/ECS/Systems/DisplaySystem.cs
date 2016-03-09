@@ -42,7 +42,7 @@ namespace ECSRogue.ECS.Systems
             }
         }
 
-        public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo, DijkstraMapTile[,] mapToPlayer)
+        public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo, DijkstraMapTile[,] mapToPlayer, SpriteFont font)
         {
             Matrix cameraMatrix = camera.GetMatrix();
             Vector2 origin = new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize);
@@ -70,6 +70,16 @@ namespace ECSRogue.ECS.Systems
                                 case TileType.TILE_WALL:
                                     spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.Wall * .5f, origin: origin);
                                     break;
+                                case TileType.TILE_TALLGRASS:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.TallGrass * .5f, origin: origin);
+                                    break;
+                            }
+                            if (!string.IsNullOrEmpty(dungeonGrid[i, j].Symbol))
+                            {
+                                Vector2 size = font.MeasureString(dungeonGrid[i, j].Symbol);
+                                spriteBatch.DrawString(font, dungeonGrid[i, j].Symbol, new Vector2(i * DevConstants.Grid.CellSize + (int)(DevConstants.Grid.CellSize / 2),
+                                    (j * DevConstants.Grid.CellSize + (int)(DevConstants.Grid.CellSize / 2))),
+                                    dungeonGrid[i, j].SymbolColor, 0f, new Vector2((int)(size.X / 2), (int)(size.Y / 2)), 1f, SpriteEffects.None, 0f);
                             }
                         }
                         else if (dungeonGrid[i, j].InRange && !dungeonGrid[i, j].NewlyFound)
@@ -77,6 +87,7 @@ namespace ECSRogue.ECS.Systems
                             int weight = mapToPlayer[i, j].Weight;
                             double opacity = 1 - (.035 * weight);
                             opacity = (opacity < .4) ? .4 : opacity;
+                            bool isWall = false;
                             switch (dungeonGrid[i, j].Type)
                             {
                                 case TileType.TILE_FLOOR:
@@ -84,7 +95,31 @@ namespace ECSRogue.ECS.Systems
                                     break;
                                 case TileType.TILE_WALL:
                                     spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.WallInRange * .85f, origin: origin);
+                                    isWall = true;
                                     break;
+                                case TileType.TILE_TALLGRASS:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.TallGrassInRange * (float)opacity, origin: origin);
+                                    break;
+                            }
+                            if(!isWall)
+                            {
+                                if (!string.IsNullOrEmpty(dungeonGrid[i, j].Symbol))
+                                {
+                                    Vector2 size = font.MeasureString(dungeonGrid[i, j].Symbol);
+                                    spriteBatch.DrawString(font, dungeonGrid[i, j].Symbol, new Vector2(i * DevConstants.Grid.CellSize + (int)(DevConstants.Grid.CellSize / 2),
+                                        (j * DevConstants.Grid.CellSize + (int)(DevConstants.Grid.CellSize / 2))),
+                                        dungeonGrid[i, j].SymbolColor * (float)opacity, 0f, new Vector2((int)(size.X / 2), (int)(size.Y / 2)), 1f, SpriteEffects.None, 0f);
+                                }
+                            }
+                            else
+                            {
+                                if (!string.IsNullOrEmpty(dungeonGrid[i, j].Symbol))
+                                {
+                                    Vector2 size = font.MeasureString(dungeonGrid[i, j].Symbol);
+                                    spriteBatch.DrawString(font, dungeonGrid[i, j].Symbol, new Vector2(i * DevConstants.Grid.CellSize + (int)(DevConstants.Grid.CellSize / 2),
+                                        (j * DevConstants.Grid.CellSize + (int)(DevConstants.Grid.CellSize / 2))),
+                                        dungeonGrid[i, j].SymbolColor * .85f, 0f, new Vector2((int)(size.X / 2), (int)(size.Y / 2)), 1f, SpriteEffects.None, 0f);
+                                }
                             }
                         }
                         else if (dungeonGrid[i, j].NewlyFound)
@@ -98,6 +133,16 @@ namespace ECSRogue.ECS.Systems
                                 case TileType.TILE_WALL:
                                     spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.WallInRange * opacity, origin: origin);
                                     break;
+                                case TileType.TILE_TALLGRASS:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.TallGrass * opacity, origin: origin);
+                                    break;
+                            }
+                            if (!string.IsNullOrEmpty(dungeonGrid[i, j].Symbol))
+                            {
+                                Vector2 size = font.MeasureString(dungeonGrid[i, j].Symbol);
+                                spriteBatch.DrawString(font, dungeonGrid[i, j].Symbol, new Vector2(i * DevConstants.Grid.CellSize + (int)(DevConstants.Grid.CellSize / 2),
+                                    (j * DevConstants.Grid.CellSize + (int)(DevConstants.Grid.CellSize / 2))),
+                                    dungeonGrid[i, j].SymbolColor * opacity, 0f, new Vector2((int)(size.X / 2), (int)(size.Y / 2)), 1f, SpriteEffects.None, 0f);
                             }
                             if (dungeonGrid[i, j].Opacity > .5)
                             {

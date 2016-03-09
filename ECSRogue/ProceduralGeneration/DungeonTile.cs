@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,11 @@ namespace ECSRogue.ProceduralGeneration
         NONE,
         TILE_ROCK,
         TILE_WALL,
-        TILE_FLOOR
+        TILE_FLOOR,
+        TILE_WATER,
+        TILE_DEEPWATER,
+        TILE_TALLGRASS,
+        TILE_SPIKE
     }
 
     public struct DungeonTile
@@ -22,6 +27,8 @@ namespace ECSRogue.ProceduralGeneration
         public bool InRange;
         public bool Occupiable;
         public float Opacity;
+        public string Symbol;
+        public Color SymbolColor;
     }
 
     public struct DijkstraMapTile
