@@ -32,7 +32,8 @@ namespace ECSRogue.ECS.Systems
                     }
                     //Guid entity = player.Id;
                     Vector2 position = spaceComponents.PositionComponents[entity].Position;
-                    int radius =  dungeonGrid[(int)position.X, (int)position.Y].Type == TileType.TILE_TALLGRASS ? (int)spaceComponents.SightRadiusComponents[entity].CurrentRadius / 2 : spaceComponents.SightRadiusComponents[entity].CurrentRadius;
+                    bool inTallGrass = dungeonGrid[(int)position.X, (int)position.Y].Type == TileType.TILE_TALLGRASS;
+                    int radius =  inTallGrass ? (int)spaceComponents.SightRadiusComponents[entity].CurrentRadius / 2 : spaceComponents.SightRadiusComponents[entity].CurrentRadius;
                     int initialX, x0, initialY, y0;
                     initialX = x0 = (int)position.X;
                     initialY = y0 = (int)position.Y;
@@ -201,7 +202,8 @@ namespace ECSRogue.ECS.Systems
                     {
                         x0 = initialX;
                         y0 = initialY;
-
+                        int tileCount = 0;
+                        int grassCount = 0;
                         int dx = Math.Abs((int)point.X - x0), sx = x0 < (int)point.X ? 1 : -1;
                         int dy = -Math.Abs((int)point.Y - y0), sy = y0 < (int)point.Y ? 1 : -1;
                         int err = dx + dy, e2; /* error value e_xy */
@@ -212,10 +214,22 @@ namespace ECSRogue.ECS.Systems
                             {
                                 dungeonGrid[x0, y0].NewlyFound = true;
                             }
+                            if(!inTallGrass && dungeonGrid[x0, y0].Type == TileType.TILE_TALLGRASS)
+                            {
+                                tileCount += 1;
+                            }
+                            if(inTallGrass && dungeonGrid[x0, y0].Type != TileType.TILE_TALLGRASS)
+                            {
+                                grassCount += 1;
+                            }
                             dungeonGrid[x0, y0].Found = dungeonGrid[x0, y0].InRange = dungeonGrid[x0, y0].Occupiable = true;
                             if (dungeonGrid[x0, y0].Type == TileType.TILE_WALL || dungeonGrid[x0, y0].Type == TileType.TILE_ROCK)
                             {
                                 dungeonGrid[x0, y0].Occupiable = false;
+                                break;
+                            }
+                            if (tileCount > 1 || grassCount > 1)
+                            {
                                 break;
                             }
 

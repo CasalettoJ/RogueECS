@@ -65,13 +65,19 @@ namespace ECSRogue.ECS.Systems
                             switch (dungeonGrid[i, j].Type)
                             {
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.Floor * .5f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.Floor * .3f, origin: origin);
                                     break;
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.Wall * .5f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.Wall * .3f, origin: origin);
                                     break;
                                 case TileType.TILE_TALLGRASS:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.TallGrass * .5f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.TallGrass * .3f, origin: origin);
+                                    break;
+                                case TileType.TILE_WATER:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.Water * .3f, origin: origin);
+                                    break;
+                                case TileType.TILE_DEEPWATER:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.DeepWater * .3f, origin: origin);
                                     break;
                             }
                             if (!string.IsNullOrEmpty(dungeonGrid[i, j].Symbol))
@@ -79,7 +85,7 @@ namespace ECSRogue.ECS.Systems
                                 Vector2 size = font.MeasureString(dungeonGrid[i, j].Symbol);
                                 spriteBatch.DrawString(font, dungeonGrid[i, j].Symbol, new Vector2(i * DevConstants.Grid.CellSize + (int)(DevConstants.Grid.CellSize / 2),
                                     (j * DevConstants.Grid.CellSize + (int)(DevConstants.Grid.CellSize / 2))),
-                                    dungeonGrid[i, j].SymbolColor, 0f, new Vector2((int)(size.X / 2), (int)(size.Y / 2)), 1f, SpriteEffects.None, 0f);
+                                    dungeonGrid[i, j].SymbolColor * .5f, 0f, new Vector2((int)(size.X / 2), (int)(size.Y / 2)), 1f, SpriteEffects.None, 0f);
                             }
                         }
                         else if (dungeonGrid[i, j].InRange && !dungeonGrid[i, j].NewlyFound)
@@ -99,6 +105,12 @@ namespace ECSRogue.ECS.Systems
                                     break;
                                 case TileType.TILE_TALLGRASS:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.TallGrassInRange * (float)opacity, origin: origin);
+                                    break;
+                                case TileType.TILE_WATER:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.WaterInRange * (float)opacity, origin: origin);
+                                    break;
+                                case TileType.TILE_DEEPWATER:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.DeepWaterInRange * (float)opacity, origin: origin);
                                     break;
                             }
                             if(!isWall)
@@ -134,7 +146,13 @@ namespace ECSRogue.ECS.Systems
                                     spriteBatch.Draw(spriteSheet, position: tile,  color: colorInfo.WallInRange * opacity, origin: origin);
                                     break;
                                 case TileType.TILE_TALLGRASS:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.TallGrass * opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.TallGrassInRange * opacity, origin: origin);
+                                    break;
+                                case TileType.TILE_WATER:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.WaterInRange * opacity, origin: origin);
+                                    break;
+                                case TileType.TILE_DEEPWATER:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.DeepWaterInRange * opacity, origin: origin);
                                     break;
                             }
                             if (!string.IsNullOrEmpty(dungeonGrid[i, j].Symbol))
