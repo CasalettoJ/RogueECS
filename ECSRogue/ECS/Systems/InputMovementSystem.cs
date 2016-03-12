@@ -43,6 +43,10 @@ namespace ECSRogue.ECS.Systems
                 {
                     movement = InputMovementSystem.CalculateMovement(ref pos, -1, 0, ref movementComponent, gameTime, Keys.NumPad4);
                 }
+                else if (keyState.IsKeyDown(Keys.NumPad5))
+                {
+                    movement = InputMovementSystem.CalculateMovement(ref pos, 0, 0, ref movementComponent, gameTime, Keys.NumPad4);
+                }
                 else if (keyState.IsKeyDown(Keys.NumPad7))
                 {
                     movement = InputMovementSystem.CalculateMovement(ref pos, -1, -1, ref movementComponent, gameTime, Keys.NumPad7);

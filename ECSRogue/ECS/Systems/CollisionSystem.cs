@@ -34,7 +34,9 @@ namespace ECSRogue.ECS.Systems
                     (spaceComponents.Entities.Where(x => (x.Id == attemptingEntity)).First().ComponentFlags & ComponentMasks.Observer) != ComponentMasks.Observer)
                 {
                     dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].Type = TileType.TILE_FLATTENEDGRASS;
-                    dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].Symbol = "\'";
+                    dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].Symbol = Tiles.FlatGrassSymbol;
+                    dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].SymbolColor = Tiles.FlatGrassSymbolColor;
+                    dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].ChanceToIgnite = Tiles.FlatGrassIgniteChance;
                 }
             }
 

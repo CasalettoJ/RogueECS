@@ -97,119 +97,117 @@ namespace ECSRogue.BaseEngine.StateSpaces
         public IStateSpace UpdateSpace(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, ref GameSettings gameSettings)
         {
             IStateSpace nextStateSpace = this;
-            #region Debug
-            if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && prevKeyboardState.IsKeyUp(Keys.LeftShift))
-            {
-                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
-                LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
-                LevelChangeSystem.RetainNecessaryComponents(stateComponents, stateSpaceComponents);
-                PlayerComponent player = stateSpaceComponents.PlayerComponent;
-                player.GoToNextFloor = false;
-                player.PlayerJustLoaded = true;
-                stateSpaceComponents.PlayerComponent = player;
-            }
-            #endregion
-            //Check to see if the next level needs to be loaded
-            if(stateSpaceComponents.PlayerComponent.GoToNextFloor)
-            {
-                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
-                PlayerComponent player = stateSpaceComponents.PlayerComponent;
-                player.GoToNextFloor = false;
-                player.PlayerJustLoaded = true;
-                stateSpaceComponents.PlayerComponent = player;
-                LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
-                LevelChangeSystem.RetainNecessaryComponents(stateComponents, stateSpaceComponents);
-            }
-            //Toggle Inventory Menu
-            if (Keyboard.GetState().IsKeyDown(Keys.I) && prevKeyboardState.IsKeyUp(Keys.I) && !showObserver)
-            {
-                showInventory = !showInventory;
-            }
-            else if (Keyboard.GetState().IsKeyDown(Keys.Enter) && prevKeyboardState.IsKeyUp(Keys.Enter) && !showInventory)
-            {
-                //If observer exists, remove it and add input component to player(s), otherwise, remove input component from all players and create an observer.
-                if (ObserverSystem.CreateOrDestroyObserver(stateSpaceComponents))
-                {
-                    showObserver = true;
-                }
-                else
-                {
-                    showObserver = false;
-                }
-            }
 
-            //Actions to complete if the inventory is open
-            if (showInventory)
+
+            //Check to see if the player has died
+            if(stateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).Count() == 0)
             {
-                //Deletion and Cleanup
-                if (stateSpaceComponents.EntitiesToDelete.Count > 0)
-                {
-                    foreach (Guid entity in stateSpaceComponents.EntitiesToDelete)
-                    {
-                        stateSpaceComponents.DestroyEntity(entity);
-                    }
-                    stateSpaceComponents.EntitiesToDelete.Clear();
-                }
-                showInventory = InventorySystem.HandleInventoryInput(stateSpaceComponents, gameTime, prevKeyboardState, Keyboard.GetState());
+                //Game End, High Score, and Save Data handling
             }
-            //Actions to complete if inventory is not open
-            if (showObserver)
-            {
-                ObserverComponent observer = stateSpaceComponents.ObserverComponent;
-                observer.Observed = new List<Guid>();
-                stateSpaceComponents.ObserverComponent = observer;
-                InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, dungeonDimensions);
-                CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
-                ObserverSystem.HandleObserverFindings(stateSpaceComponents, Keyboard.GetState(), prevKeyboardState, dungeonGrid);
-                stateSpaceComponents.InvokeDelayedActions();
-            }
-            else if (!showInventory && !showObserver)
-            {
-                //Deletion and Cleanup
-                if (stateSpaceComponents.EntitiesToDelete.Count > 0)
+            else
+            {//Check to see if the next level needs to be loaded
+                if (stateSpaceComponents.PlayerComponent.GoToNextFloor)
                 {
-                    foreach (Guid entity in stateSpaceComponents.EntitiesToDelete)
-                    {
-                        stateSpaceComponents.DestroyEntity(entity);
-                    }
-                    stateSpaceComponents.EntitiesToDelete.Clear();
-                }
-                DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
-
-                //Non-turn-based
-                AnimationSystem.UpdateFovColors(stateSpaceComponents, gameTime);
-                AnimationSystem.UpdateOutlineColors(stateSpaceComponents, gameTime);
-                MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
-                MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
-
-                //Movement and Reaction
-                InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, dungeonDimensions);
-                CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
-                TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
-                TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
-                MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
-                DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
-
-                //AI and Combat
-                AISystem.AICheckDetection(stateSpaceComponents);
-                AISystem.AIMovement(stateSpaceComponents, dungeonGrid, dungeonDimensions, mapToPlayer);
-                InventorySystem.TryPickupItems(stateSpaceComponents, dungeonGrid);
-                AISystem.AIUpdateVision(stateSpaceComponents, dungeonGrid, dungeonDimensions);
-                CombatSystem.HandleMeleeCombat(stateSpaceComponents, DevConstants.Grid.CellSize);
-                AISystem.AICheckFleeing(stateSpaceComponents);
-                CombatSystem.RegenerateHealth(stateSpaceComponents);
-
-                //Resetting Systems
-                if (stateSpaceComponents.PlayerComponent.PlayerJustLoaded || stateSpaceComponents.PlayerComponent.PlayerTookTurn)
-                {
+                    nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
                     PlayerComponent player = stateSpaceComponents.PlayerComponent;
-                    player.PlayerJustLoaded = false;
-                    player.PlayerTookTurn = false;
+                    player.GoToNextFloor = false;
+                    player.PlayerJustLoaded = true;
                     stateSpaceComponents.PlayerComponent = player;
+                    LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
+                    LevelChangeSystem.RetainNecessaryComponents(stateComponents, stateSpaceComponents);
                 }
-                CollisionSystem.ResetCollision(stateSpaceComponents);
-                stateSpaceComponents.InvokeDelayedActions();
+                //Toggle Inventory Menu
+                if (Keyboard.GetState().IsKeyDown(Keys.I) && prevKeyboardState.IsKeyUp(Keys.I) && !showObserver)
+                {
+                    showInventory = !showInventory;
+                }
+                else if (Keyboard.GetState().IsKeyDown(Keys.Enter) && prevKeyboardState.IsKeyUp(Keys.Enter) && !showInventory)
+                {
+                    //If observer exists, remove it and add input component to player(s), otherwise, remove input component from all players and create an observer.
+                    if (ObserverSystem.CreateOrDestroyObserver(stateSpaceComponents))
+                    {
+                        showObserver = true;
+                    }
+                    else
+                    {
+                        showObserver = false;
+                    }
+                }
+
+                //Actions to complete if the inventory is open
+                if (showInventory)
+                {
+                    //Deletion and Cleanup
+                    if (stateSpaceComponents.EntitiesToDelete.Count > 0)
+                    {
+                        foreach (Guid entity in stateSpaceComponents.EntitiesToDelete)
+                        {
+                            stateSpaceComponents.DestroyEntity(entity);
+                        }
+                        stateSpaceComponents.EntitiesToDelete.Clear();
+                    }
+                    showInventory = InventorySystem.HandleInventoryInput(stateSpaceComponents, gameTime, prevKeyboardState, Keyboard.GetState());
+                }
+                //Actions to complete if inventory is not open
+                if (showObserver)
+                {
+                    ObserverComponent observer = stateSpaceComponents.ObserverComponent;
+                    observer.Observed = new List<Guid>();
+                    stateSpaceComponents.ObserverComponent = observer;
+                    InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, dungeonDimensions);
+                    CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
+                    ObserverSystem.HandleObserverFindings(stateSpaceComponents, Keyboard.GetState(), prevKeyboardState, dungeonGrid);
+                    stateSpaceComponents.InvokeDelayedActions();
+                }
+                else if (!showInventory && !showObserver)
+                {
+                    //Deletion and Cleanup
+                    DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
+
+                    //Non-turn-based
+                    AnimationSystem.UpdateFovColors(stateSpaceComponents, gameTime);
+                    AnimationSystem.UpdateOutlineColors(stateSpaceComponents, gameTime);
+                    MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
+                    MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
+
+                    //Movement and Reaction
+                    InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, dungeonDimensions);
+                    CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
+                    TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
+                    TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
+                    MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
+                    DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
+
+                    //AI and Combat
+                    AISystem.AICheckDetection(stateSpaceComponents);
+                    AISystem.AIMovement(stateSpaceComponents, dungeonGrid, dungeonDimensions, mapToPlayer);
+                    InventorySystem.TryPickupItems(stateSpaceComponents, dungeonGrid);
+                    AISystem.AIUpdateVision(stateSpaceComponents, dungeonGrid, dungeonDimensions);
+                    CombatSystem.HandleMeleeCombat(stateSpaceComponents, DevConstants.Grid.CellSize);
+                    AISystem.AICheckFleeing(stateSpaceComponents);
+                    CombatSystem.RegenerateHealth(stateSpaceComponents);
+
+                    //Resetting Systems
+                    if (stateSpaceComponents.PlayerComponent.PlayerJustLoaded || stateSpaceComponents.PlayerComponent.PlayerTookTurn)
+                    {
+                        PlayerComponent player = stateSpaceComponents.PlayerComponent;
+                        player.PlayerJustLoaded = false;
+                        player.PlayerTookTurn = false;
+                        stateSpaceComponents.PlayerComponent = player;
+                    }
+                    CollisionSystem.ResetCollision(stateSpaceComponents);
+                    if (stateSpaceComponents.EntitiesToDelete.Count > 0)
+                    {
+                        foreach (Guid entity in stateSpaceComponents.EntitiesToDelete)
+                        {
+                            stateSpaceComponents.DestroyEntity(entity);
+                        }
+                        stateSpaceComponents.EntitiesToDelete.Clear();
+                    }
+                    stateSpaceComponents.InvokeDelayedActions();
+                }
             }
+            
             return nextStateSpace;
         }  
         #endregion

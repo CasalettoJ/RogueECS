@@ -19,8 +19,13 @@ namespace ECSRogue.ECS.Systems
             Matrix cameraMatrix = camera.GetMatrix();
             IEnumerable<Guid> drawableEntities = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Drawable) == ComponentMasks.Drawable).Select(x => x.Id);
 
-            Vector2 playerPos = spaceComponents.PositionComponents[spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id].Position;
-            bool inWater = dungeonGrid[(int)playerPos.X, (int)playerPos.Y].Type == TileType.TILE_WATER;
+            Entity player = spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
+            bool inWater = false;
+            if (player != null)
+            {
+                Vector2 playerPos = spaceComponents.PositionComponents[spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id].Position;
+                inWater = dungeonGrid[(int)playerPos.X, (int)playerPos.Y].Type == TileType.TILE_WATER;
+            }
 
             foreach (Guid id in drawableEntities)
             {
@@ -53,8 +58,13 @@ namespace ECSRogue.ECS.Systems
 
         public static void DrawTiles(Camera camera, SpriteBatch spriteBatch, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, Texture2D spriteSheet, DungeonColorInfo colorInfo, DijkstraMapTile[,] mapToPlayer, SpriteFont font, StateSpaceComponents spaceComponents)
         {
-            Vector2 playerPos = spaceComponents.PositionComponents[spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id].Position;
-            bool inWater = dungeonGrid[(int)playerPos.X, (int)playerPos.Y].Type == TileType.TILE_WATER;
+            Entity player = spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
+            bool inWater = false;
+            if(player != null)
+            {
+                Vector2 playerPos = spaceComponents.PositionComponents[spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id].Position;
+                inWater = dungeonGrid[(int)playerPos.X, (int)playerPos.Y].Type == TileType.TILE_WATER;
+            }
 
             Matrix cameraMatrix = camera.GetMatrix();
             Vector2 origin = new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize);
@@ -90,9 +100,6 @@ namespace ECSRogue.ECS.Systems
                                 case TileType.TILE_WATER:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.Water * .3f, origin: origin);
                                     break;
-                                case TileType.TILE_DEEPWATER:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.DeepWater * .3f, origin: origin);
-                                    break;
                             }
                             if (!string.IsNullOrEmpty(dungeonGrid[i, j].Symbol))
                             {
@@ -124,9 +131,6 @@ namespace ECSRogue.ECS.Systems
                                     break;
                                 case TileType.TILE_WATER:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.WaterInRange * (float)opacity, origin: origin);
-                                    break;
-                                case TileType.TILE_DEEPWATER:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.DeepWaterInRange * (float)opacity, origin: origin);
                                     break;
                             }
                             if(!isWall)
@@ -169,9 +173,6 @@ namespace ECSRogue.ECS.Systems
                                 case TileType.TILE_WATER:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.WaterInRange * opacity, origin: origin);
                                     break;
-                                case TileType.TILE_DEEPWATER:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.DeepWaterInRange * opacity, origin: origin);
-                                    break;
                             }
                             if (!string.IsNullOrEmpty(dungeonGrid[i, j].Symbol))
                             {
@@ -198,9 +199,13 @@ namespace ECSRogue.ECS.Systems
         public static void DrawOutlines(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D rectangleTexture, DungeonTile[,] dungeonGrid)
         {
             Matrix cameraMatrix = camera.GetMatrix();
-
-            Vector2 playerPos = spaceComponents.PositionComponents[spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id].Position;
-            bool inWater = dungeonGrid[(int)playerPos.X, (int)playerPos.Y].Type == TileType.TILE_WATER;
+            Entity player = spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
+            bool inWater = false;
+            if (player != null)
+            {
+                Vector2 playerPos = spaceComponents.PositionComponents[spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id].Position;
+                inWater = dungeonGrid[(int)playerPos.X, (int)playerPos.Y].Type == TileType.TILE_WATER;
+            }
 
             foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.DrawableOutline) == ComponentMasks.DrawableOutline).Select(x => x.Id))
             {

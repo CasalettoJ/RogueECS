@@ -34,7 +34,7 @@ namespace ECSRogue.ProceduralGeneration
 
         public void TallGrassGeneration(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, Random random, List<Vector2> freeTiles)
         {
-            int numberOfGrassPlumes = random.Next(0, 6); //Must change to a formula
+            int numberOfGrassPlumes = random.Next(10, 20); //Must change to a formula
             for(int i = 0; i < numberOfGrassPlumes; i++)
             {
                 Vector2 tile = freeTiles[random.Next(0, freeTiles.Count)];
@@ -196,8 +196,9 @@ namespace ECSRogue.ProceduralGeneration
                         if (dungeonGrid[x0, y0].Occupiable)
                         {
                             dungeonGrid[x0, y0].Type = TileType.TILE_TALLGRASS;
-                            dungeonGrid[x0, y0].Symbol = "\"";
-                            dungeonGrid[x0, y0].SymbolColor = Color.Wheat;
+                            dungeonGrid[x0, y0].Symbol = Tiles.TallGrassSymbol;
+                            dungeonGrid[x0, y0].SymbolColor = Tiles.TallGrassSymbolColor;
+                            dungeonGrid[x0, y0].ChanceToIgnite = Tiles.TallGrassIgniteChange;
                         }
                         else
                         {
@@ -357,8 +358,9 @@ namespace ECSRogue.ProceduralGeneration
                         if (cellularLake[xStart+l, yStart+m] && dungeonGrid[l,m].Occupiable)
                         {
                             dungeonGrid[xStart+l, yStart+m].Type = TileType.TILE_WATER;
-                            dungeonGrid[xStart+l, yStart+m].Symbol = "~";
-                            dungeonGrid[xStart+l, yStart+m].SymbolColor = Color.CornflowerBlue;
+                            dungeonGrid[xStart+l, yStart+m].Symbol = Tiles.WaterSymbol;
+                            dungeonGrid[xStart+l, yStart+m].SymbolColor = Tiles.WaterSymbolColor;
+                            dungeonGrid[xStart + l, yStart + m].ChanceToIgnite = Tiles.WaterIgniteChance;
                         }
                     }
                 }
@@ -685,6 +687,7 @@ namespace ECSRogue.ProceduralGeneration
                     if(dungeonGrid[i,j].Type == TileType.TILE_FLOOR)
                     {
                         dungeonGrid[i, j].Occupiable = true;
+                        dungeonGrid[i, j].ChanceToIgnite = Tiles.FloorIgniteChance;
                         freeTiles.Add(new Vector2(i, j));
                     }
                 }
