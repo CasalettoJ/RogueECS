@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ECSRogue.ECS.Components;
+using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +26,23 @@ namespace ECSRogue.BaseEngine
             public static readonly int TileSpriteSize = 36;
             public static readonly int TileBorderSize = (TileSpriteSize - CellSize) / 2;
             public static readonly int WallWeight = 10000;
+        }
+
+        public static class ConstantComponents
+        {
+            public static readonly DisplayComponent UnknownDisplay = new DisplayComponent()
+            {
+                AlwaysDraw = false,
+                Color = Color.Black,
+                Opacity = 1f,
+                Origin = Vector2.Zero,
+                Rotation = 0f,
+                Scale = 1f,
+                SpriteEffect = Microsoft.Xna.Framework.Graphics.SpriteEffects.None,
+                SpriteSource = new Rectangle(0 * DevConstants.Grid.CellSize, 0 * DevConstants.Grid.CellSize, DevConstants.Grid.CellSize, DevConstants.Grid.CellSize),
+                Symbol = "?",
+                SymbolColor = Color.White
+            };
         }
     }
 }

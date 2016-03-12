@@ -15,6 +15,10 @@ namespace ECSRogue.BaseEngine
             public static readonly string Floor = "The floor here is moss-covered and damp.";
             public static readonly string Wall = "A thick cavern wall, glistening with precious gems and minerals.  If only you had a picaxe, you would not have to kill a dragon to get rich.";
             public static readonly string Rock = "Impenetrable rock that has hardened over thousands of years.";
+            public static readonly string Water = "There is deep water here.  Who knows what lurks under the surface?";
+            public static readonly string TallGrass = "Overgrown cavern grass has spread here.  Its dense nature is hard to see through.";
+            public static readonly string FlatGrass = "Vegetation here has been trampled flat.";
+            public static readonly string Unknown = "You can barely make out some sort of outline, but no details.";
         }
 
         public static readonly string InventoryHeader = "MY TREASURE HOARD";

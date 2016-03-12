@@ -30,10 +30,11 @@ namespace ECSRogue.ECS.Systems
             if(canMove)
             {
                 spaceComponents.PositionComponents[attemptingEntity] = newPosition;
-                if(dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].Type == TileType.TILE_TALLGRASS)
+                if(dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].Type == TileType.TILE_TALLGRASS && 
+                    (spaceComponents.Entities.Where(x => (x.Id == attemptingEntity)).First().ComponentFlags & ComponentMasks.Observer) != ComponentMasks.Observer)
                 {
-                    dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].Type = TileType.TILE_FLOOR;
-                    dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].Symbol = string.Empty;
+                    dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].Type = TileType.TILE_FLATTENEDGRASS;
+                    dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].Symbol = "\'";
                 }
             }
 

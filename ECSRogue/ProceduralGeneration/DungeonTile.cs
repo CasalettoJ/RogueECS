@@ -16,7 +16,8 @@ namespace ECSRogue.ProceduralGeneration
         TILE_WATER,
         TILE_DEEPWATER,
         TILE_TALLGRASS,
-        TILE_SPIKE
+        TILE_SPIKE,
+        TILE_FLATTENEDGRASS
     }
 
     public struct DungeonTile

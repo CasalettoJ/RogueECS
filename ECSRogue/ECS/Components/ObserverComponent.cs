@@ -9,5 +9,6 @@ namespace ECSRogue.ECS.Components
     {
         public Guid SelectedItem;
         public List<Guid> Observed;
+        public bool SeeUnknown;
     }
 }

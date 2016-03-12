@@ -52,6 +52,10 @@ namespace ECSRogue.ECS.Systems
         {
             ObserverComponent observer = spaceComponents.ObserverComponent;
             Entity observerInfo = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Observer) == ComponentMasks.Observer).FirstOrDefault();
+            
+            Vector2 playerPos = spaceComponents.PositionComponents[spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id].Position;
+            bool inWater = dungeonGrid[(int)playerPos.X, (int)playerPos.Y].Type == TileType.TILE_WATER;
+            observer.SeeUnknown = false;
 
             if (observerInfo != null)
             {
@@ -62,9 +66,16 @@ namespace ECSRogue.ECS.Systems
                 //gather a list of all observed items
                 foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Observable) == ComponentMasks.Observable).Select(x => x.Id))
                 {
+
                     PositionComponent enPos = spaceComponents.PositionComponents[id];
                     if (dungeonGrid[(int)observerPosition.Position.X, (int)observerPosition.Position.Y].InRange && enPos.Position == observerPosition.Position)
                     {
+                        bool observedInWater = dungeonGrid[(int)enPos.Position.X, (int)enPos.Position.Y].Type == TileType.TILE_WATER;
+                        if (observedInWater != inWater)
+                        {
+                            observer.SeeUnknown = true;
+                            break;
+                        }
                         observer.Observed.Add(id);
                     }
                 }
@@ -103,8 +114,9 @@ namespace ECSRogue.ECS.Systems
                 if (observer.Observed.Count > 0)
                 {
                     observer.SelectedItem = observer.Observed[selectedItem];
-                    spaceComponents.ObserverComponent = observer;
                 }
+
+                spaceComponents.ObserverComponent = observer;
             }
         }
 
@@ -163,7 +175,23 @@ namespace ECSRogue.ECS.Systems
                         case TileType.TILE_ROCK:
                             leftFindings.Add(new Tuple<Color, string>(Colors.Messages.Normal, Messages.Observer.Rock));
                             break;
+                        case TileType.TILE_WATER:
+                            leftFindings.Add(new Tuple<Color, string>(Colors.Messages.Normal, Messages.Observer.Water));
+                            break;
+                        case TileType.TILE_TALLGRASS:
+                            leftFindings.Add(new Tuple<Color, string>(Colors.Messages.Normal, Messages.Observer.TallGrass));
+                            break;
+                        case TileType.TILE_FLATTENEDGRASS:
+                            leftFindings.Add(new Tuple<Color, string>(Colors.Messages.Normal, Messages.Observer.FlatGrass));
+                            break;
+
                     }
+                }
+
+                if(observer.SeeUnknown)
+                {
+                    leftFindings.Add(new Tuple<Color, string>(Colors.Messages.Normal, System.Environment.NewLine));
+                    leftFindings.Add(new Tuple<Color, string>(Colors.Messages.Normal, Messages.Observer.Unknown));
                 }
 
                 if(observer.Observed.Count > 0)

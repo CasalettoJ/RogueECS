@@ -27,20 +27,21 @@ namespace ECSRogue.ECS.Systems
                 DisplayComponent display = spaceComponents.DisplayComponents[id];
                 Vector2 gridPos = spaceComponents.PositionComponents[id].Position;
                 Vector2 position = new Vector2(spaceComponents.PositionComponents[id].Position.X * cellSize, spaceComponents.PositionComponents[id].Position.Y * cellSize);
-                if(dungeonGrid[(int)spaceComponents.PositionComponents[id].Position.X, (int)spaceComponents.PositionComponents[id].Position.Y].InRange || display.AlwaysDraw)
+                if (dungeonGrid[(int)spaceComponents.PositionComponents[id].Position.X, (int)spaceComponents.PositionComponents[id].Position.Y].InRange || display.AlwaysDraw)
                 {
                     Vector2 bottomRight = Vector2.Transform(new Vector2((position.X) + cellSize, (position.Y) + cellSize), cameraMatrix);
                     Vector2 topLeft = Vector2.Transform(new Vector2(position.X, position.Y), cameraMatrix);
                     Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
 
-                    if (camera.IsInView(cameraMatrix, cameraBounds) )
+                    if (camera.IsInView(cameraMatrix, cameraBounds))
                     {
+                        display = dungeonGrid[(int)gridPos.X, (int)gridPos.Y].Type == TileType.TILE_WATER == inWater || (spaceComponents.Entities.Where(x => (x.Id == id)).First().ComponentFlags & ComponentMasks.Observer) == ComponentMasks.Observer ? display : DevConstants.ConstantComponents.UnknownDisplay;
                         Color displayColor = dungeonGrid[(int)gridPos.X, (int)gridPos.Y].Type == TileType.TILE_WATER || inWater ? Color.Lerp(display.Color, colorInfo.WaterInRange, .5f) : display.Color;
 
                         spriteBatch.Draw(spriteSheet, position, display.SpriteSource, displayColor * display.Opacity, display.Rotation, display.Origin, display.Scale, display.SpriteEffect, 0f);
-                        if (!string.IsNullOrEmpty(spaceComponents.DisplayComponents[id].Symbol))
+                        if (!string.IsNullOrEmpty(display.Symbol))
                         {
-                            Vector2 size = font.MeasureString(spaceComponents.DisplayComponents[id].Symbol);
+                            Vector2 size = font.MeasureString(display.Symbol);
                             spriteBatch.DrawString(font, display.Symbol, new Vector2(((int)position.X + (int)display.SpriteSource.Center.X), ((int)position.Y + (int)display.SpriteSource.Center.Y)), 
                                 display.SymbolColor, 0f, new Vector2((int)(size.X/2), (int)(size.Y/2)-3), 1f, SpriteEffects.None, 0f);
                         }
@@ -74,6 +75,7 @@ namespace ECSRogue.ECS.Systems
                         {
                             switch (dungeonGrid[i, j].Type)
                             {
+                                case TileType.TILE_FLATTENEDGRASS:
                                 case TileType.TILE_FLOOR:
                                     spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater ? Color.Lerp(colorInfo.Floor, colorInfo.Water, .3f) : colorInfo.Floor) * .3f, origin: origin);
                                     break;
@@ -106,6 +108,7 @@ namespace ECSRogue.ECS.Systems
                             bool isWall = false;
                             switch (dungeonGrid[i, j].Type)
                             {
+                                case TileType.TILE_FLATTENEDGRASS:
                                 case TileType.TILE_FLOOR:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.FloorInRange, colorInfo.WaterInRange, .55f) :  colorInfo.FloorInRange) * (float)opacity, origin: origin);
                                     break;
@@ -149,6 +152,7 @@ namespace ECSRogue.ECS.Systems
                             float opacity = dungeonGrid[i, j].Opacity;
                             switch (dungeonGrid[i, j].Type)
                             {
+                                case TileType.TILE_FLATTENEDGRASS:
                                 case TileType.TILE_FLOOR:
                                     spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater ? Color.Lerp(colorInfo.FloorInRange, colorInfo.WaterInRange, .55f) : colorInfo.FloorInRange) * opacity, origin: origin);
                                     break;
@@ -190,17 +194,30 @@ namespace ECSRogue.ECS.Systems
         public static void DrawOutlines(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D rectangleTexture, DungeonTile[,] dungeonGrid)
         {
             Matrix cameraMatrix = camera.GetMatrix();
-            foreach(Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.DrawableOutline) == ComponentMasks.DrawableOutline).Select(x => x.Id))
+
+            Vector2 playerPos = spaceComponents.PositionComponents[spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id].Position;
+            bool inWater = dungeonGrid[(int)playerPos.X, (int)playerPos.Y].Type == TileType.TILE_WATER;
+
+            foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.DrawableOutline) == ComponentMasks.DrawableOutline).Select(x => x.Id))
             {
+                Entity observer = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Observer) == ComponentMasks.Observer).FirstOrDefault();
+                bool isObserver = false;
+                if(observer != null)
+                {
+                    isObserver = observer.Id == id;
+                }
+
                 OutlineComponent outline = spaceComponents.OutlineComponents[id];
                 PositionComponent position = spaceComponents.PositionComponents[id];
+
+                bool outlineInWater = dungeonGrid[(int)position.Position.X, (int)position.Position.Y].Type == TileType.TILE_WATER;
                 Vector2 tile = new Vector2((int)position.Position.X * DevConstants.Grid.CellSize, (int)position.Position.Y * DevConstants.Grid.CellSize);
 
                 Vector2 bottomRight = Vector2.Transform(new Vector2((tile.X + DevConstants.Grid.CellSize), (tile.Y + DevConstants.Grid.CellSize)), cameraMatrix);
                 Vector2 topLeft = Vector2.Transform(tile, cameraMatrix);
                 Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
 
-                if (dungeonGrid[(int)position.Position.X, (int)position.Position.Y].InRange && camera.IsInView(cameraMatrix, cameraBounds))
+                if (dungeonGrid[(int)position.Position.X, (int)position.Position.Y].InRange && camera.IsInView(cameraMatrix, cameraBounds) && (inWater == outlineInWater || isObserver))
                 {
                     if (spaceComponents.SecondaryOutlineComponents.ContainsKey(id))
                     {
