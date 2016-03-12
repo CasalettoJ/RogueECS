@@ -28,11 +28,13 @@ namespace ECSRogue.ProceduralGeneration
         public bool Found;
         public bool NewlyFound;
         public bool InRange;
+        public bool ExternalIllumination;
         public bool Occupiable;
         public float Opacity;
         public string Symbol;
         public int ChanceToIgnite;
         public int TurnsToBurn;
+        public Guid AttachedEntity;
         public Color SymbolColor;
     }
 
@@ -52,8 +54,8 @@ namespace ECSRogue.ProceduralGeneration
         public static readonly Color WaterSymbolColor = Color.CornflowerBlue;
         public static readonly int WaterIgniteChance = 0;
 
-        public static readonly string FireSymbol = "^";
-        public static readonly Color FireSymbolColor = Color.Firebrick;
+        public static readonly string FireSymbol = "*";
+        public static readonly Color FireSymbolColor = Color.LightGoldenrodYellow;
         public static readonly int FireIgniteChance = 0;
 
         public static readonly string FlatGrassSymbol = "\'";
@@ -61,5 +63,9 @@ namespace ECSRogue.ProceduralGeneration
         public static readonly int FlatGrassIgniteChance = 20;
 
         public static readonly int FloorIgniteChance = 1;
+
+        public static readonly string AshSymbol = string.Empty;
+        public static readonly Color AshSymbolColor = Color.Black;
+        public static readonly int AshIgniteChance = 0;
     }
 }

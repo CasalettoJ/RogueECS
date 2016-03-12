@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ECSRogue.ECS.Components;
 
 namespace ECSRogue.ECS.Systems
 {
@@ -22,6 +23,7 @@ namespace ECSRogue.ECS.Systems
                     for (int j = 0; j < dungeonDimensions.Y; j++)
                     {
                         dungeonGrid[i, j].InRange = false;
+                        dungeonGrid[i, j].ExternalIllumination = false;
                     }
                 }
                 //See if the player is in water
@@ -29,13 +31,14 @@ namespace ECSRogue.ECS.Systems
 
                 foreach (Guid entity in spaceComponents.Entities.Where(c => (c.ComponentFlags & Component.COMPONENT_SIGHTRADIUS) == Component.COMPONENT_SIGHTRADIUS).Select(c => c.Id))
                 {
+                    bool isPlayer = player.Id == entity;
                     if(!spaceComponents.SightRadiusComponents[entity].DrawRadius || spaceComponents.SightRadiusComponents[entity].CurrentRadius == 0)
                     {
                         continue;
                     }
                     //Guid entity = player.Id;
                     Vector2 position = spaceComponents.PositionComponents[entity].Position;
-                    int radius =  inWater ? spaceComponents.SightRadiusComponents[entity].CurrentRadius / 2 : spaceComponents.SightRadiusComponents[entity].CurrentRadius;
+                    int radius =  inWater && isPlayer ? spaceComponents.SightRadiusComponents[entity].CurrentRadius / 2 : spaceComponents.SightRadiusComponents[entity].CurrentRadius;
                     int initialX, x0, initialY, y0;
                     initialX = x0 = (int)position.X;
                     initialY = y0 = (int)position.Y;
@@ -215,6 +218,7 @@ namespace ECSRogue.ECS.Systems
                             {
                                 dungeonGrid[x0, y0].NewlyFound = true;
                             }
+                            dungeonGrid[x0, y0].ExternalIllumination = !isPlayer;
                             dungeonGrid[x0, y0].Found = dungeonGrid[x0, y0].InRange = dungeonGrid[x0, y0].Occupiable = true;
                             if (dungeonGrid[x0, y0].Type == TileType.TILE_WALL || dungeonGrid[x0, y0].Type == TileType.TILE_ROCK)
                             {
@@ -273,5 +277,73 @@ namespace ECSRogue.ECS.Systems
             }
             
         }
+
+        public static void SpreadFire(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, StateSpaceComponents spaceComponents)
+        {
+            if(spaceComponents.PlayerComponent.PlayerTookTurn)
+            {
+                for (int i = 0; i < (int)dungeonDimensions.X; i++)
+                {
+                    for (int j = 0; j < (int)dungeonDimensions.Y; j++)
+                    {
+                        //If it's a fire tile, check its neighbors and attempt to spread the fire.  Decrease the fire burn time.  If the fire is dead, turn it to ash.
+                        if(dungeonGrid[i,j].Type == TileType.TILE_FIRE)
+                        {
+                            if(dungeonGrid[i,j].TurnsToBurn <= 0)
+                            {
+                                TileRevealSystem.ExtinguishFire(i, j, spaceComponents, dungeonGrid);
+                            }
+                            else
+                            {
+                                for (int k = i - 1; k <= i + 1; k++)
+                                {
+                                    for (int l = j - 1; l <= j + 1; l++)
+                                    {
+                                        if(l >= 0 && k >= 0 && l < (int)dungeonDimensions.Y && k < (int)dungeonDimensions.X && spaceComponents.random.Next(0, 101) <= dungeonGrid[k, l].ChanceToIgnite)
+                                        {
+                                            TileRevealSystem.CreateFire(k, l, spaceComponents, dungeonGrid);
+                                        }
+                                    }
+                                }
+
+                                dungeonGrid[i, j].TurnsToBurn -= 1;
+                            }
+
+                        }
+                    }
+                }
+            }
+
+        }
+
+        public static void CreateFire(int x, int y, StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid)
+        {
+            dungeonGrid[x, y].Type = TileType.TILE_FIRE;
+            dungeonGrid[x, y].Symbol = Tiles.FireSymbol;
+            dungeonGrid[x, y].SymbolColor = Tiles.FireSymbolColor;
+            dungeonGrid[x, y].TurnsToBurn = spaceComponents.random.Next(3, 10);
+            dungeonGrid[x, y].ChanceToIgnite = Tiles.FireIgniteChance;
+            spaceComponents.DelayedActions.Add(new Action(() =>
+            {
+                Guid idFire = spaceComponents.CreateEntity();
+                spaceComponents.Entities.Where(c => c.Id == idFire).First().ComponentFlags = Component.COMPONENT_POSITION | Component.COMPONENT_SIGHTRADIUS;
+                spaceComponents.PositionComponents[idFire] = new PositionComponent() { Position = new Vector2(x, y) };
+                spaceComponents.SightRadiusComponents[idFire] = new SightRadiusComponent() { DrawRadius = true, CurrentRadius = 5, MaxRadius = 5 };
+                dungeonGrid[x, y].AttachedEntity = idFire;
+            }));
+        }
+
+        public static void ExtinguishFire(int x, int y, StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid)
+        {
+            dungeonGrid[x, y].Type = TileType.TILE_ASH;
+            dungeonGrid[x, y].Symbol = Tiles.AshSymbol;
+            dungeonGrid[x, y].SymbolColor = Tiles.AshSymbolColor;
+            dungeonGrid[x, y].TurnsToBurn = 0;
+            dungeonGrid[x, y].ChanceToIgnite = Tiles.AshIgniteChance;
+            spaceComponents.EntitiesToDelete.Add(dungeonGrid[x, y].AttachedEntity);
+            dungeonGrid[x, y].AttachedEntity = Guid.Empty;
+        }
+
+
     }
 }

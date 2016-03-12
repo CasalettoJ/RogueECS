@@ -100,6 +100,9 @@ namespace ECSRogue.ECS.Systems
                                 case TileType.TILE_WATER:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.Water * .3f, origin: origin);
                                     break;
+                                case TileType.TILE_FIRE:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.Fire, colorInfo.Water, .3f) : colorInfo.Fire) * .3f, origin: origin);
+                                    break;
                             }
                             if (!string.IsNullOrEmpty(dungeonGrid[i, j].Symbol))
                             {
@@ -114,6 +117,7 @@ namespace ECSRogue.ECS.Systems
                             int weight = mapToPlayer[i, j].Weight;
                             double opacity = 1 - (.035 * weight);
                             opacity = (opacity < .4) ? .4 : opacity;
+                            opacity = dungeonGrid[i, j].ExternalIllumination ? .85f : opacity;
                             bool isWall = false;
                             switch (dungeonGrid[i, j].Type)
                             {
@@ -131,6 +135,11 @@ namespace ECSRogue.ECS.Systems
                                     break;
                                 case TileType.TILE_WATER:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.WaterInRange * (float)opacity, origin: origin);
+                                    break;
+                                case TileType.TILE_FIRE:
+                                    opacity = 0f + (.07f * dungeonGrid[i, j].TurnsToBurn);
+                                    opacity = (opacity > 1f) ? 1f : opacity;
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.FireInRange, colorInfo.Water, .3f) : colorInfo.FireInRange) * (float)opacity, origin: origin);
                                     break;
                             }
                             if(!isWall)
@@ -172,6 +181,9 @@ namespace ECSRogue.ECS.Systems
                                     break;
                                 case TileType.TILE_WATER:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.WaterInRange * opacity, origin: origin);
+                                    break;
+                                case TileType.TILE_FIRE:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.FireInRange, colorInfo.Water, .3f) : colorInfo.FireInRange), origin: origin);
                                     break;
                             }
                             if (!string.IsNullOrEmpty(dungeonGrid[i, j].Symbol))

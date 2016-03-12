@@ -20,5 +20,9 @@ namespace ECSRogue.ProceduralGeneration
         public Color TallGrassInRange;
         public Color Spikes;
         public Color SpikesInRange;
+        public Color Fire;
+        public Color FireInRange;
+        public Color Ash;
+        public Color AshInRange;
     }
 }

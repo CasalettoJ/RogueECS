@@ -26,7 +26,11 @@ namespace ECSRogue.ProceduralGeneration
                 TallGrass = Colors.Caves.TallGrass,
                 TallGrassInRange = Colors.Caves.TallGrassInRange,
                 Water = Colors.Caves.Water,
-                WaterInRange = Colors.Caves.WaterInRange
+                WaterInRange = Colors.Caves.WaterInRange,
+                Ash = Colors.Caves.Ash,
+                AshInRange = Colors.Caves.AshInRange,
+                Fire = Colors.Caves.Fire,
+                FireInRange = Colors.Caves.FireInRange
             };
         }
 
