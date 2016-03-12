@@ -218,11 +218,20 @@ namespace ECSRogue.ProceduralGeneration
 
         public void WaterGeneration(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, Random random, List<Vector2> freeTiles)
         {
-            int numberOfLakes = random.Next(0, 2);
-            bool[,] cellularLake = new bool[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
+            int numberOfLakes = random.Next(0, 11);
+            int maxWidth = 30;
+            int minWidth = 10;
+            int maxHeight = 40;
+            int minHeight = 10;
 
             for(int i = 0; i < numberOfLakes; i++)
             {
+                int xStart = random.Next(0, (int)dungeonDimensions.X - maxWidth);
+                int yStart = random.Next(0, (int)dungeonDimensions.Y - maxHeight);
+                int width = random.Next(minWidth, maxWidth);
+                int height = random.Next(minHeight, maxHeight);
+
+                bool[,] cellularLake = new bool[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
                 //Initial Seed
                 for (int j = 0; j < (int)dungeonDimensions.X; j++)
                 {
@@ -341,15 +350,15 @@ namespace ECSRogue.ProceduralGeneration
 
                 }
 
-                for (int l = 0; l < (int)dungeonDimensions.X; l++)
+                for (int l = 0; l <= width; l++)
                 {
-                    for (int m = 0; m < (int)dungeonDimensions.Y; m++)
+                    for (int m = 0; m < height; m++)
                     {
-                        if (cellularLake[l, m] && dungeonGrid[l,m].Occupiable)
+                        if (cellularLake[xStart+l, yStart+m] && dungeonGrid[l,m].Occupiable)
                         {
-                            dungeonGrid[l, m].Type = TileType.TILE_WATER;
-                            dungeonGrid[l, m].Symbol = "~";
-                            dungeonGrid[l, m].SymbolColor = Color.CornflowerBlue;
+                            dungeonGrid[xStart+l, yStart+m].Type = TileType.TILE_WATER;
+                            dungeonGrid[xStart+l, yStart+m].Symbol = "~";
+                            dungeonGrid[xStart+l, yStart+m].SymbolColor = Color.CornflowerBlue;
                         }
                     }
                 }

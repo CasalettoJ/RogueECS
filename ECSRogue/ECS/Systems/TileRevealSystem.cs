@@ -11,6 +11,7 @@ namespace ECSRogue.ECS.Systems
     {
         public static void RevealTiles(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, StateSpaceComponents spaceComponents)
         {
+            bool inWater = false;
             Entity player = spaceComponents.Entities.Where(z => (z.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER).FirstOrDefault();
             if (player != null && (spaceComponents.PlayerComponent.PlayerTookTurn || spaceComponents.PlayerComponent.PlayerJustLoaded)) 
             {
@@ -23,6 +24,8 @@ namespace ECSRogue.ECS.Systems
                         dungeonGrid[i, j].InRange = false;
                     }
                 }
+                //See if the player is in water
+                inWater = dungeonGrid[(int)spaceComponents.PositionComponents[player.Id].Position.X, (int)spaceComponents.PositionComponents[player.Id].Position.Y].Type == TileType.TILE_WATER;
 
                 foreach (Guid entity in spaceComponents.Entities.Where(c => (c.ComponentFlags & Component.COMPONENT_SIGHTRADIUS) == Component.COMPONENT_SIGHTRADIUS).Select(c => c.Id))
                 {
@@ -32,7 +35,7 @@ namespace ECSRogue.ECS.Systems
                     }
                     //Guid entity = player.Id;
                     Vector2 position = spaceComponents.PositionComponents[entity].Position;
-                    int radius =  spaceComponents.SightRadiusComponents[entity].CurrentRadius;
+                    int radius =  inWater ? spaceComponents.SightRadiusComponents[entity].CurrentRadius / 2 : spaceComponents.SightRadiusComponents[entity].CurrentRadius;
                     int initialX, x0, initialY, y0;
                     initialX = x0 = (int)position.X;
                     initialY = y0 = (int)position.Y;

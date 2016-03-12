@@ -35,6 +35,7 @@ namespace ECSRogue.ECS.Systems
 
                     if (camera.IsInView(cameraMatrix, cameraBounds))
                     {
+                        //If the item is in water, you need to tint it, and if the player is in water and the object isn't (or vice versa) it must be hidden unless it's the observer.
                         display = dungeonGrid[(int)gridPos.X, (int)gridPos.Y].Type == TileType.TILE_WATER == inWater || (spaceComponents.Entities.Where(x => (x.Id == id)).First().ComponentFlags & ComponentMasks.Observer) == ComponentMasks.Observer ? display : DevConstants.ConstantComponents.UnknownDisplay;
                         Color displayColor = dungeonGrid[(int)gridPos.X, (int)gridPos.Y].Type == TileType.TILE_WATER || inWater ? Color.Lerp(display.Color, colorInfo.WaterInRange, .5f) : display.Color;
 
@@ -79,6 +80,7 @@ namespace ECSRogue.ECS.Systems
                                 case TileType.TILE_FLOOR:
                                     spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater ? Color.Lerp(colorInfo.Floor, colorInfo.Water, .3f) : colorInfo.Floor) * .3f, origin: origin);
                                     break;
+                                case TileType.TILE_ROCK:
                                 case TileType.TILE_WALL:
                                     spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater ? Color.Lerp(colorInfo.Wall, colorInfo.Water, .3f) : colorInfo.Wall) * .3f, origin: origin);
                                     break;
@@ -112,6 +114,7 @@ namespace ECSRogue.ECS.Systems
                                 case TileType.TILE_FLOOR:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.FloorInRange, colorInfo.WaterInRange, .55f) :  colorInfo.FloorInRange) * (float)opacity, origin: origin);
                                     break;
+                                case TileType.TILE_ROCK:
                                 case TileType.TILE_WALL:
                                     spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater ? Color.Lerp(colorInfo.WallInRange, colorInfo.WaterInRange, .55f) : colorInfo.WallInRange) * .85f, origin: origin);
                                     isWall = true;
@@ -156,6 +159,7 @@ namespace ECSRogue.ECS.Systems
                                 case TileType.TILE_FLOOR:
                                     spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater ? Color.Lerp(colorInfo.FloorInRange, colorInfo.WaterInRange, .55f) : colorInfo.FloorInRange) * opacity, origin: origin);
                                     break;
+                                case TileType.TILE_ROCK:
                                 case TileType.TILE_WALL:
                                     spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater ? Color.Lerp(colorInfo.WallInRange, colorInfo.WaterInRange, .55f) : colorInfo.WallInRange) * opacity, origin: origin);
                                     break;
