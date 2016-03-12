@@ -25,8 +25,8 @@ namespace ECSRogue.BaseEngine
 
             public static readonly Color Fire = new Color(204, 15, 15);
             public static readonly Color FireInRange = new Color(204, 15, 15);
-            public static readonly Color Ash = new Color(127, 73, 73);
-            public static readonly Color AshInRange = new Color(164, 109, 109);
+            public static readonly Color Ash = new Color(93, 70, 70);
+            public static readonly Color AshInRange = new Color(136, 112, 112);
             //Alternate Wall Color:
             //new Color(127, 157, 175);
             //Alternate Wall Inrange Color:

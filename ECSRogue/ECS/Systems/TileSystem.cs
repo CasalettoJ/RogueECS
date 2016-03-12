@@ -8,15 +8,17 @@ using ECSRogue.ECS.Components;
 
 namespace ECSRogue.ECS.Systems
 {
-    public static class TileRevealSystem
+    public static class TileSystem
     {
         public static void RevealTiles(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, StateSpaceComponents spaceComponents)
         {
             bool inWater = false;
             Entity player = spaceComponents.Entities.Where(z => (z.ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER).FirstOrDefault();
-            if (player != null && (spaceComponents.PlayerComponent.PlayerTookTurn || spaceComponents.PlayerComponent.PlayerJustLoaded)) 
+            if (player != null && (spaceComponents.PlayerComponent.PlayerTookTurn || spaceComponents.PlayerComponent.PlayerJustLoaded || spaceComponents.PlayerComponent.SightRadiusDeleted)) 
             {
-
+                PlayerComponent events = spaceComponents.PlayerComponent;
+                events.SightRadiusDeleted = false;
+                spaceComponents.PlayerComponent = events;
                 //Reset Range
                 for (int i = 0; i < dungeonDimensions.X; i++)
                 {
@@ -289,24 +291,21 @@ namespace ECSRogue.ECS.Systems
                         //If it's a fire tile, check its neighbors and attempt to spread the fire.  Decrease the fire burn time.  If the fire is dead, turn it to ash.
                         if(dungeonGrid[i,j].Type == TileType.TILE_FIRE)
                         {
-                            if(dungeonGrid[i,j].TurnsToBurn <= 0)
+                            for (int k = i - 1; k <= i + 1; k++)
                             {
-                                TileRevealSystem.ExtinguishFire(i, j, spaceComponents, dungeonGrid);
-                            }
-                            else
-                            {
-                                for (int k = i - 1; k <= i + 1; k++)
+                                for (int l = j - 1; l <= j + 1; l++)
                                 {
-                                    for (int l = j - 1; l <= j + 1; l++)
+                                    if(l >= 0 && k >= 0 && l < (int)dungeonDimensions.Y && k < (int)dungeonDimensions.X && spaceComponents.random.Next(0, 101) < dungeonGrid[k, l].ChanceToIgnite)
                                     {
-                                        if(l >= 0 && k >= 0 && l < (int)dungeonDimensions.Y && k < (int)dungeonDimensions.X && spaceComponents.random.Next(0, 101) <= dungeonGrid[k, l].ChanceToIgnite)
-                                        {
-                                            TileRevealSystem.CreateFire(k, l, spaceComponents, dungeonGrid);
-                                        }
+                                        TileSystem.CreateFire(k, l, spaceComponents, dungeonGrid);
                                     }
                                 }
+                            }
 
-                                dungeonGrid[i, j].TurnsToBurn -= 1;
+                            dungeonGrid[i, j].TurnsToBurn -= 1;
+                            if (dungeonGrid[i, j].TurnsToBurn <= 0)
+                            {
+                                TileSystem.ExtinguishFire(i, j, spaceComponents, dungeonGrid);
                             }
 
                         }
@@ -318,13 +317,14 @@ namespace ECSRogue.ECS.Systems
 
         public static void CreateFire(int x, int y, StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid)
         {
-            dungeonGrid[x, y].Type = TileType.TILE_FIRE;
-            dungeonGrid[x, y].Symbol = Tiles.FireSymbol;
-            dungeonGrid[x, y].SymbolColor = Tiles.FireSymbolColor;
-            dungeonGrid[x, y].TurnsToBurn = spaceComponents.random.Next(3, 10);
-            dungeonGrid[x, y].ChanceToIgnite = Tiles.FireIgniteChance;
+            dungeonGrid[x, y].ChanceToIgnite = 0;
             spaceComponents.DelayedActions.Add(new Action(() =>
             {
+                dungeonGrid[x, y].Type = TileType.TILE_FIRE;
+                dungeonGrid[x, y].Symbol = Tiles.FireSymbol;
+                dungeonGrid[x, y].SymbolColor = Tiles.FireSymbolColor;
+                dungeonGrid[x, y].TurnsToBurn = spaceComponents.random.Next(3, 10);
+                dungeonGrid[x, y].ChanceToIgnite = Tiles.FireIgniteChance;
                 Guid idFire = spaceComponents.CreateEntity();
                 spaceComponents.Entities.Where(c => c.Id == idFire).First().ComponentFlags = Component.COMPONENT_POSITION | Component.COMPONENT_SIGHTRADIUS;
                 spaceComponents.PositionComponents[idFire] = new PositionComponent() { Position = new Vector2(x, y) };
@@ -335,6 +335,9 @@ namespace ECSRogue.ECS.Systems
 
         public static void ExtinguishFire(int x, int y, StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid)
         {
+            PlayerComponent player = spaceComponents.PlayerComponent;
+            player.SightRadiusDeleted = true;
+            spaceComponents.PlayerComponent = player;
             dungeonGrid[x, y].Type = TileType.TILE_ASH;
             dungeonGrid[x, y].Symbol = Tiles.AshSymbol;
             dungeonGrid[x, y].SymbolColor = Tiles.AshSymbolColor;

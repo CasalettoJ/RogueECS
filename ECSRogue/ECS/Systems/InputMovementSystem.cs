@@ -94,7 +94,7 @@ namespace ECSRogue.ECS.Systems
                 #region debug
                 else if (keyState.IsKeyDown(Keys.OemPeriod) && prevKeyboardState.IsKeyUp(Keys.OemPeriod))
                 {
-                    TileRevealSystem.CreateFire((int)pos.Position.X, (int)pos.Position.Y, spaceComponents, dungeonGrid);
+                    TileSystem.CreateFire((int)pos.Position.X, (int)pos.Position.Y, spaceComponents, dungeonGrid);
                 }
 
                 #endregion

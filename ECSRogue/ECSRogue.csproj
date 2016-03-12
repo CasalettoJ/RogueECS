@@ -113,7 +113,7 @@
     <Compile Include="ECS\Systems\DungeonCreationSystem.cs" />
     <Compile Include="ECS\Systems\MovementSystem.cs" />
     <Compile Include="ECS\Systems\ObserverSystem.cs" />
-    <Compile Include="ECS\Systems\TileRevealSystem.cs" />
+    <Compile Include="ECS\Systems\TileSystem.cs" />
     <Compile Include="ProceduralGeneration\CaveArenaGeneration.cs" />
     <Compile Include="ProceduralGeneration\CaveGeneration.cs" />
     <Compile Include="ProceduralGeneration\DungeonColorInfo.cs" />

@@ -97,6 +97,9 @@ namespace ECSRogue.ECS.Systems
                                 case TileType.TILE_TALLGRASS:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.TallGrass, colorInfo.Water, .3f) : colorInfo.TallGrass) * .3f, origin: origin);
                                     break;
+                                case TileType.TILE_ASH:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.Ash, colorInfo.Water, .3f) : colorInfo.Ash) * .3f, origin: origin);
+                                    break;
                                 case TileType.TILE_WATER:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.Water * .3f, origin: origin);
                                     break;
@@ -136,9 +139,13 @@ namespace ECSRogue.ECS.Systems
                                 case TileType.TILE_WATER:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.WaterInRange * (float)opacity, origin: origin);
                                     break;
+                                case TileType.TILE_ASH:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.AshInRange, colorInfo.WaterInRange, .55f) : colorInfo.AshInRange) * (float)opacity, origin: origin);
+                                    break;
                                 case TileType.TILE_FIRE:
                                     opacity = 0f + (.07f * dungeonGrid[i, j].TurnsToBurn);
                                     opacity = (opacity > 1f) ? 1f : opacity;
+                                    opacity = (opacity < .3f) ? .3f : opacity;
                                     spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.FireInRange, colorInfo.Water, .3f) : colorInfo.FireInRange) * (float)opacity, origin: origin);
                                     break;
                             }
@@ -178,6 +185,9 @@ namespace ECSRogue.ECS.Systems
                                     break;
                                 case TileType.TILE_TALLGRASS:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.TallGrassInRange, colorInfo.WaterInRange, .55f) : colorInfo.TallGrassInRange) * opacity, origin: origin);
+                                    break;
+                                case TileType.TILE_ASH:
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.AshInRange, colorInfo.WaterInRange, .55f) : colorInfo.AshInRange) * opacity, origin: origin);
                                     break;
                                 case TileType.TILE_WATER:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: colorInfo.WaterInRange * opacity, origin: origin);

@@ -173,9 +173,9 @@ namespace ECSRogue.BaseEngine.StateSpaces
                     //Movement and Reaction
                     InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, dungeonDimensions);
                     CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
-                    TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
-                    TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
-                    TileRevealSystem.SpreadFire(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
+                    TileSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
+                    TileSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
+                    TileSystem.SpreadFire(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
                     MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
                     DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
 
