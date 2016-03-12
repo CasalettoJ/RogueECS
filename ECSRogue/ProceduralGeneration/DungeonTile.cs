@@ -6,6 +6,7 @@ using System.Text;
 
 namespace ECSRogue.ProceduralGeneration
 {
+
     public enum TileType
     {
         NONE,
