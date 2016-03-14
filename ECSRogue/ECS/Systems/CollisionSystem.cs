@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static ECSRogue.BaseEngine.DevConstants;
 
 namespace ECSRogue.ECS.Systems
 {
@@ -37,6 +38,15 @@ namespace ECSRogue.ECS.Systems
                     dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].Symbol = Tiles.FlatGrassSymbol;
                     dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].SymbolColor = Tiles.FlatGrassSymbolColor;
                     dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].ChanceToIgnite = Tiles.FlatGrassIgniteChance;
+                }
+                if (dungeonGrid[(int)newPosition.Position.X, (int)newPosition.Position.Y].Type == TileType.TILE_FIRE &&
+                    (spaceComponents.Entities.Where(x => (x.Id == attemptingEntity)).First().ComponentFlags & ComponentMasks.Observer) != ComponentMasks.Observer)
+                {
+                    spaceComponents.DelayedActions.Add(new Action(() =>
+                    {
+                        //Burn effect damage is hardcoded for now
+                        StatusSystem.ApplyBurnEffect(spaceComponents, attemptingEntity, StatusEffects.Burning.Turns, StatusEffects.Burning.MinDamage, StatusEffects.Burning.MaxDamage);
+                    }));
                 }
             }
 

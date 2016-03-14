@@ -44,5 +44,15 @@ namespace ECSRogue.BaseEngine
                 SymbolColor = Color.White
             };
         }
+
+        public static class StatusEffects
+        {
+            public static class Burning
+            {
+                public static readonly int Turns = 7;
+                public static readonly int MinDamage = 1;
+                public static readonly int MaxDamage = 8;
+            }
+        }
     }
 }

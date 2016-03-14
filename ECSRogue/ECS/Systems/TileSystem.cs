@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ECSRogue.ECS.Components;
+using static ECSRogue.BaseEngine.DevConstants;
 
 namespace ECSRogue.ECS.Systems
 {
@@ -330,6 +331,13 @@ namespace ECSRogue.ECS.Systems
                 spaceComponents.PositionComponents[idFire] = new PositionComponent() { Position = new Vector2(x, y) };
                 spaceComponents.SightRadiusComponents[idFire] = new SightRadiusComponent() { DrawRadius = true, CurrentRadius = 5, MaxRadius = 5 };
                 dungeonGrid[x, y].AttachedEntity = idFire;
+                foreach (Guid id in spaceComponents.PositionComponents.Where(z => z.Value.Position == new Vector2(x, y)).Select(z => z.Key))
+                {
+                    if (spaceComponents.SkillLevelsComponents.ContainsKey(id))
+                    {
+                        StatusSystem.ApplyBurnEffect(spaceComponents, id, StatusEffects.Burning.Turns, StatusEffects.Burning.MinDamage, StatusEffects.Burning.MaxDamage);
+                    }
+                }
             }));
         }
 

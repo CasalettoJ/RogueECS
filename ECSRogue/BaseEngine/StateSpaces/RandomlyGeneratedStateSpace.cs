@@ -175,7 +175,6 @@ namespace ECSRogue.BaseEngine.StateSpaces
                     CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
                     TileSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
                     TileSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
-                    TileSystem.SpreadFire(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
                     MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
                     DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
 
@@ -186,7 +185,11 @@ namespace ECSRogue.BaseEngine.StateSpaces
                     AISystem.AIUpdateVision(stateSpaceComponents, dungeonGrid, dungeonDimensions);
                     CombatSystem.HandleMeleeCombat(stateSpaceComponents, DevConstants.Grid.CellSize);
                     AISystem.AICheckFleeing(stateSpaceComponents);
-                    CombatSystem.RegenerateHealth(stateSpaceComponents);
+
+                    //End-Of-Turn Status Effects
+                    StatusSystem.RegenerateHealth(stateSpaceComponents);
+                    StatusSystem.ApplyBurnDamage(stateSpaceComponents, dungeonGrid);
+                    TileSystem.SpreadFire(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
 
                     //Resetting Systems
                     if (stateSpaceComponents.PlayerComponent.PlayerJustLoaded || stateSpaceComponents.PlayerComponent.PlayerTookTurn)

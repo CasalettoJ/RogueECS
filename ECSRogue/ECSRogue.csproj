@@ -92,6 +92,7 @@
     <Compile Include="ECS\Components\PositionComponent.cs" />
     <Compile Include="ECS\Components\SightRadiusComponent.cs" />
     <Compile Include="ECS\Components\SkillLevelsComponent.cs" />
+    <Compile Include="ECS\Components\StatusComponents\BurningComponent.cs" />
     <Compile Include="ECS\Components\TargetPositionComponent.cs" />
     <Compile Include="ECS\Components\TimeToLiveComponent.cs" />
     <Compile Include="ECS\Components\VelocityComponent.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="ECS\Systems\DungeonCreationSystem.cs" />
     <Compile Include="ECS\Systems\MovementSystem.cs" />
     <Compile Include="ECS\Systems\ObserverSystem.cs" />
+    <Compile Include="ECS\Systems\StatusSystem.cs" />
     <Compile Include="ECS\Systems\TileSystem.cs" />
     <Compile Include="ProceduralGeneration\CaveArenaGeneration.cs" />
     <Compile Include="ProceduralGeneration\CaveGeneration.cs" />

@@ -48,7 +48,7 @@ namespace ECSRogue.ProceduralGeneration
     {
         public static readonly string TallGrassSymbol = "\"";
         public static readonly Color TallGrassSymbolColor = Color.Wheat;
-        public static readonly int TallGrassIgniteChange = 50;
+        public static readonly int TallGrassIgniteChange = 10;
 
         public static readonly string WaterSymbol = "~";
         public static readonly Color WaterSymbolColor = Color.CornflowerBlue;
@@ -60,9 +60,9 @@ namespace ECSRogue.ProceduralGeneration
 
         public static readonly string FlatGrassSymbol = "\'";
         public static readonly Color FlatGrassSymbolColor = Color.Wheat;
-        public static readonly int FlatGrassIgniteChance = 20;
+        public static readonly int FlatGrassIgniteChance = 5;
 
-        public static readonly int FloorIgniteChance = 1;
+        public static readonly int FloorIgniteChance = 2;
 
         public static readonly string AshSymbol = string.Empty;
         public static readonly Color AshSymbolColor = Color.Black;

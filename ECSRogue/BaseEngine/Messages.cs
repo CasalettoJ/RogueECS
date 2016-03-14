@@ -21,6 +21,18 @@ namespace ECSRogue.BaseEngine
             public static readonly string Unknown = "You can barely make out some sort of outline, but no details.";
         }
 
+        public static class Deaths
+        {
+            public static readonly string Fire = "{0} burns to death.";
+            public static readonly string FirePlayer = "{0} burn to death.";
+        }
+
+        public static class HighScoreMessages
+        {
+            public static readonly string Burned = "Burned to death on floor {0} with {1} gold.";
+            public static readonly string Monster = "Killed by a {0} on floor {1} with {2} gold.";
+        }
+
         public static readonly string InventoryHeader = "MY TREASURE HOARD";
         public static readonly string InventoryConsumables = "CONSUMABLE TREASURES";
         public static readonly string InventoryArtifacts = "ARTIFACT TREASURES";

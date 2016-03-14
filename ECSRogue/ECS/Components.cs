@@ -2,6 +2,7 @@
 using ECSRogue.ECS.Components.AIComponents;
 using ECSRogue.ECS.Components.GraphicalEffectsComponents;
 using ECSRogue.ECS.Components.ItemizationComponents;
+using ECSRogue.ECS.Components.StatusComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace ECSRogue.ECS
         COMPONENT_ANIMATION = 1 << 4,
         COMPONENT_INPUTMOVEMENT = 1 << 6,
         COMPONENT_SIGHTRADIUS = 1 << 7,
-        //8: FREE SLOT
+        COMPONENT_BURNING = 1 << 8,
         COMPONENT_GAMEPLAY_INFO = 1 << 9,
         COMPONENT_SKILL_LEVELS = 1 << 10,
         COMPONENT_TARGET_POSITION = 1 << 11,
@@ -95,6 +96,7 @@ namespace ECSRogue.ECS
 
         //Effects        
         public const Component HealthRegen = Component.COMPONENT_HEALTH_REGENERATION | Component.COMPONENT_SKILL_LEVELS;
+        public const Component BurningStatus = Component.COMPONENT_BURNING | Component.COMPONENT_SKILL_LEVELS;
 
 
 
@@ -144,6 +146,7 @@ namespace ECSRogue.ECS
         public Dictionary<Guid, ItemFunctionsComponent> ItemFunctionsComponents { get; private set; }
         public Dictionary<Guid, PassivesComponent> PassivesComponents { get; private set; }
         public Dictionary<Guid, ArtifactStatsComponent> ArtifactStatsComponents { get; private set; }
+        public Dictionary<Guid, BurningComponent> BurningComponents { get; private set; }
 
         public List<Action> DelayedActions { get; private set; }
         public PlayerComponent PlayerComponent { get; set; }
@@ -190,6 +193,7 @@ namespace ECSRogue.ECS
             ItemFunctionsComponents = new Dictionary<Guid, ItemFunctionsComponent>();
             PassivesComponents = new Dictionary<Guid, PassivesComponent>();
             ArtifactStatsComponents = new Dictionary<Guid, ArtifactStatsComponent>();
+            BurningComponents = new Dictionary<Guid, BurningComponent>();
 
             GlobalCollisionComponent = new GlobalCollisionComponent() { EntitiesThatCollided = new List<Guid>() };
             PlayerComponent = new PlayerComponent();
@@ -246,6 +250,7 @@ namespace ECSRogue.ECS
                 ItemFunctionsComponents.Remove(id);
                 PassivesComponents.Remove(id);
                 ArtifactStatsComponents.Remove(id);
+                BurningComponents.Remove(id);
             }
         }
 

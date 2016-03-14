@@ -101,6 +101,7 @@ namespace ECSRogue.ECS.Systems
                                 else if(isPlayerBeingAttacked)
                                 {
                                     spaceComponents.GameMessageComponent.GameMessages.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format("[TURN " + spaceComponents.GameplayInfoComponent.StepsTaken + "] " + "You were killed by a {0}!", spaceComponents.NameComponents[id].Name)));
+                                    //SCORE RECORD
                                 }
                                 else
                                 {
@@ -153,26 +154,6 @@ namespace ECSRogue.ECS.Systems
         public static int CalculateRangeDamate()
         {
             return 0;
-        }
-
-        public static void RegenerateHealth(StateSpaceComponents spaceComponents)
-        {
-            if(spaceComponents.PlayerComponent.PlayerTookTurn)
-            {
-                foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.HealthRegen) == ComponentMasks.HealthRegen).Select(x => x.Id))
-                {
-                    HealthRegenerationComponent healthRegen = spaceComponents.HealthRegenerationComponents[id];
-                    healthRegen.TurnsSinceLastHeal += 1;
-                    if(healthRegen.TurnsSinceLastHeal >= healthRegen.RegenerateTurnRate)
-                    {
-                        SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[id];
-                        skills.CurrentHealth += healthRegen.HealthRegain;
-                        skills.CurrentHealth = (skills.CurrentHealth >= skills.Health) ? skills.Health : skills.CurrentHealth;
-                        spaceComponents.SkillLevelsComponents[id] = skills;
-                    }
-                    spaceComponents.HealthRegenerationComponents[id] = healthRegen;
-                }
-            }
         }
 
 
