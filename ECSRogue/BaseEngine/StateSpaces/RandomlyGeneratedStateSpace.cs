@@ -84,6 +84,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             if(createEntities)
             {
                 LevelChangeSystem.CreateGameplayInfo(stateComponents, stateSpaceComponents);
+                DungeonCreationSystem.TallGrassGeneration(ref dungeonGrid, dungeonDimensions, stateSpaceComponents.random, freeTiles, stateSpaceComponents);
+                DungeonCreationSystem.WaterGeneration(ref dungeonGrid, dungeonDimensions, stateSpaceComponents.random, freeTiles, stateSpaceComponents);
                 DungeonCreationSystem.CreateDungeonDrops(stateSpaceComponents, dungeonGrid, dungeonDimensions, freeTiles);
                 DungeonCreationSystem.CreateDungeonMonsters(stateSpaceComponents, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, freeTiles);
                 LevelChangeSystem.LoadPlayerSkillset(stateComponents, stateSpaceComponents);
@@ -106,7 +108,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             }
             else
             {//Check to see if the next level needs to be loaded
-                if (stateSpaceComponents.PlayerComponent.GoToNextFloor)
+                if (stateSpaceComponents.PlayerComponent.GoToNextFloor || Keyboard.GetState().IsKeyDown(Keys.LeftShift))
                 {
                     nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
                     PlayerComponent player = stateSpaceComponents.PlayerComponent;

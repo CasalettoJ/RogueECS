@@ -24,6 +24,7 @@ namespace ECSRogue.ECS.Systems
         {
             //Transfer components, then delete all AI-related components and all item related components that aren't in the players' inventories.
             stateComponents.StateSpaceComponents = spaceComponents;
+            List<Guid> itemsToKeep = new List<Guid>();
             foreach(Guid id in stateComponents.StateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.CombatReadyAI) == ComponentMasks.CombatReadyAI).Select(x => x.Id))
             {
                 //Change this to only hostile AI when allies need to be implemented.
@@ -39,6 +40,17 @@ namespace ECSRogue.ECS.Systems
                         stateComponents.StateSpaceComponents.EntitiesToDelete.Add(id);
                         break;
                     }
+                    else
+                    {
+                        itemsToKeep.Add(id);
+                    }
+                }
+            }
+            foreach(Guid id in stateComponents.StateSpaceComponents.Entities.Where(x => (x.ComponentFlags & Component.COMPONENT_PLAYER) != Component.COMPONENT_PLAYER).Select(x => x.Id))
+            {
+                if(!itemsToKeep.Contains(id))
+                {
+                    stateComponents.StateSpaceComponents.EntitiesToDelete.Add(id);
                 }
             }
         }
