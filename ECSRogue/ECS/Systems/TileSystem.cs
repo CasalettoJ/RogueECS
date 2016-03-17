@@ -26,7 +26,7 @@ namespace ECSRogue.ECS.Systems
                     for (int j = 0; j < dungeonDimensions.Y; j++)
                     {
                         dungeonGrid[i, j].InRange = false;
-                        dungeonGrid[i, j].ExternalIllumination = false;
+                        dungeonGrid[i, j].FireIllumination = false;
                     }
                 }
                 //See if the player is in water
@@ -221,7 +221,7 @@ namespace ECSRogue.ECS.Systems
                             {
                                 dungeonGrid[x0, y0].NewlyFound = true;
                             }
-                            dungeonGrid[x0, y0].ExternalIllumination = !isPlayer;
+                            dungeonGrid[x0, y0].FireIllumination = !isPlayer && dungeonGrid[(int)position.X, (int)position.Y].Type == TileType.TILE_FIRE;
                             dungeonGrid[x0, y0].Found = dungeonGrid[x0, y0].InRange = dungeonGrid[x0, y0].Occupiable = true;
                             if (dungeonGrid[x0, y0].Type == TileType.TILE_WALL || dungeonGrid[x0, y0].Type == TileType.TILE_ROCK)
                             {

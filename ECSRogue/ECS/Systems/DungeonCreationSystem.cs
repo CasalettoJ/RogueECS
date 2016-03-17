@@ -92,7 +92,7 @@ namespace ECSRogue.ECS.Systems
         {
             int floorNumber = spaceComponents.GameplayInfoComponent.FloorsReached;
             floorNumber = floorNumber > 5 ? 5 : floorNumber;
-            int numberOfLakes = random.Next(0, floorNumber +1);
+            int numberOfLakes = random.Next(5, 5 + floorNumber +1);
             int maxWidth = 40;
             int minWidth = 25;
             int maxHeight = 35;
@@ -252,7 +252,7 @@ namespace ECSRogue.ECS.Systems
             {
                 Vector2 tile = freeTiles[random.Next(0, freeTiles.Count)];
 
-                int radius = random.Next(3, 6 + floorNumber); //Must change to formula
+                int radius = random.Next(15, 15 + 6 + floorNumber); //Must change to formula
                 int initialX, x0, initialY, y0;
                 initialX = x0 = (int)tile.X;
                 initialY = y0 = (int)tile.Y;

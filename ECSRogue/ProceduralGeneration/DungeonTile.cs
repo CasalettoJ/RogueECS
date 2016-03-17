@@ -28,7 +28,7 @@ namespace ECSRogue.ProceduralGeneration
         public bool Found;
         public bool NewlyFound;
         public bool InRange;
-        public bool ExternalIllumination;
+        public bool FireIllumination;
         public bool Occupiable;
         public float Opacity;
         public string Symbol;

@@ -74,6 +74,7 @@ namespace ECSRogue.ECS.Systems
             {
                 for (int j = 0; j < (int)dungeonDimensions.Y; j++)
                 {
+                    bool tintFire = inFire || dungeonGrid[i, j].FireIllumination;
                     Vector2 tile = new Vector2((int)i * cellSize, (int)j * cellSize);
                     Rectangle floor = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize); //Need to be moved eventually
                     Rectangle wall = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize); //Need to be moved eventually
@@ -89,25 +90,25 @@ namespace ECSRogue.ECS.Systems
                         if (dungeonGrid[i, j].Found && !dungeonGrid[i, j].InRange)
                         {
 
-                            Color colorToLerp = inFire ? colorInfo.Fire : colorInfo.Water; //Default to water, if fire then change it.
+                            Color colorToLerp = tintFire ? colorInfo.Fire : colorInfo.Water; //Default to water, if fire then change it.
                             switch (dungeonGrid[i, j].Type)
                             {
                                 case TileType.TILE_FLATTENEDGRASS:
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || inFire ? Color.Lerp(colorInfo.Floor, colorToLerp, .3f) : colorInfo.Floor) * .3f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || tintFire ? Color.Lerp(colorInfo.Floor, colorToLerp, .3f) : colorInfo.Floor) * .3f, origin: origin);
                                     break;
                                 case TileType.TILE_ROCK:
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || inFire ? Color.Lerp(colorInfo.Wall, colorToLerp, .3f) : colorInfo.Wall) * .3f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || tintFire ? Color.Lerp(colorInfo.Wall, colorToLerp, .3f) : colorInfo.Wall) * .3f, origin: origin);
                                     break;
                                 case TileType.TILE_TALLGRASS:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || inFire ? Color.Lerp(colorInfo.TallGrass, colorToLerp, .3f) : colorInfo.TallGrass) * .3f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.TallGrass, colorToLerp, .3f) : colorInfo.TallGrass) * .3f, origin: origin);
                                     break;
                                 case TileType.TILE_ASH:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || inFire ? Color.Lerp(colorInfo.Ash, colorToLerp, .3f) : colorInfo.Ash) * .3f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.Ash, colorToLerp, .3f) : colorInfo.Ash) * .3f, origin: origin);
                                     break;
                                 case TileType.TILE_WATER:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inFire ? Color.Lerp(colorInfo.Water, colorToLerp, .3f) : colorInfo.Water) * .3f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (tintFire ? Color.Lerp(colorInfo.Water, colorToLerp, .3f) : colorInfo.Water) * .3f, origin: origin);
                                     break;
                                 case TileType.TILE_FIRE:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.Fire, colorToLerp, .3f) : colorInfo.Fire) * .3f, origin: origin);
@@ -126,29 +127,29 @@ namespace ECSRogue.ECS.Systems
                             int weight = mapToPlayer[i, j].Weight;
                             double opacity = 1 - (.035 * weight);
                             opacity = (opacity < .4) ? .4 : opacity;
-                            opacity = dungeonGrid[i, j].ExternalIllumination ? .85f : opacity;
+                            opacity = dungeonGrid[i, j].FireIllumination ? .85f : opacity;
                             bool isWall = false;
 
-                            Color colorToLerp = inFire ? colorInfo.FireInRange : colorInfo.WaterInRange; //Default to water, if fire then change it.
+                            Color colorToLerp = tintFire ? colorInfo.FireInRange : colorInfo.WaterInRange; //Default to water, if fire then change it.
                             switch (dungeonGrid[i, j].Type)
                             {
                                 case TileType.TILE_FLATTENEDGRASS:
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || inFire ? Color.Lerp(colorInfo.FloorInRange, colorToLerp, .55f) :  colorInfo.FloorInRange) * (float)opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.FloorInRange, colorToLerp, .55f) :  colorInfo.FloorInRange) * (float)opacity, origin: origin);
                                     break;
                                 case TileType.TILE_ROCK:
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || inFire? Color.Lerp(colorInfo.WallInRange, colorToLerp, .55f) : colorInfo.WallInRange) * .85f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || tintFire ? Color.Lerp(colorInfo.WallInRange, colorToLerp, .55f) : colorInfo.WallInRange) * .85f, origin: origin);
                                     isWall = true;
                                     break;
                                 case TileType.TILE_TALLGRASS:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || inFire? Color.Lerp(colorInfo.TallGrassInRange, colorToLerp, .55f) : colorInfo.TallGrassInRange) * (float)opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.TallGrassInRange, colorToLerp, .55f) : colorInfo.TallGrassInRange) * (float)opacity, origin: origin);
                                     break;
                                 case TileType.TILE_WATER:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inFire ? Color.Lerp(colorInfo.WaterInRange, colorToLerp, .55f) : colorInfo.WaterInRange) * (float)opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (tintFire ? Color.Lerp(colorInfo.WaterInRange, colorToLerp, .55f) : colorInfo.WaterInRange) * (float)opacity, origin: origin);
                                     break;
                                 case TileType.TILE_ASH:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || inFire? Color.Lerp(colorInfo.AshInRange, colorToLerp, .55f) : colorInfo.AshInRange) * (float)opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.AshInRange, colorToLerp, .55f) : colorInfo.AshInRange) * (float)opacity, origin: origin);
                                     break;
                                 case TileType.TILE_FIRE:
                                     opacity = 0f + (.1f * dungeonGrid[i, j].TurnsToBurn);
@@ -181,25 +182,25 @@ namespace ECSRogue.ECS.Systems
                         else if (dungeonGrid[i, j].NewlyFound)
                         {
                             float opacity = dungeonGrid[i, j].Opacity;
-                            Color colorToLerp = inFire ? colorInfo.FireInRange : colorInfo.WaterInRange; //Default to water, if fire then change it.
+                            Color colorToLerp = tintFire ? colorInfo.FireInRange : colorInfo.WaterInRange; //Default to water, if fire then change it.
                             switch (dungeonGrid[i, j].Type)
                             {
                                 case TileType.TILE_FLATTENEDGRASS:
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || inFire ? Color.Lerp(colorInfo.FloorInRange, colorToLerp, .55f) : colorInfo.FloorInRange) * opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || tintFire ? Color.Lerp(colorInfo.FloorInRange, colorToLerp, .55f) : colorInfo.FloorInRange) * opacity, origin: origin);
                                     break;
                                 case TileType.TILE_ROCK:
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || inFire ? Color.Lerp(colorInfo.WallInRange, colorToLerp, .55f) : colorInfo.WallInRange) * opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || tintFire ? Color.Lerp(colorInfo.WallInRange, colorToLerp, .55f) : colorInfo.WallInRange) * opacity, origin: origin);
                                     break;
                                 case TileType.TILE_TALLGRASS:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || inFire ? Color.Lerp(colorInfo.TallGrassInRange, colorToLerp, .55f) : colorInfo.TallGrassInRange) * opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.TallGrassInRange, colorToLerp, .55f) : colorInfo.TallGrassInRange) * opacity, origin: origin);
                                     break;
                                 case TileType.TILE_ASH:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || inFire ? Color.Lerp(colorInfo.AshInRange, colorToLerp, .55f) : colorInfo.AshInRange) * opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.AshInRange, colorToLerp, .55f) : colorInfo.AshInRange) * opacity, origin: origin);
                                     break;
                                 case TileType.TILE_WATER:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inFire ? Color.Lerp(colorInfo.WaterInRange, colorToLerp, .55f) : colorInfo.WaterInRange) * opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (tintFire ? Color.Lerp(colorInfo.WaterInRange, colorToLerp, .55f) : colorInfo.WaterInRange) * opacity, origin: origin);
                                     break;
                                 case TileType.TILE_FIRE:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.FireInRange, colorToLerp, .55f) : colorInfo.FireInRange), origin: origin);
