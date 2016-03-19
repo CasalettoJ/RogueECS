@@ -184,6 +184,12 @@ namespace ECSRogue.ECS.Systems
                         case TileType.TILE_FLATTENEDGRASS:
                             leftFindings.Add(new Tuple<Color, string>(Colors.Messages.Normal, Messages.Observer.FlatGrass));
                             break;
+                        case TileType.TILE_FIRE:
+                            leftFindings.Add(new Tuple<Color, string>(Colors.Messages.Normal, Messages.Observer.Fire));
+                            break;
+                        case TileType.TILE_ASH:
+                            leftFindings.Add(new Tuple<Color, string>(Colors.Messages.Normal, Messages.Observer.Ash));
+                            break;
 
                     }
                 }

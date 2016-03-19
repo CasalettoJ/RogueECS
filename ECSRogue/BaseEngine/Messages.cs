@@ -18,6 +18,8 @@ namespace ECSRogue.BaseEngine
             public static readonly string Water = "There is deep water here.  Who knows what lurks under the surface?";
             public static readonly string TallGrass = "Overgrown cavern grass has spread here.  Its dense nature is hard to see through.";
             public static readonly string FlatGrass = "Vegetation here has been trampled flat.";
+            public static readonly string Fire = "A raging fire burns here.  It illumates the area.";
+            public static readonly string Ash = "Ashes from a previous fire are all that's left here.";
             public static readonly string Unknown = "You can barely make out some sort of outline, but no details.";
         }
 
