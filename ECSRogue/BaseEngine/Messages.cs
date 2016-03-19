@@ -23,6 +23,20 @@ namespace ECSRogue.BaseEngine
             public static readonly string Unknown = "You can barely make out some sort of outline, but no details.";
         }
 
+        public static class StatusMessages
+        {
+            public static readonly string Normal = "Normal";
+            /// <summary>
+            /// 0: Health Gain, 1: Turns Per Gain
+            /// </summary>
+            public static readonly string HealthRegen = "Health Regeneration {0}:{1}";
+            /// <summary>
+            /// 0: Damage Min, 1: Damage Max, 2: Turns Left
+            /// </summary>
+            public static readonly string Burning = "Burning {0}-{1} ({2})";
+            public static readonly string Underwater = "Underwater";
+        }
+
         public static class Deaths
         {
             public static readonly string Fire = "{0} burns to death.";

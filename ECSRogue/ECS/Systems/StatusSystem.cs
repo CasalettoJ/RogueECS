@@ -2,6 +2,7 @@
 using ECSRogue.ECS.Components;
 using ECSRogue.ECS.Components.StatusComponents;
 using ECSRogue.ProceduralGeneration;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,15 @@ using System.Text;
 
 namespace ECSRogue.ECS.Systems
 {
+    [Flags]
+    public enum Statuses : ulong
+    {
+        NONE = 0,
+        UNDERWATER = 1 << 0,
+        BURNING = 1 << 1,
+        HEALTHREGEN = 1 << 2
+    }
+
     public static class StatusSystem
     {
         public static void RegenerateHealth(StateSpaceComponents spaceComponents)
@@ -110,6 +120,35 @@ namespace ECSRogue.ECS.Systems
 
                 }
             }
+        }
+
+        public static Statuses GetStatusEffectsOfEntity(StateSpaceComponents spaceComponents, Guid entity, DungeonTile[,] dungeonGrid)
+        {
+            Statuses statuses = Statuses.NONE;
+
+            //Check for UnderWater
+            if((spaceComponents.Entities.Where(x => x.Id == entity).First().ComponentFlags & Component.COMPONENT_POSITION) == Component.COMPONENT_POSITION)
+            {
+                Vector2 entityPosition = spaceComponents.PositionComponents[entity].Position;
+                if (dungeonGrid[(int)entityPosition.X, (int)entityPosition.Y].Type == TileType.TILE_WATER)
+                {
+                    statuses |= Statuses.UNDERWATER;
+                }
+            }
+
+            //Check for Burning
+            if ((spaceComponents.Entities.Where(x => x.Id == entity).First().ComponentFlags & ComponentMasks.BurningStatus) == ComponentMasks.BurningStatus)
+            {
+                statuses |= Statuses.BURNING;
+            }
+
+            //Check for HealthRegen
+            if ((spaceComponents.Entities.Where(x => x.Id == entity).First().ComponentFlags & ComponentMasks.HealthRegen) == ComponentMasks.HealthRegen)
+            {
+                statuses |= Statuses.HEALTHREGEN;
+            }
+
+            return statuses;
         }
 
     }

@@ -242,14 +242,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
             {
                 ObserverSystem.PrintObserver(stateSpaceComponents, messageFont, spriteBatch, dungeonGrid, camera, UI);
                 spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.Black);
-                //spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.DarkSlateBlue * .3f);
-                //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewport.Bounds.X, camera.DungeonUIViewport.Bounds.Y), new Point(camera.DungeonUIViewport.Bounds.Width, 3)), Color.DarkSlateBlue);
-                //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewport.Bounds.X, camera.DungeonUIViewport.Bounds.Y+5), new Point(camera.DungeonUIViewport.Bounds.Width, camera.DungeonUIViewport.Bounds.Height - 5)), Color.DarkSlateBlue * .3f);
                 spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.Black);
-                //spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.DarkOrange * .15f);
-                //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewportLeft.Bounds.X, camera.DungeonUIViewportLeft.Bounds.Y), new Point(3, camera.DungeonUIViewportLeft.Bounds.Height - camera.DungeonUIViewport.Bounds.Height + 3)), Color.DarkSlateBlue);
-                //spriteBatch.Draw(UI, new Rectangle(new Point(camera.DungeonUIViewportLeft.Bounds.X, camera.DungeonUIViewportLeft.Bounds.Y), new Point(camera.DungeonUIViewportLeft.Bounds.Width, camera.DungeonUIViewportLeft.Bounds.Height)), Color.DarkSlateBlue * .3f);
-                MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont);
+                MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont, dungeonGrid);
             }
         }
         #endregion

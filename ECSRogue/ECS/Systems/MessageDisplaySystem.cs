@@ -2,6 +2,8 @@
 using ECSRogue.BaseEngine.IO.Objects;
 using ECSRogue.ECS.Components;
 using ECSRogue.ECS.Components.ItemizationComponents;
+using ECSRogue.ECS.Components.StatusComponents;
+using ECSRogue.ProceduralGeneration;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -15,7 +17,7 @@ namespace ECSRogue.ECS.Systems
 {
     public static class MessageDisplaySystem
     {
-        public static void WriteMessages(StateSpaceComponents spaceComponents, SpriteBatch spriteBatch, Camera camera, SpriteFont font)
+        public static void WriteMessages(StateSpaceComponents spaceComponents, SpriteBatch spriteBatch, Camera camera, SpriteFont font, DungeonTile[,] dungeonGrid)
         {
             float opacity = 1.15f;
             float decrement = .09f;
@@ -50,62 +52,89 @@ namespace ECSRogue.ECS.Systems
 
             messageNumber = 0;
             //Draw statistics
-                List<string> statsToPrint = new List<string>();
+                List<Tuple<Color,string>> statsToPrint = new List<Tuple<Color,string>>();
                 GameplayInfoComponent gameplayInfo = spaceComponents.GameplayInfoComponent;
 
-                statsToPrint.Add(string.Format("Floor {0}", gameplayInfo.FloorsReached));
-                statsToPrint.Add(string.Format("Steps: {0}", gameplayInfo.StepsTaken));
-                statsToPrint.Add(string.Format("Kills: {0}", gameplayInfo.Kills));
+                statsToPrint.Add(new Tuple<Color, string>( Colors.Messages.Normal, string.Format("Floor {0}", gameplayInfo.FloorsReached)));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Steps: {0}", gameplayInfo.StepsTaken)));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Kills: {0}", gameplayInfo.Kills)));
             Entity player = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
             if (player != null)
             {
                 SkillLevelsComponent skills = InventorySystem.ApplyStatModifications(spaceComponents, player.Id, spaceComponents.SkillLevelsComponents[player.Id]);
                 InventoryComponent inventory = spaceComponents.InventoryComponents[player.Id];
-                statsToPrint.Add(System.Environment.NewLine);
-                statsToPrint.Add(string.Format("Health:  {0} / {1}", skills.CurrentHealth, skills.Health));
-                statsToPrint.Add(string.Format("Wealth: {0}", skills.Wealth));
-                statsToPrint.Add(System.Environment.NewLine);
-                statsToPrint.Add(string.Format("Damage: {0}-{1}", skills.MinimumDamage, skills.MaximumDamage));
-                statsToPrint.Add(string.Format("Accuracy: {0}", skills.Accuracy));
-                statsToPrint.Add(string.Format("Defense: {0}", skills.Defense));
-                statsToPrint.Add(System.Environment.NewLine);
-                statsToPrint.Add(string.Format(Messages.InventoryArtifacts + " ({0}/{1})", inventory.Artifacts.Count, inventory.MaxArtifacts));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, System.Environment.NewLine));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Health:  {0} / {1}", skills.CurrentHealth, skills.Health)));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Wealth: {0}", skills.Wealth)));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, System.Environment.NewLine));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Damage: {0}-{1}", skills.MinimumDamage, skills.MaximumDamage)));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Accuracy: {0}", skills.Accuracy)));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, string.Format("Defense: {0}", skills.Defense)));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, System.Environment.NewLine));
+                //Status Effects:
+                Statuses statuses = StatusSystem.GetStatusEffectsOfEntity(spaceComponents, player.Id, dungeonGrid);
+                if(statuses == Statuses.NONE)
+                {
+                    statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, Messages.StatusMessages.Normal));
+                    statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, System.Environment.NewLine));
+                }
+                //If there are status effects on the player..
+                else
+                {
+                    if((statuses & Statuses.BURNING) == Statuses.BURNING)
+                    {
+                        BurningComponent burning = spaceComponents.BurningComponents[player.Id];
+                        statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Bad, string.Format(Messages.StatusMessages.Burning, burning.MinDamage, burning.MaxDamage, burning.TurnsLeft)));
+                    }
+                    if((statuses & Statuses.UNDERWATER) == Statuses.UNDERWATER)
+                    {
+                        statsToPrint.Add(new Tuple<Color, string>(Colors.Caves.WaterInRange, Messages.StatusMessages.Underwater));
+                    }
+                    if((statuses & Statuses.HEALTHREGEN) == Statuses.HEALTHREGEN)
+                    {
+                        HealthRegenerationComponent healthRegen = spaceComponents.HealthRegenerationComponents[player.Id];
+                        statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Good, string.Format(Messages.StatusMessages.HealthRegen, healthRegen.HealthRegain, healthRegen.RegenerateTurnRate)));
+                    }
+                    statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, System.Environment.NewLine));
+                }
+
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format(Messages.InventoryArtifacts + " ({0}/{1})", inventory.Artifacts.Count, inventory.MaxArtifacts)));
                 foreach (Guid id in inventory.Artifacts)
                 {
                     NameComponent name = spaceComponents.NameComponents[id];
                     ArtifactStatsComponent artifactStats = spaceComponents.ArtifactStatsComponents[id];
-                    statsToPrint.Add(string.Format("{0} Lv{1}", name.Name, artifactStats.UpgradeLevel));
+                    statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.LootPickup, string.Format("{0} Lv{1}", name.Name, artifactStats.UpgradeLevel)));
                 }
 
-                statsToPrint.Add(System.Environment.NewLine);
-                statsToPrint.Add(string.Format(Messages.InventoryConsumables + " ({0}/{1})", inventory.Consumables.Count, inventory.MaxConsumables));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, System.Environment.NewLine));
+                statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Special, string.Format(Messages.InventoryConsumables + " ({0}/{1})", inventory.Consumables.Count, inventory.MaxConsumables)));
                 if(inventory.Consumables.Count > 0)
                 {
-                    statsToPrint.Add(System.Environment.NewLine);
+                    statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, System.Environment.NewLine));
                     NameComponent name = spaceComponents.NameComponents[inventory.Consumables[0]];
                     ItemFunctionsComponent funcs = spaceComponents.ItemFunctionsComponents[inventory.Consumables[0]];
-                    statsToPrint.Add(string.Format("{0}({1})", name.Name, funcs.Uses));
-                    statsToPrint.Add("Q - Use");
-                    statsToPrint.Add("X - Throw");
-                    statsToPrint.Add(System.Environment.NewLine);
+                    statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.LootPickup, string.Format("{0}({1})", name.Name, funcs.Uses)));
+                    statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, "Q - Use"));
+                    statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, "X - Throw"));
+                    statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, System.Environment.NewLine));
                     if (inventory.Consumables.Count > 1)
                     {
                         name = spaceComponents.NameComponents[inventory.Consumables[1]];
                         funcs = spaceComponents.ItemFunctionsComponents[inventory.Consumables[1]];
-                        statsToPrint.Add(string.Format("{0}({1})", name.Name, funcs.Uses));
-                        statsToPrint.Add("E - Use");
-                        statsToPrint.Add("C - Throw");
+                        statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.LootPickup, string.Format("{0}({1})", name.Name, funcs.Uses)));
+                        statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, "E - Use"));
+                        statsToPrint.Add(new Tuple<Color, string>(Colors.Messages.Normal, "C - Throw"));
                     }
                 }
             }
 
             if (font != null)
                 {
-                    foreach (string stat in statsToPrint)
+                    foreach (Tuple<Color,string> stat in statsToPrint)
                     {
-                        string text = MessageDisplaySystem.WordWrap(font, stat, camera.DungeonUIViewportLeft.Width - messageSpacing);
-                        Vector2 messageSize = font.MeasureString(stat);
-                        spriteBatch.DrawString(font, text, new Vector2(camera.DungeonUIViewportLeft.X + 10, 10 + (messageSpacing * messageNumber)), Colors.Messages.Special);
+                        string text = MessageDisplaySystem.WordWrap(font, stat.Item2, camera.DungeonUIViewportLeft.Width - messageSpacing);
+                        Vector2 messageSize = font.MeasureString(stat.Item2);
+                        spriteBatch.DrawString(font, text, new Vector2(camera.DungeonUIViewportLeft.X + 10, 10 + (messageSpacing * messageNumber)), stat.Item1);
                         messageNumber += 1;
                         messageNumber += Regex.Matches(text, System.Environment.NewLine).Count;
                     }
