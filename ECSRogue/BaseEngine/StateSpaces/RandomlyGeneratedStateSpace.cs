@@ -35,6 +35,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         private Vector2 dungeonDimensions;
         private DungeonTile[,] dungeonGrid = null;
         private List<Vector2> freeTiles;
+        private List<Vector2> waterTiles;
         private string dungeonSpriteFile;
         private DungeonColorInfo dungeonColorInfo;
         private DijkstraMapTile[,] mapToPlayer;
@@ -47,6 +48,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
         {
             stateSpaceComponents = new StateSpaceComponents();
             freeTiles = new List<Vector2>();
+            waterTiles = new List<Vector2>();
             dungeonDimensions = dungeonGeneration.GenerateDungeon(ref dungeonGrid, worldMin, worldMax, stateSpaceComponents.random, freeTiles);
             dungeonSpriteFile = dungeonGeneration.GetDungeonSpritesheetFileName();
             dungeonColorInfo = dungeonGeneration.GetColorInfo();
@@ -85,7 +87,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             {
                 LevelChangeSystem.CreateGameplayInfo(stateComponents, stateSpaceComponents);
                 DungeonCreationSystem.TallGrassGeneration(ref dungeonGrid, dungeonDimensions, stateSpaceComponents.random, freeTiles, stateSpaceComponents);
-                DungeonCreationSystem.WaterGeneration(ref dungeonGrid, dungeonDimensions, stateSpaceComponents.random, freeTiles, stateSpaceComponents);
+                DungeonCreationSystem.WaterGeneration(ref dungeonGrid, dungeonDimensions, stateSpaceComponents.random, freeTiles, stateSpaceComponents, waterTiles);
                 DungeonCreationSystem.CreateDungeonDrops(stateSpaceComponents, dungeonGrid, dungeonDimensions, freeTiles);
                 DungeonCreationSystem.CreateDungeonMonsters(stateSpaceComponents, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, freeTiles);
                 LevelChangeSystem.LoadPlayerSkillset(stateComponents, stateSpaceComponents);
@@ -259,7 +261,8 @@ namespace ECSRogue.BaseEngine.StateSpaces
                 stateComponents = this.stateComponents,
                 dungeonSpriteFile = this.dungeonSpriteFile,
                 stateSpaceComponents = this.stateSpaceComponents,
-                freeTiles = this.freeTiles
+                freeTiles = this.freeTiles,
+                waterTiles = this.waterTiles
             };
         }
         #endregion

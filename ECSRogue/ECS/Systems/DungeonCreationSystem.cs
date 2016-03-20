@@ -88,7 +88,7 @@ namespace ECSRogue.ECS.Systems
 
         }
 
-        public static void WaterGeneration(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, Random random, List<Vector2> freeTiles, StateSpaceComponents spaceComponents)
+        public static void WaterGeneration(ref DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, Random random, List<Vector2> freeTiles, StateSpaceComponents spaceComponents, List<Vector2> waterTiles)
         {
             int floorNumber = spaceComponents.GameplayInfoComponent.FloorsReached;
             floorNumber = floorNumber > 5 ? 5 : floorNumber;
@@ -234,6 +234,11 @@ namespace ECSRogue.ECS.Systems
                             dungeonGrid[xStart + l, yStart + m].Symbol = Tiles.WaterSymbol;
                             dungeonGrid[xStart + l, yStart + m].SymbolColor = Tiles.WaterSymbolColor;
                             dungeonGrid[xStart + l, yStart + m].ChanceToIgnite = Tiles.WaterIgniteChance;
+                            freeTiles.Remove(new Vector2(xStart + 1, yStart + m));
+                            if(!waterTiles.Contains(new Vector2(xStart + 1, yStart + m)))
+                            {
+                                waterTiles.Add(new Vector2(xStart + 1, yStart + m));
+                            }
                         }
                     }
                 }

@@ -78,7 +78,7 @@ namespace ECSRogue.ECS.Systems
                             extinguished = true;
                         }
                     }
-                    if(!extinguished)
+                    if (!extinguished && spaceComponents.BurningComponents.ContainsKey(id))
                     {
                         BurningComponent burning = spaceComponents.BurningComponents[id];
                         burning.TurnsLeft -= 1;
