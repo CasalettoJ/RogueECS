@@ -91,6 +91,11 @@ namespace ECSRogue.ECS.Systems
                         //Handle Death
                         if (skills.CurrentHealth <= 0)
                         {
+                            Entity deadEntity = spaceComponents.Entities.Where(x => x.Id == id).FirstOrDefault();
+                            if(deadEntity != null)
+                            {
+                                deadEntity.ComponentFlags &= ~Component.COMPONENT_POSITION;
+                            }
                             spaceComponents.EntitiesToDelete.Add(id);
                             if (isPlayer)
                             {

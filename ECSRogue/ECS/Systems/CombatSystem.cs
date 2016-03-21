@@ -89,6 +89,11 @@ namespace ECSRogue.ECS.Systems
 
                             if (collidedStats.CurrentHealth <= 0)
                             {
+                                Entity deadEntity = spaceComponents.Entities.Where(x => x.Id == collidedEntity).FirstOrDefault();
+                                if (deadEntity != null)
+                                {
+                                    deadEntity.ComponentFlags &= ~Component.COMPONENT_POSITION;
+                                }
                                 InventorySystem.IncrementKillsWithArtifact(spaceComponents, id);
                                 spaceComponents.EntitiesToDelete.Add(collidedEntity);
                                 if (isPlayerAttacking)

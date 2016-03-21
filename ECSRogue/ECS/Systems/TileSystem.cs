@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using ECSRogue.ECS.Components;
 using static ECSRogue.BaseEngine.DevConstants;
+using ECSRogue.ECS.Components.StatusComponents;
 
 namespace ECSRogue.ECS.Systems
 {
@@ -312,6 +313,28 @@ namespace ECSRogue.ECS.Systems
                         }
                     }
                 }
+
+                foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.BurningStatus) == ComponentMasks.BurningStatus).Select(x => x.Id))
+                {
+                    if((spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags & Component.COMPONENT_POSITION) == Component.COMPONENT_POSITION)
+                    {
+                        Vector2 position = spaceComponents.PositionComponents[id].Position;
+                        int i = (int)position.X;
+                        int j = (int)position.Y;
+
+                        for (int k = i - 1; k <= i + 1; k++)
+                        {
+                            for (int l = j - 1; l <= j + 1; l++)
+                            {
+                                if (l >= 0 && k >= 0 && l < (int)dungeonDimensions.Y && k < (int)dungeonDimensions.X && spaceComponents.random.Next(0, 101) < dungeonGrid[k, l].ChanceToIgnite)
+                                {
+                                    TileSystem.CreateFire(k, l, spaceComponents, dungeonGrid);
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
 
         }
