@@ -66,6 +66,14 @@ namespace ECSRogue.ECS.Systems
                                 InventorySystem.IncrementDamageGivenWithArtifact(spaceComponents, id, damageDone);
                                 InventorySystem.UpdateMaxCombo(spaceComponents, id, (int)attackingStats.TimesHit);
                                 InventorySystem.IncrementDamageTakenWithArtifact(spaceComponents, collidedEntity, damageDone);
+                                if ((spaceComponents.Entities.Where(x => x.Id == collidedEntity).First().ComponentFlags & Component.COMPONENT_AI_STATE) == Component.COMPONENT_AI_STATE)
+                                {
+                                    AIState state = spaceComponents.AIStateComponents[collidedEntity];
+                                    if (state.State == AIStates.STATE_ROAMING)
+                                    {
+                                        AISystem.AITryToFind(collidedEntity, spaceComponents);
+                                    }
+                                }
                             }
                             //Miss
                             else

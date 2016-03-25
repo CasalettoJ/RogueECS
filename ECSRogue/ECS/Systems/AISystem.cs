@@ -404,7 +404,7 @@ namespace ECSRogue.ECS.Systems
             }
         }
 
-        private static void AITryToFind(Guid entity, StateSpaceComponents spaceComponents)
+        public static void AITryToFind(Guid entity, StateSpaceComponents spaceComponents)
         {
             AIFieldOfView entityFOV = spaceComponents.AIFieldOfViewComponents[entity];
             AIAlignment entityAlignment = spaceComponents.AIAlignmentComponents[entity];
