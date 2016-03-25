@@ -167,9 +167,12 @@ namespace ECSRogue.ECS.Systems
                                     break;
                                 case ItemType.DOWNSTAIRS:
                                     //Tell the game to go to the next level
-                                    PlayerComponent player = spaceComponents.PlayerComponent;
-                                    player.GoToNextFloor = true;
-                                    spaceComponents.PlayerComponent = player;
+                                    if((spaceComponents.Entities.Where(x => x.Id == collidingEntity).FirstOrDefault().ComponentFlags & Component.COMPONENT_PLAYER) == Component.COMPONENT_PLAYER)
+                                    {
+                                        PlayerComponent player = spaceComponents.PlayerComponent;
+                                        player.GoToNextFloor = true;
+                                        spaceComponents.PlayerComponent = player;
+                                    }
                                     break;
                             }
                         }

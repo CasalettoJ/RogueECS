@@ -115,10 +115,6 @@ namespace ECSRogue.ECS.Systems
                             }
                             spaceComponents.SkillLevelsComponents[id] = attackingStats;
                             spaceComponents.SkillLevelsComponents[collidedEntity] = collidedStats;
-                            //spaceComponents.DelayedActions.Add(new Action(() =>
-                            //{
-                            //    MakeCombatText("-" + damageDone.ToString(), MessageColors.Harm, spaceComponents, spaceComponents.PositionComponents[collidedEntity], cellSize);
-                            //}));
                         }
 
 
