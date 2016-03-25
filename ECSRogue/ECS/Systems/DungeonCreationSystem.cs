@@ -92,7 +92,7 @@ namespace ECSRogue.ECS.Systems
         {
             int floorNumber = spaceComponents.GameplayInfoComponent.FloorsReached;
             floorNumber = floorNumber > 5 ? 5 : floorNumber;
-            int numberOfLakes = random.Next(5, 5 + floorNumber +1);
+            int numberOfLakes = random.Next(0, floorNumber +1);
             int maxWidth = 40;
             int minWidth = 25;
             int maxHeight = 35;
@@ -252,7 +252,7 @@ namespace ECSRogue.ECS.Systems
         {
             int floorNumber = spaceComponents.GameplayInfoComponent.FloorsReached;
             floorNumber = floorNumber > 10 ? 10 : floorNumber;
-            int numberOfGrassPlumes = random.Next(1, 5 + floorNumber); //Must change to a formula
+            int numberOfGrassPlumes = random.Next(1 + 50, 50 + 5 + floorNumber); //Must change to a formula
             for (int i = 0; i < numberOfGrassPlumes; i++)
             {
                 Vector2 tile = freeTiles[random.Next(0, freeTiles.Count)];

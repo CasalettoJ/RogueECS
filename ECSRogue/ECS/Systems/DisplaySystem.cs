@@ -17,24 +17,37 @@ namespace ECSRogue.ECS.Systems
         public static void DrawDungeonEntities(StateSpaceComponents spaceComponents, Camera camera, SpriteBatch spriteBatch, Texture2D spriteSheet, int cellSize, DungeonTile[,] dungeonGrid, SpriteFont font, DungeonColorInfo colorInfo)
         {
             Matrix cameraMatrix = camera.GetMatrix();
-            IEnumerable<Guid> drawableEntities = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Drawable) == ComponentMasks.Drawable).Select(x => x.Id);
+            List<Entity> drawableEntities = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Drawable) == ComponentMasks.Drawable).ToList();
 
             Entity player = spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
             bool inWater = false;
+            bool inFire = false;
             if (player != null)
             {
                 Vector2 playerPos = spaceComponents.PositionComponents[spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id].Position;
                 inWater = dungeonGrid[(int)playerPos.X, (int)playerPos.Y].Type == TileType.TILE_WATER;
+                inFire = dungeonGrid[(int)playerPos.X, (int)playerPos.Y].Type == TileType.TILE_FIRE;
             }
+            //Draw items
+            List<Guid> items = drawableEntities.Where(x => (x.ComponentFlags & ComponentMasks.PickupItem) == ComponentMasks.PickupItem).Select(x => x.Id).ToList();
+            DisplaySystem.DrawEntities(items, spaceComponents, dungeonGrid, cameraMatrix, inWater, inFire, spriteBatch, spriteSheet, font, camera, colorInfo);
 
+            //Draw everything else
+            List<Guid> nonItems = drawableEntities.Where(x => (x.ComponentFlags & ComponentMasks.PickupItem) != ComponentMasks.PickupItem).Select(x => x.Id).ToList();
+            DisplaySystem.DrawEntities(nonItems, spaceComponents, dungeonGrid, cameraMatrix, inWater, inFire, spriteBatch, spriteSheet, font, camera, colorInfo);
+
+        }
+
+        private static void DrawEntities(List<Guid> drawableEntities, StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Matrix cameraMatrix, bool inWater, bool inFire, SpriteBatch spriteBatch, Texture2D spriteSheet, SpriteFont font, Camera camera, DungeonColorInfo colorInfo)
+        {
             foreach (Guid id in drawableEntities)
             {
                 DisplayComponent display = spaceComponents.DisplayComponents[id];
                 Vector2 gridPos = spaceComponents.PositionComponents[id].Position;
-                Vector2 position = new Vector2(spaceComponents.PositionComponents[id].Position.X * cellSize, spaceComponents.PositionComponents[id].Position.Y * cellSize);
+                Vector2 position = new Vector2(spaceComponents.PositionComponents[id].Position.X * DevConstants.Grid.CellSize, spaceComponents.PositionComponents[id].Position.Y * DevConstants.Grid.CellSize);
                 if (dungeonGrid[(int)spaceComponents.PositionComponents[id].Position.X, (int)spaceComponents.PositionComponents[id].Position.Y].InRange || display.AlwaysDraw)
                 {
-                    Vector2 bottomRight = Vector2.Transform(new Vector2((position.X) + cellSize, (position.Y) + cellSize), cameraMatrix);
+                    Vector2 bottomRight = Vector2.Transform(new Vector2((position.X) + DevConstants.Grid.CellSize, (position.Y) + DevConstants.Grid.CellSize), cameraMatrix);
                     Vector2 topLeft = Vector2.Transform(new Vector2(position.X, position.Y), cameraMatrix);
                     Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
 
@@ -43,13 +56,17 @@ namespace ECSRogue.ECS.Systems
                         //If the item is in water, you need to tint it, and if the player is in water and the object isn't (or vice versa) it must be hidden unless it's the observer.
                         display = dungeonGrid[(int)gridPos.X, (int)gridPos.Y].Type == TileType.TILE_WATER == inWater || (spaceComponents.Entities.Where(x => (x.Id == id)).First().ComponentFlags & ComponentMasks.Observer) == ComponentMasks.Observer ? display : DevConstants.ConstantComponents.UnknownDisplay;
                         Color displayColor = dungeonGrid[(int)gridPos.X, (int)gridPos.Y].Type == TileType.TILE_WATER || inWater ? Color.Lerp(display.Color, colorInfo.WaterInRange, .5f) : display.Color;
+                        if(!inWater && dungeonGrid[(int)gridPos.X, (int)gridPos.Y].Type != TileType.TILE_WATER)
+                        {
+                            displayColor = dungeonGrid[(int)gridPos.X, (int)gridPos.Y].FireIllumination || inFire ? Color.Lerp(display.Color, colorInfo.FireInRange, .5f) : display.Color;
+                        }
 
                         spriteBatch.Draw(spriteSheet, position, display.SpriteSource, displayColor * display.Opacity, display.Rotation, display.Origin, display.Scale, display.SpriteEffect, 0f);
                         if (!string.IsNullOrEmpty(display.Symbol))
                         {
                             Vector2 size = font.MeasureString(display.Symbol);
-                            spriteBatch.DrawString(font, display.Symbol, new Vector2(((int)position.X + (int)display.SpriteSource.Center.X), ((int)position.Y + (int)display.SpriteSource.Center.Y)), 
-                                display.SymbolColor, 0f, new Vector2((int)(size.X/2), (int)(size.Y/2)-3), 1f, SpriteEffects.None, 0f);
+                            spriteBatch.DrawString(font, display.Symbol, new Vector2(((int)position.X + (int)display.SpriteSource.Center.X), ((int)position.Y + (int)display.SpriteSource.Center.Y)),
+                                display.SymbolColor, 0f, new Vector2((int)(size.X / 2), (int)(size.Y / 2) - 3), 1f, SpriteEffects.None, 0f);
                         }
                     }
                 }
@@ -61,7 +78,7 @@ namespace ECSRogue.ECS.Systems
             Entity player = spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
             bool inWater = false;
             bool inFire = false;
-            if(player != null)
+            if (player != null)
             {
                 Vector2 playerPos = spaceComponents.PositionComponents[spaceComponents.Entities.Where(c => (c.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).First().Id].Position;
                 inWater = dungeonGrid[(int)playerPos.X, (int)playerPos.Y].Type == TileType.TILE_WATER;
@@ -95,11 +112,11 @@ namespace ECSRogue.ECS.Systems
                             {
                                 case TileType.TILE_FLATTENEDGRASS:
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || tintFire ? Color.Lerp(colorInfo.Floor, colorToLerp, .3f) : colorInfo.Floor) * .3f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.Floor, colorToLerp, .3f) : colorInfo.Floor) * .3f, origin: origin);
                                     break;
                                 case TileType.TILE_ROCK:
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || tintFire ? Color.Lerp(colorInfo.Wall, colorToLerp, .3f) : colorInfo.Wall) * .3f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.Wall, colorToLerp, .3f) : colorInfo.Wall) * .3f, origin: origin);
                                     break;
                                 case TileType.TILE_TALLGRASS:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.TallGrass, colorToLerp, .3f) : colorInfo.TallGrass) * .3f, origin: origin);
@@ -135,11 +152,11 @@ namespace ECSRogue.ECS.Systems
                             {
                                 case TileType.TILE_FLATTENEDGRASS:
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.FloorInRange, colorToLerp, .55f) :  colorInfo.FloorInRange) * (float)opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.FloorInRange, colorToLerp, .55f) : colorInfo.FloorInRange) * (float)opacity, origin: origin);
                                     break;
                                 case TileType.TILE_ROCK:
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || tintFire ? Color.Lerp(colorInfo.WallInRange, colorToLerp, .55f) : colorInfo.WallInRange) * .85f, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.WallInRange, colorToLerp, .55f) : colorInfo.WallInRange) * .85f, origin: origin);
                                     isWall = true;
                                     break;
                                 case TileType.TILE_TALLGRASS:
@@ -158,7 +175,7 @@ namespace ECSRogue.ECS.Systems
                                     spriteBatch.Draw(spriteSheet, position: tile, color: (inWater ? Color.Lerp(colorInfo.FireInRange, colorToLerp, .55f) : colorInfo.FireInRange) * (float)opacity, origin: origin);
                                     break;
                             }
-                            if(!isWall)
+                            if (!isWall)
                             {
                                 if (!string.IsNullOrEmpty(dungeonGrid[i, j].Symbol))
                                 {
@@ -187,11 +204,11 @@ namespace ECSRogue.ECS.Systems
                             {
                                 case TileType.TILE_FLATTENEDGRASS:
                                 case TileType.TILE_FLOOR:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || tintFire ? Color.Lerp(colorInfo.FloorInRange, colorToLerp, .55f) : colorInfo.FloorInRange) * opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.FloorInRange, colorToLerp, .55f) : colorInfo.FloorInRange) * opacity, origin: origin);
                                     break;
                                 case TileType.TILE_ROCK:
                                 case TileType.TILE_WALL:
-                                    spriteBatch.Draw(spriteSheet, position: tile,  color: (inWater || tintFire ? Color.Lerp(colorInfo.WallInRange, colorToLerp, .55f) : colorInfo.WallInRange) * opacity, origin: origin);
+                                    spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.WallInRange, colorToLerp, .55f) : colorInfo.WallInRange) * opacity, origin: origin);
                                     break;
                                 case TileType.TILE_TALLGRASS:
                                     spriteBatch.Draw(spriteSheet, position: tile, color: (inWater || tintFire ? Color.Lerp(colorInfo.TallGrassInRange, colorToLerp, .55f) : colorInfo.TallGrassInRange) * opacity, origin: origin);
@@ -221,7 +238,7 @@ namespace ECSRogue.ECS.Systems
                         }
                     }
 
-                   
+
                 }
             }
 
@@ -243,7 +260,7 @@ namespace ECSRogue.ECS.Systems
             {
                 Entity observer = spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Observer) == ComponentMasks.Observer).FirstOrDefault();
                 bool isObserver = false;
-                if(observer != null)
+                if (observer != null)
                 {
                     isObserver = observer.Id == id;
                 }
@@ -281,9 +298,9 @@ namespace ECSRogue.ECS.Systems
             foreach (Guid id in spaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.AIView) == ComponentMasks.AIView).Select(x => x.Id))
             {
                 AIFieldOfView fovInfo = spaceComponents.AIFieldOfViewComponents[id];
-                if(fovInfo.DrawField)
+                if (fovInfo.DrawField)
                 {
-                    foreach(Vector2 tilePosition in fovInfo.SeenTiles)
+                    foreach (Vector2 tilePosition in fovInfo.SeenTiles)
                     {
                         Vector2 tile = new Vector2((int)tilePosition.X * cellSize, (int)tilePosition.Y * cellSize);
 
@@ -291,12 +308,12 @@ namespace ECSRogue.ECS.Systems
                         Vector2 topLeft = Vector2.Transform(tile, cameraMatrix);
                         Rectangle cameraBounds = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)bottomRight.X - (int)topLeft.X, (int)bottomRight.Y - (int)topLeft.Y);
 
-                        if(dungeonGrid[(int)tilePosition.X, (int)tilePosition.Y].InRange && camera.IsInView(cameraMatrix, cameraBounds))
+                        if (dungeonGrid[(int)tilePosition.X, (int)tilePosition.Y].InRange && camera.IsInView(cameraMatrix, cameraBounds))
                         {
-                            if(spaceComponents.AlternateFOVColorChangeComponents.ContainsKey(id))
+                            if (spaceComponents.AlternateFOVColorChangeComponents.ContainsKey(id))
                             {
                                 AlternateFOVColorChangeComponent altColorInfo = spaceComponents.AlternateFOVColorChangeComponents[id];
-                                spriteBatch.Draw(rectangleTexture, position: tile, color: Color.Lerp(fovInfo.Color,altColorInfo.AlternateColor,altColorInfo.Seconds/altColorInfo.SwitchAtSeconds) * fovInfo.Opacity, origin: new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize));
+                                spriteBatch.Draw(rectangleTexture, position: tile, color: Color.Lerp(fovInfo.Color, altColorInfo.AlternateColor, altColorInfo.Seconds / altColorInfo.SwitchAtSeconds) * fovInfo.Opacity, origin: new Vector2(DevConstants.Grid.TileBorderSize, DevConstants.Grid.TileBorderSize));
                             }
                             else
                             {
