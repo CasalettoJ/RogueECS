@@ -252,12 +252,12 @@ namespace ECSRogue.ECS.Systems
         {
             int floorNumber = spaceComponents.GameplayInfoComponent.FloorsReached;
             floorNumber = floorNumber > 10 ? 10 : floorNumber;
-            int numberOfGrassPlumes = random.Next(1 + 50, 50 + 5 + floorNumber); //Must change to a formula
+            int numberOfGrassPlumes = random.Next(0, 5 + floorNumber); //Must change to a formula
             for (int i = 0; i < numberOfGrassPlumes; i++)
             {
                 Vector2 tile = freeTiles[random.Next(0, freeTiles.Count)];
 
-                int radius = random.Next(15, 15 + 6 + floorNumber); //Must change to formula
+                int radius = random.Next(4, 10 + floorNumber); //Must change to formula
                 int initialX, x0, initialY, y0;
                 initialX = x0 = (int)tile.X;
                 initialY = y0 = (int)tile.Y;

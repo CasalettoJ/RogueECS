@@ -18,7 +18,8 @@ namespace ECSRogue.BaseEngine
         NONE,
         PLAYER,
         TESTENEMYNPC,
-        WILDVINES
+        WILDVINES,
+        CRAZEDMINER
     }
 
     public struct MonsterInfo
@@ -64,6 +65,18 @@ namespace ECSRogue.BaseEngine
                 },
                 IsRequiredSpawn = false,
                 SpawnFunction = MonsterSpawners.SpawnWildVines
+            },
+
+            //Crazed Miner
+            new MonsterInfo()
+            {
+                Name = MonsterNames.CRAZEDMINER,
+                SpawnDepthsAndChances = new Dictionary<int, int>()
+                {
+                    {1, 5}, {2, 3 }, {3, 5 }, {4, 6 }, {6, 6 }, {7, 4 }, {8, 3 }
+                },
+                IsRequiredSpawn = true,
+                SpawnFunction = MonsterSpawners.CrazedMiner
             }
         };
     }
@@ -332,6 +345,80 @@ namespace ECSRogue.BaseEngine
                         " and the cocky creature allows {0} damage to go through!",
                         ", breaking impossible odds, landing {0} damage!!",
                         " and the test is broken! It takes {0} damage!"
+                }
+            };
+            spaceComponents.InventoryComponents[id] = new InventoryComponent() { Artifacts = new List<Guid>(), Consumables = new List<Guid>(), MaxArtifacts = 0, MaxConsumables = 0 };
+
+            return true;
+        }
+        public static bool CrazedMiner(StateSpaceComponents spaceComponents, DungeonTile[,] dungeonGrid, Vector2 dungeonDimensions, int cellSize, List<Vector2> freeTiles)
+        {
+            Guid id = spaceComponents.CreateEntity();
+            spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.CombatReadyAI | ComponentMasks.AIView | ComponentMasks.InventoryPickup;
+
+            int tileIndex = spaceComponents.random.Next(0, freeTiles.Count);
+            spaceComponents.PositionComponents[id] = new PositionComponent() { Position = freeTiles[tileIndex] };
+            freeTiles.RemoveAt(tileIndex);
+            spaceComponents.DisplayComponents[id] = new DisplayComponent()
+            {
+                Color = Color.MediumPurple, // Color.DarkRed,
+                Origin = Vector2.Zero,
+                Rotation = 0f,
+                Scale = 1f,
+                SpriteEffect = SpriteEffects.None,
+                SpriteSource = new Rectangle(0 * cellSize, 0 * cellSize, cellSize, cellSize),
+                Symbol = "C",
+                SymbolColor = Color.White,
+                Opacity = 1f
+            };
+            spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 25, DieNumber = 1, Health = 25, Defense = 4, Accuracy = 80, Wealth = 100, MinimumDamage = 2, MaximumDamage = 7 };
+            spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
+            spaceComponents.NameComponents[id] = new NameComponent() { Name = "CRAZED MINER", Description = "An injured, shambling husk of a man.  He clutches a picaxe in his hands and precious gems are stuffed in his pockets.  It looks like greed got the better of his mind long ago." };
+            spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
+            spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
+            spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_ROAMING };
+            spaceComponents.AIFieldOfViewComponents[id] = new AIFieldOfView() { DrawField = false, Opacity = .3f, radius = 3, SeenTiles = new List<Vector2>(), Color = FOVColors.Roaming };
+            spaceComponents.AISleepComponents[id] = new AISleep() { ChanceToWake = 10, FOVRadiusChangeOnWake = 1 };
+            spaceComponents.AIRoamComponents[id] = new AIRoam() { ChanceToDetect = 25 };
+            spaceComponents.AIFleeComponents[id] = new AIFlee() { DoesFlee = false, FleeAtHealthPercent = 25, FleeUntilHealthPercent = 30 };
+            spaceComponents.EntityMessageComponents[id] = new EntityMessageComponent()
+            {
+                AttackNPCMessages = new string[]
+                {
+                        "{0} swings its picaxe at {1}",
+                        "{0} shambles toward {1}",
+                        "{0} claws madly at {1}",
+                },
+                AttackPlayerMessages = new string[]
+                {
+                        "{0} swings its picaxe at you",
+                        "{0} shambles toward you",
+                        "{0} claws madly at you",
+                },
+                NormalDodgeMessages = new string[]
+                {
+                        " but the attack missed!",
+                        " and the creature dodges the attack.",
+                        " but the creature's defense protects it.",
+                },
+                StreakDodgeMessages = new string[]
+                {
+                        " and, as always, the attack misses.",
+                        " and it misses again!",
+                        " and it laughs madly.",
+                        " and taunts at the attack. \"Give up!\""
+                },
+                NormalTakeDamageMessages = new string[]
+                {
+                        " and it takes {0} damage.",
+                        " and it cries out, {0} health weaker.",
+                        " for {0} damage."
+                },
+                BrokenDodgeStreakTakeDamageMessages = new string[]
+                {
+                        " and against all odds deals {0} damage!",
+                        " and the cocky creature allows {0} damage to go through!",
+                        ", breaking impossible odds, landing {0} damage!!",
                 }
             };
             spaceComponents.InventoryComponents[id] = new InventoryComponent() { Artifacts = new List<Guid>(), Consumables = new List<Guid>(), MaxArtifacts = 0, MaxConsumables = 0 };

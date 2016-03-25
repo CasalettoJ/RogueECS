@@ -271,6 +271,75 @@ namespace ECSRogue.ECS.Systems
             return keepInventory;
         }
 
+        public static void DropWholeInventory(StateSpaceComponents spaceComponents, Guid droppingEntity, Vector2 entityPos)
+        {
+            Entity entity = spaceComponents.Entities.Where(x => x.Id == droppingEntity).FirstOrDefault();
+            if(entity != null && (entity.ComponentFlags & Component.COMPONENT_INVENTORY) == Component.COMPONENT_INVENTORY)
+            {
+                InventoryComponent invo = spaceComponents.InventoryComponents[entity.Id];
+                foreach(Guid artifact in invo.Artifacts)
+                {
+                    Entity item = spaceComponents.Entities.Where(x => x.Id == artifact).FirstOrDefault();
+                    if (item != null)
+                    {
+                        item.ComponentFlags |= Component.COMPONENT_POSITION;
+                        spaceComponents.PositionComponents[item.Id] = new PositionComponent() { Position = entityPos };
+                        invo.Artifacts.Remove(item.Id);
+                    }
+                }
+
+                foreach(Guid consumable in invo.Consumables)
+                {
+                    Entity item = spaceComponents.Entities.Where(x => x.Id == consumable).FirstOrDefault();
+                    if (item != null)
+                    {
+                        item.ComponentFlags |= Component.COMPONENT_POSITION;
+                        spaceComponents.PositionComponents[item.Id] = new PositionComponent() { Position = entityPos };
+                        invo.Consumables.Remove(item.Id);
+                    }
+                }
+
+                if((entity.ComponentFlags & Component.COMPONENT_SKILL_LEVELS) == Component.COMPONENT_SKILL_LEVELS)
+                {
+                    SkillLevelsComponent skills = spaceComponents.SkillLevelsComponents[entity.Id];
+                    if(skills.Wealth > 0)
+                    {
+                        spaceComponents.DelayedActions.Add(new Action(() =>
+                        {
+                            Guid id = spaceComponents.CreateEntity();
+                            spaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Drawable | ComponentMasks.GlowingOutline | ComponentMasks.PickupItem;
+                            spaceComponents.DisplayComponents[id] = new DisplayComponent()
+                            {
+                                AlwaysDraw = false,
+                                Color = Colors.Messages.Special,
+                                Opacity = 1f,
+                                Origin = Vector2.Zero,
+                                Rotation = 0f,
+                                Scale = 1f,
+                                SpriteEffect = SpriteEffects.None,
+                                SpriteSource = new Rectangle(0 * DevConstants.Grid.CellSize, 0 * DevConstants.Grid.CellSize, DevConstants.Grid.CellSize, DevConstants.Grid.CellSize),
+                                Symbol = "$",
+                                SymbolColor = Color.White
+                            };
+                            Vector2 position = entityPos;
+                            spaceComponents.PositionComponents[id] = new PositionComponent() { Position = position };
+                            spaceComponents.OutlineComponents[id] = new OutlineComponent() { Color = Color.Purple, Opacity = 1f };
+                            spaceComponents.SecondaryOutlineComponents[id] = new SecondaryOutlineComponent() { AlternateColor = Color.LightBlue, Seconds = 0f, SwitchAtSeconds = .75f };
+                            spaceComponents.PickupComponents[id] = new PickupComponent() { PickupType = ItemType.GOLD };
+                            spaceComponents.ValueComponents[id] = new ValueComponent() { Gold = skills.Wealth };
+                            spaceComponents.NameComponents[id] = new NameComponent()
+                            {
+                                Name = "Gold",
+                                Description = "Some people try and use fancy names for this mass of wealth. Credits, Stardust, Gil... it buys shelter and women all the same."
+                            };
+                            spaceComponents.CollisionComponents[id] = new CollisionComponent() { CollidedObjects = new List<Guid>(), Solid = false };
+                        }));
+                    }
+                }
+            }
+
+        }
+
 
         public static void ShowInventoryMenu(StateSpaceComponents spaceComponents, SpriteBatch spriteBatch, Camera camera, SpriteFont messageFont, SpriteFont optionFont, Texture2D UI)
         {
@@ -474,6 +543,7 @@ namespace ECSRogue.ECS.Systems
 
             }
         }
+
 
         #region artifact stats update functions
         public static void IncrementKillsWithArtifact(StateSpaceComponents spaceComponents, Guid entityWithInventory)

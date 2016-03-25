@@ -94,6 +94,7 @@ namespace ECSRogue.ECS.Systems
                             Entity deadEntity = spaceComponents.Entities.Where(x => x.Id == id).FirstOrDefault();
                             if(deadEntity != null)
                             {
+                                InventorySystem.DropWholeInventory(spaceComponents, deadEntity.Id, spaceComponents.PositionComponents[deadEntity.Id].Position);
                                 deadEntity.ComponentFlags &= ~Component.COMPONENT_POSITION;
                             }
                             spaceComponents.EntitiesToDelete.Add(id);
