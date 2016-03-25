@@ -373,7 +373,7 @@ namespace ECSRogue.BaseEngine
             };
             spaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent() { CurrentHealth = 25, DieNumber = 1, Health = 25, Defense = 4, Accuracy = 80, Wealth = 100, MinimumDamage = 2, MaximumDamage = 7 };
             spaceComponents.CollisionComponents[id] = new CollisionComponent() { Solid = true, CollidedObjects = new List<Guid>() };
-            spaceComponents.NameComponents[id] = new NameComponent() { Name = "CRAZED MINER", Description = "An injured, shambling husk of a man.  He clutches a picaxe in his hands and precious gems are stuffed in his pockets.  It looks like greed got the better of his mind long ago." };
+            spaceComponents.NameComponents[id] = new NameComponent() { Name = "CRAZED MINER", Description = "An injured, shambling husk of a man.  He clutches a pickaxe in his hands and precious gems are stuffed in his pockets.  It looks like greed got the better of his mind long ago." };
             spaceComponents.AIAlignmentComponents[id] = new AIAlignment() { Alignment = AIAlignments.ALIGNMENT_HOSTILE };
             spaceComponents.AICombatComponents[id] = new AICombat() { AttackType = AIAttackTypes.ATTACK_TYPE_NORMAL, FleesWhenLowHealth = true };
             spaceComponents.AIStateComponents[id] = new AIState() { State = AIStates.STATE_ROAMING };
@@ -385,13 +385,13 @@ namespace ECSRogue.BaseEngine
             {
                 AttackNPCMessages = new string[]
                 {
-                        "{0} swings its picaxe at {1}",
+                        "{0} swings its pickaxe at {1}",
                         "{0} shambles toward {1}",
                         "{0} claws madly at {1}",
                 },
                 AttackPlayerMessages = new string[]
                 {
-                        "{0} swings its picaxe at you",
+                        "{0} swings its pickaxe at you",
                         "{0} shambles toward you",
                         "{0} claws madly at you",
                 },
