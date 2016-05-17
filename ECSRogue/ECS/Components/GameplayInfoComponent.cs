@@ -10,5 +10,8 @@ namespace ECSRogue.ECS.Components
         public int Kills;
         public int StepsTaken;
         public int FloorsReached;
+
+        //"Hidden" global stats
+        public int Madness;
     }
 }

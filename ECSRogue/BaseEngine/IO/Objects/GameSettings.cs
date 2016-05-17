@@ -11,7 +11,7 @@ namespace ECSRogue.BaseEngine.IO.Objects
         public Vector2 Resolution;
         public float Scale;
         public bool Vsync;
-        public bool ShowNormalMessages;
+        public bool ShowGlow;
         public bool Borderless;
         public bool HasChanges;
     }

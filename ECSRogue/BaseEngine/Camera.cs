@@ -19,10 +19,13 @@ namespace ECSRogue.BaseEngine
         {
             get
             {
-                return new Vector2(600, 600);
+                return new Vector2(900, 900);
             }
         }
-        public Viewport Viewport;
+        public Viewport DungeonViewport;
+        public Viewport FullViewport;
+        public Viewport DungeonUIViewport;
+        public Viewport DungeonUIViewportLeft;
 
         public Camera(Vector2 position, Vector2 origin, float rotation, float scale, GraphicsDeviceManager graphics)
         {
@@ -35,26 +38,34 @@ namespace ECSRogue.BaseEngine
             Rotation = rotation;
             Scale = scale;
             Position = position;
-            Bounds = graphics.GraphicsDevice.Viewport.Bounds;
-            Viewport = graphics.GraphicsDevice.Viewport;
-        }
+            FullViewport = graphics.GraphicsDevice.Viewport;
 
-        //public Vector3 ResetScreenScale(GraphicsDeviceManager graphics, Vector2 screenScale)
-        //{
-        //    var scaleX = (float)graphics.GraphicsDevice.Viewport.Width / screenScale.X;
-        //    var scaleY = (float)graphics.GraphicsDevice.Viewport.Height / screenScale.Y;
-        //    Scale = new Vector3(scaleX, scaleY, 1.0f);
-        //    Viewport = graphics.GraphicsDevice.Viewport;
-        //    return Scale;
-        //}
+            DungeonViewport = FullViewport;
+            DungeonViewport.Height -= 200;
+            DungeonViewport.Width -= 200;
+            Bounds = DungeonViewport.Bounds;
+
+            DungeonUIViewport = FullViewport;
+            DungeonUIViewport.Height = 200;
+            DungeonUIViewport.Width -= DungeonUIViewport.Height;
+            DungeonUIViewport.Y = DungeonViewport.Height;
+
+            DungeonUIViewportLeft = FullViewport;
+            DungeonUIViewportLeft.Width = DungeonUIViewport.Height;
+            DungeonUIViewportLeft.X = DungeonUIViewport.Width;
+        }
 
         public Matrix GetMatrix()
         {
-            return
+            Matrix transform = 
                 Matrix.CreateTranslation(new Vector3((int)-Position.X, (int)-Position.Y, 0)) *
                 Matrix.CreateRotationZ(Rotation) *
                 Matrix.CreateScale(Scale) *
                 Matrix.CreateTranslation(new Vector3((int)(Bounds.Width * 0.5f), (int)(Bounds.Height * 0.5f), 0));
+            //M41 and M42 are for translation, cast them to ints to avoid jitteryness
+            transform.M41 = (int)transform.M41;
+            transform.M42 = (int)transform.M42;
+            return transform;
         }
 
         public Matrix GetInverseMatrix()
@@ -77,10 +88,11 @@ namespace ECSRogue.BaseEngine
             return Vector2.Transform(point.ToVector2(), this.GetMatrix());
         }
 
-        public bool IsInView(Matrix matrix, Vector2 positionUpperBounds, Vector2 positionLowerBounds)
+        public bool IsInView(Matrix matrix, Rectangle item)
         {
-            return this.Viewport.Bounds.Contains(Vector2.Transform(positionLowerBounds, matrix))
-                || this.Viewport.Bounds.Contains(Vector2.Transform(positionUpperBounds, matrix));
+            //return this.DungeonViewport.Bounds.Contains(Vector2.Transform(positionLowerBounds, matrix))
+            //    || this.DungeonViewport.Bounds.Contains(Vector2.Transform(positionUpperBounds, matrix));
+            return !Rectangle.Intersect(this.DungeonViewport.Bounds, item).IsEmpty;
         }
 
     }

@@ -11,10 +11,16 @@ namespace ECSRogue.ECS.Components
         public int CurrentHealth;
 
         public int Wealth;
+        
+        public double Accuracy;
+        public double Defense;
 
-        public int PhysicalAttack;
-        public int MagicAttack;
-        public int PhysicalDefense;
-        public int MagicDefense;
+        public int MinimumDamage;
+        public int MaximumDamage;
+        public int DieNumber;
+
+        //"Hidden" statistics
+        public double TimesMissed;
+        public double TimesHit;
     }
 }

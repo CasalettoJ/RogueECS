@@ -139,7 +139,7 @@ namespace ECSRogue.BaseEngine.States
             return nextState;
         }
 
-        public void DrawContent(SpriteBatch spriteBatch, Camera camera)
+        public void DrawContent(SpriteBatch spriteBatch, Camera camera, ref GameSettings gameSettings)
         {
             //Ain't nothing here
         }
@@ -149,11 +149,11 @@ namespace ECSRogue.BaseEngine.States
             int messageCount = 0;
             int messageSpacing = 50;
             Vector2 titleLength = titleText.MeasureString(Title);
-            spriteBatch.DrawString(titleText, Title, new Vector2((camera.Viewport.Width / 2) - titleLength.X / 2, messageSpacing), Color.Goldenrod);
+            spriteBatch.DrawString(titleText, Title, new Vector2((camera.FullViewport.Width / 2) - titleLength.X / 2, messageSpacing), Color.Goldenrod);
             foreach (Option option in menuOptions)
             {
                 int stringLength = (int)optionText.MeasureString(option.Message).X;
-                spriteBatch.DrawString(optionText, option.Message, new Vector2((camera.Viewport.Width / 2) - stringLength / 2, (camera.Viewport.Height / 2) + (messageCount * messageSpacing)),
+                spriteBatch.DrawString(optionText, option.Message, new Vector2((camera.FullViewport.Width / 2) - stringLength / 2, (camera.FullViewport.Height / 2) + (messageCount * messageSpacing)),
                     option.Enabled ? messageCount == optionSelection ? Color.MediumPurple : Color.Goldenrod : Color.Gray);
                 messageCount += 1;
             }
