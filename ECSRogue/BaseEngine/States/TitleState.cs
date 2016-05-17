@@ -58,8 +58,8 @@ namespace ECSRogue.BaseEngine.States
             PrevGamepadState = gamePadState;
             PrevKeyboardState = keyboardState;
             StateComponents = new StateComponents();
-            titleText = content.Load<SpriteFont>("Fonts/TitleText");
-            optionText = content.Load<SpriteFont>("Fonts/OptionText");
+            titleText = content.Load<SpriteFont>(DevConstants.Graphics.TitleText);
+            optionText = content.Load<SpriteFont>(DevConstants.Graphics.OptionFont);
             optionSelection = 0;
             menuOptions = new Option[optionsAmount];
             Title = "PLACEHOLDER TITLE";
@@ -129,7 +129,7 @@ namespace ECSRogue.BaseEngine.States
                         break;
                     case (int)Options.LOAD_GAME:
                         RandomlyGeneratedStateSpace nextSpace = new RandomlyGeneratedStateSpace(DungeonInfo);
-                        nextState = new PlayingState(nextSpace, camera, Content, Graphics, saveInfo: DungeonInfo);
+                        nextState = new PlayingState(nextSpace, camera, Content, Graphics, saveInfo: DungeonInfo, keyboardState: keyState);
                         break;
                     case (int)Options.OPTIONS:
                         GameSettingsMenuStateSpace nextMenu = new GameSettingsMenuStateSpace(ref gameSettings);
@@ -147,7 +147,7 @@ namespace ECSRogue.BaseEngine.States
             return nextState;
         }
 
-        public void DrawContent(SpriteBatch spriteBatch, Camera camera)
+        public void DrawContent(SpriteBatch spriteBatch, Camera camera, ref GameSettings gameSettings)
         {
             //Ain't nothing here
         }
@@ -157,11 +157,11 @@ namespace ECSRogue.BaseEngine.States
             int messageCount = 0;
             int messageSpacing = 50;
             Vector2 titleLength = titleText.MeasureString(Title);
-            spriteBatch.DrawString(titleText, Title, new Vector2(((int)(camera.Viewport.Width / 2) - (int)(titleLength.X / 2)), messageSpacing), Color.Goldenrod);
+            spriteBatch.DrawString(titleText, Title, new Vector2(((int)(camera.FullViewport.Width / 2) - (int)(titleLength.X / 2)), messageSpacing), Color.Goldenrod);
             foreach (Option option in menuOptions)
             {
                 int stringLength = (int)optionText.MeasureString(option.Message).X;
-                spriteBatch.DrawString(optionText, option.Message, new Vector2((int)((camera.Viewport.Width / 2) - stringLength / 2), (int)((camera.Viewport.Height / 2) + (messageCount * messageSpacing))),
+                spriteBatch.DrawString(optionText, option.Message, new Vector2((int)((camera.FullViewport.Width / 2) - stringLength / 2), (int)((camera.FullViewport.Height / 2) + (messageCount * messageSpacing))),
                     option.Enabled ? messageCount == optionSelection ? Color.MediumPurple : Color.Goldenrod : Color.Gray);
                 messageCount += 1;
             }

@@ -83,17 +83,28 @@ namespace ECSRogue
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            currentState = currentState.UpdateContent(gameTime, gameCamera, ref gameSettings);
-            prevKey = Keyboard.GetState();
-            if(currentState == null)
+            if (this.IsActive)
             {
-                Exit();
+                try
+                {
+                    currentState = currentState.UpdateContent(gameTime, gameCamera, ref gameSettings);
+                }
+                catch (Exception ex)
+                {
+                    FileIO.LogError(ex);
+                    Environment.Exit(0); // When laptop is unplugged game.exit() doesn't work...
+                }
+                prevKey = Keyboard.GetState();
+                if (currentState == null)
+                {
+                    Exit();
+                }
+                if (gameSettings.HasChanges)
+                {
+                    ResetGameSettings();
+                }
+                base.Update(gameTime);
             }
-            if(gameSettings.HasChanges)
-            {
-                ResetGameSettings();
-            }
-            base.Update(gameTime);
         }
 
         /// <summary>
@@ -105,7 +116,7 @@ namespace ECSRogue
             GraphicsDevice.Clear(Color.Black);
             //Draw entities
             spriteBatch.Begin(transformMatrix: gameCamera.GetMatrix(), samplerState: SamplerState.PointClamp);
-            currentState.DrawContent(spriteBatch, gameCamera);
+            currentState.DrawContent(spriteBatch, gameCamera, ref gameSettings);
             spriteBatch.End();
             //Draw UI
             spriteBatch.Begin(samplerState: SamplerState.PointClamp);
@@ -122,9 +133,7 @@ namespace ECSRogue
             graphics.SynchronizeWithVerticalRetrace = gameSettings.Vsync;
             this.IsFixedTimeStep = gameSettings.Vsync;
             graphics.ApplyChanges();
-            gameCamera.Scale = gameSettings.Scale;
-            gameCamera.Bounds = graphics.GraphicsDevice.Viewport.Bounds;
-            gameCamera.Viewport = graphics.GraphicsDevice.Viewport;
+            gameCamera.ResetCamera(gameCamera.Position, Vector2.Zero, 0f, gameSettings.Scale, graphics);
             gameSettings.HasChanges = false;
             this.Window.Position = new Point((int)graphics.GraphicsDevice.DisplayMode.Width/2 - (int)gameSettings.Resolution.X/2, (int)graphics.GraphicsDevice.DisplayMode.Height / 2 - (int)gameSettings.Resolution.Y / 2);
             this.Window.IsBorderless = gameSettings.Borderless;

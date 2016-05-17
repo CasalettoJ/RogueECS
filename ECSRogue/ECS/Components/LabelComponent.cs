@@ -11,5 +11,9 @@ namespace ECSRogue.ECS.Components
     {
         public string Text;
         public Color Color;
+        public float Scale;
+        public Vector2 Origin;
+        public SpriteEffects SpriteEffect;
+        public float Rotation;
     }
 }

@@ -5,7 +5,10 @@ using System.Text;
 
 namespace ECSRogue.ECS.Components
 {
-    public struct AIComponent
+    public struct ObserverComponent
     {
+        public Guid SelectedItem;
+        public List<Guid> Observed;
+        public bool SeeUnknown;
     }
 }

@@ -5,34 +5,36 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using ECSRogue.BaseEngine;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using ECSRogue.ECS;
-using ECSRogue.ECS.Systems;
 
 namespace ECSRogue.ProceduralGeneration
 {
     public class CaveGeneration : IGenerationAlgorithm
     {
-        private const int cellSize = 32;
-
-        public int GetCellsize()
-        {
-            return cellSize;
-        }
-
         public DungeonColorInfo GetColorInfo()
         {
             return new DungeonColorInfo()
             {
-                Floor = Color.DarkGreen,
-                Wall = Color.DarkViolet,
-                FloorInRange = Color.Green,
-                WallInRange = Color.Violet
+                Floor = Colors.Caves.Floor,
+                Wall = Colors.Caves.Wall,
+                FloorInRange = Colors.Caves.FloorInRange,
+                WallInRange = Colors.Caves.WallInRange,
+                //Test Colors
+                DeepWater = Colors.Caves.DeepWater,
+                DeepWaterInRange = Colors.Caves.DeepWaterInRange,
+                Spikes = Colors.Caves.Spikes,
+                SpikesInRange = Colors.Caves.SpikesInRange,
+                TallGrass = Colors.Caves.TallGrass,
+                TallGrassInRange = Colors.Caves.TallGrassInRange,
+                Water = Colors.Caves.Water,
+                WaterInRange = Colors.Caves.WaterInRange,
+                Ash = Colors.Caves.Ash,
+                AshInRange = Colors.Caves.AshInRange,
+                Fire = Colors.Caves.Fire,
+                FireInRange = Colors.Caves.FireInRange
             };
         }
 
-        public Vector2 GenerateDungeon(ref DungeonTile[,] dungeonGrid, int worldMin, int worldMax, Random random)
+        public Vector2 GenerateDungeon(ref DungeonTile[,] dungeonGrid, int worldMin, int worldMax, Random random, List<Vector2> freeTiles)
         {
             int worldI = random.Next(worldMin, worldMax);
             int worldJ = random.Next(worldMin, worldMax);
@@ -335,17 +337,27 @@ namespace ECSRogue.ProceduralGeneration
                 }
             }
 
+
+
+            for (int i = 0; i < worldI; i++)
+            {
+                for(int j = 0; j < worldJ; j++)
+                {
+                    if(dungeonGrid[i,j].Type == TileType.TILE_FLOOR)
+                    {
+                        dungeonGrid[i, j].Occupiable = true;
+                        dungeonGrid[i, j].ChanceToIgnite = Tiles.FloorIgniteChance;
+                        freeTiles.Add(new Vector2(i, j));
+                    }
+                }
+            }
+
             return new Vector2(worldI, worldJ);
         }
 
         public string GetDungeonSpritesheetFileName()
         {
-            return "Sprites/anonsheet";
-        }
-        
-        public void GenerateDungeonEntities(StateSpaceComponents spaceComponents)
-        {
-            throw new NotImplementedException();
+            return DevConstants.Graphics.CavesSpriteSheet;
         }
 
         private void FloodFill(int x, int y, int worldI, int worldJ, ref DungeonTile[,] dungeonGrid)

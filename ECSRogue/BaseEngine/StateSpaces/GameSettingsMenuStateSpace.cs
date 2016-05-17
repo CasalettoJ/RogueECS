@@ -25,7 +25,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             GRAPHICS_SCALE = 1,
             BORDERLESS = 2,
             VSYNC = 3,
-            MESSAGE_FILTER = 4,
+            GLOW_FILTER = 4,
             SAVE_CHANGES = 5,
             RESTORE_DEFAULTS = 6,
             CANCEL = 7
@@ -85,9 +85,6 @@ namespace ECSRogue.BaseEngine.StateSpaces
             menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(1.25f);
             menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(1.5f);
             menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(2f);
-            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(2.25f);
-            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(2.5f);
-            menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.Add(4f);
             menuOptions[(int)Options.GRAPHICS_SCALE].Selection =
                 menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.FindIndex(x => Convert.ToDouble(x) == (double)gameSettings.Scale) > 0 ?
                 menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection.FindIndex(x => Convert.ToDouble(x) == (double)gameSettings.Scale) : 0;
@@ -107,11 +104,11 @@ namespace ECSRogue.BaseEngine.StateSpaces
             menuOptions[(int)Options.VSYNC].Selection = menuOptions[(int)Options.VSYNC].OptionsCollection.FindIndex(x => (bool)x == gameSettings.Vsync);
 
             //Message Filter Option
-            menuOptions[(int)Options.MESSAGE_FILTER] = new Option() { Message = "SHOW UNIMPORTANT MESSAGES: ", OptionsCollection = new List<object>(), Selection = 0 };
+            menuOptions[(int)Options.GLOW_FILTER] = new Option() { Message = "SHOW GLOWING BORDERS: ", OptionsCollection = new List<object>(), Selection = 0 };
             //Set to current message filter option
-            menuOptions[(int)Options.MESSAGE_FILTER].OptionsCollection.Add(true);
-            menuOptions[(int)Options.MESSAGE_FILTER].OptionsCollection.Add(false);
-            menuOptions[(int)Options.MESSAGE_FILTER].Selection = menuOptions[(int)Options.MESSAGE_FILTER].OptionsCollection.FindIndex(x => (bool)x == gameSettings.ShowNormalMessages);
+            menuOptions[(int)Options.GLOW_FILTER].OptionsCollection.Add(true);
+            menuOptions[(int)Options.GLOW_FILTER].OptionsCollection.Add(false);
+            menuOptions[(int)Options.GLOW_FILTER].Selection = menuOptions[(int)Options.GLOW_FILTER].OptionsCollection.FindIndex(x => (bool)x == gameSettings.ShowGlow);
 
             //Save Changes
             menuOptions[(int)Options.SAVE_CHANGES] = new Option() { Message = "[SAVE CHANGES]", OptionsCollection = null, Selection = 0 };
@@ -189,7 +186,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
                         gameSettings.Resolution = (Vector2)menuOptions[(int)Options.RESOLUTION].OptionsCollection[menuOptions[(int)Options.RESOLUTION].Selection];
                         gameSettings.Scale = (float)menuOptions[(int)Options.GRAPHICS_SCALE].OptionsCollection[menuOptions[(int)Options.GRAPHICS_SCALE].Selection];
                         gameSettings.Borderless = (bool)menuOptions[(int)Options.BORDERLESS].OptionsCollection[menuOptions[(int)Options.BORDERLESS].Selection];
-                        gameSettings.ShowNormalMessages = (bool)menuOptions[(int)Options.MESSAGE_FILTER].OptionsCollection[menuOptions[(int)Options.MESSAGE_FILTER].Selection];
+                        gameSettings.ShowGlow = (bool)menuOptions[(int)Options.GLOW_FILTER].OptionsCollection[menuOptions[(int)Options.GLOW_FILTER].Selection];
                         gameSettings.Vsync = (bool)menuOptions[(int)Options.VSYNC].OptionsCollection[menuOptions[(int)Options.VSYNC].Selection];
                         FileIO.SaveGameSettings(ref gameSettings);
                         nextSpace = null;
@@ -208,7 +205,7 @@ namespace ECSRogue.BaseEngine.StateSpaces
             return nextSpace;
         }
 
-        public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
+        public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera, ref GameSettings gameSettings)
         {
             //Nothing here
         }
@@ -218,18 +215,18 @@ namespace ECSRogue.BaseEngine.StateSpaces
             int messageCount = 0;
             int messageSpacing = 50;
             Vector2 titleLength = titleText.MeasureString(Title);
-            spriteBatch.DrawString(titleText, Title, new Vector2((camera.Viewport.Width / 2) - titleLength.X / 2, messageSpacing), Color.Goldenrod);
+            spriteBatch.DrawString(titleText, Title, new Vector2((camera.FullViewport.Width / 2) - titleLength.X / 2, messageSpacing), Color.Goldenrod);
             foreach (Option option in menuOptions)
             {
                 int stringLength = (int)optionText.MeasureString(option.Message).X;
                 if(option.OptionsCollection != null)
                 {
-                    spriteBatch.DrawString(optionText, option.Message + option.OptionsCollection[option.Selection].ToString(), new Vector2((camera.Viewport.Width / 2) - titleLength.X / 2, (camera.Viewport.Height / 3) + (messageCount * messageSpacing)),
+                    spriteBatch.DrawString(optionText, option.Message + option.OptionsCollection[option.Selection].ToString(), new Vector2((camera.FullViewport.Width / 2) - titleLength.X / 2, (camera.FullViewport.Height / 3) + (messageCount * messageSpacing)),
                         messageCount == optionSelection ? Color.MediumPurple : Color.Goldenrod);
                 }
                 else
                 {
-                    spriteBatch.DrawString(optionText, option.Message, new Vector2((camera.Viewport.Width / 2) - titleLength.X / 2, (camera.Viewport.Height / 3) + (messageCount * messageSpacing)),
+                    spriteBatch.DrawString(optionText, option.Message, new Vector2((camera.FullViewport.Width / 2) - titleLength.X / 2, (camera.FullViewport.Height / 3) + (messageCount * messageSpacing)),
                         messageCount == optionSelection ? Color.MediumPurple : Color.Goldenrod);
                 }
                 messageCount += 1;

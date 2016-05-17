@@ -13,6 +13,8 @@ using ECSRogue.ProceduralGeneration.Interfaces;
 using ECSRogue.ECS.Systems;
 using ECSRogue.ECS.Components;
 using ECSRogue.BaseEngine.IO.Objects;
+using ECSRogue.ECS.Components.GraphicalEffectsComponents;
+using ECSRogue.ECS.Components.ItemizationComponents;
 
 namespace ECSRogue.BaseEngine.StateSpaces
 {
@@ -25,20 +27,29 @@ namespace ECSRogue.BaseEngine.StateSpaces
 
         #region Dungeon Environment Variables
         private Texture2D sprites;
+        private Texture2D dungeonSprites;
+        private Texture2D UI;
         private SpriteFont messageFont;
+        private SpriteFont asciiDisplay;
+        private SpriteFont optionFont;
         private Vector2 dungeonDimensions;
         private DungeonTile[,] dungeonGrid = null;
-        private int cellSize;
-        private Texture2D dungeonSprites;
+        private List<Vector2> freeTiles;
+        private List<Vector2> waterTiles;
         private string dungeonSpriteFile;
         private DungeonColorInfo dungeonColorInfo;
+        private DijkstraMapTile[,] mapToPlayer;
+        private bool showInventory = false;
+        private bool showObserver = false;
         #endregion
 
+        #region Constructors
         public RandomlyGeneratedStateSpace(IGenerationAlgorithm dungeonGeneration, int worldMin, int worldMax)
         {
             stateSpaceComponents = new StateSpaceComponents();
-            dungeonDimensions = dungeonGeneration.GenerateDungeon(ref dungeonGrid, worldMin, worldMax, stateSpaceComponents.random);
-            cellSize = dungeonGeneration.GetCellsize();
+            freeTiles = new List<Vector2>();
+            waterTiles = new List<Vector2>();
+            dungeonDimensions = dungeonGeneration.GenerateDungeon(ref dungeonGrid, worldMin, worldMax, stateSpaceComponents.random, freeTiles);
             dungeonSpriteFile = dungeonGeneration.GetDungeonSpritesheetFileName();
             dungeonColorInfo = dungeonGeneration.GetColorInfo();
         }
@@ -48,153 +59,194 @@ namespace ECSRogue.BaseEngine.StateSpaces
             stateSpaceComponents = data.stateSpaceComponents;
             dungeonSpriteFile = data.dungeonSpriteFile;
             dungeonGrid = data.dungeonGrid;
-            cellSize = data.cellSize;
             dungeonColorInfo = data.dungeonColorInfo;
             dungeonDimensions = data.dungeonDimensions;
+            freeTiles = data.freeTiles;
+            PlayerComponent player = stateSpaceComponents.PlayerComponent;
+            player.PlayerJustLoaded = true;
+            stateSpaceComponents.PlayerComponent = player;
         }
+        #endregion
 
         #region Load Logic
         public void LoadLevel(ContentManager content, GraphicsDeviceManager graphics, Camera camera, StateComponents stateComponents, bool createEntities = true)
         {
             this.stateComponents = stateComponents;
-            sprites = content.Load<Texture2D>("Sprites/anonsheet");
+            if(stateComponents.StateSpaceComponents != null)
+            {
+                this.stateSpaceComponents = stateComponents.StateSpaceComponents;
+            }
+            sprites = content.Load<Texture2D>(DevConstants.Graphics.SpriteSheet);
             dungeonSprites = content.Load<Texture2D>(dungeonSpriteFile);
-            messageFont = content.Load<SpriteFont>("Fonts/InfoText");
-            if (createEntities)
-            {
-                CreatePlayer();
-                CreateMessageLog();
-            }
+            messageFont = content.Load<SpriteFont>(DevConstants.Graphics.MessageFont);
+            asciiDisplay = content.Load<SpriteFont>(DevConstants.Graphics.AsciiFont);
+            optionFont = content.Load<SpriteFont>(DevConstants.Graphics.OptionFont);
+            UI = content.Load<Texture2D>(DevConstants.Graphics.UISheet);
             camera.AttachedToPlayer = true;
-        }
-
-        private void CreatePlayer()
-        {
-            Guid id = stateSpaceComponents.CreateEntity();
-            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = ComponentMasks.Player;
-            //Set Position
-            int X = 0;
-            int Y = 0;
-            do
+            if(createEntities)
             {
-                X = stateSpaceComponents.random.Next(0, (int)dungeonDimensions.X);
-                Y = stateSpaceComponents.random.Next(0, (int)dungeonDimensions.Y);
-            } while (dungeonGrid[X, Y].Type != TileType.TILE_FLOOR);
-            stateSpaceComponents.PositionComponents[id] = new PositionComponent() { Position = new Vector2(X, Y) };
-            dungeonGrid[X, Y].Occupiable = true;
-            if(stateComponents != null)
-            {
-                GameplayInfoComponent info = stateComponents.GameplayInfo;
-                info.FloorsReached += 1;
-                stateSpaceComponents.GameplayInfoComponents[id] = info;
-                stateSpaceComponents.SkillLevelsComponents[id] = stateComponents.PlayerSkillLevels;
+                LevelChangeSystem.CreateGameplayInfo(stateComponents, stateSpaceComponents);
+                DungeonCreationSystem.TallGrassGeneration(ref dungeonGrid, dungeonDimensions, stateSpaceComponents.random, freeTiles, stateSpaceComponents);
+                DungeonCreationSystem.WaterGeneration(ref dungeonGrid, dungeonDimensions, stateSpaceComponents.random, freeTiles, stateSpaceComponents, waterTiles);
+                DungeonCreationSystem.CreateDungeonDrops(stateSpaceComponents, dungeonGrid, dungeonDimensions, freeTiles);
+                DungeonCreationSystem.CreateDungeonMonsters(stateSpaceComponents, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, freeTiles);
+                LevelChangeSystem.LoadPlayerSkillset(stateComponents, stateSpaceComponents);
+                LevelChangeSystem.CreateMessageLog(stateSpaceComponents);
             }
-            else
-            {
-
-                //Set GameplayInfo
-                stateSpaceComponents.GameplayInfoComponents[id] = new GameplayInfoComponent() { Kills = 0, StepsTaken = 0, FloorsReached = 0 };
-                //Set Skills Level
-                stateSpaceComponents.SkillLevelsComponents[id] = new SkillLevelsComponent()
-                {
-                    CurrentHealth = 100,
-                    Health = 100,
-                    MagicAttack = 10,
-                    MagicDefense = 3,
-                    PhysicalAttack = 20,
-                    PhysicalDefense = 10,
-                    Wealth = 100
-                };
-            }
-            //Set Display
-            stateSpaceComponents.DisplayComponents[id] = new DisplayComponent() { Color = Color.White, SpriteSource = new Rectangle(2 * cellSize, 0 * cellSize, cellSize, cellSize) };
-            //Set Sightradius
-            stateSpaceComponents.SightRadiusComponents[id] = new SightRadiusComponent() { Radius = 12 };
-        }
-
-        private void CreateMessageLog()
-        {
-            Guid id = stateSpaceComponents.CreateEntity();
-            stateSpaceComponents.Entities.Where(x => x.Id == id).First().ComponentFlags = Component.COMPONENT_GAMEMESSAGE;
-            stateSpaceComponents.GameMessageComponents[id] = new GameMessageComponent() { GlobalColor = Color.White, GlobalMessage = string.Empty,
-                 MaxMessages = 100, IndexBegin = 0, GameMessages = new List<Tuple<Color,string>>()};
-            MessageDisplaySystem.GenerateRandomGameMessage(stateSpaceComponents, Messages.CaveEntranceMessages, MessageColors.SpecialAction);
+            mapToPlayer = new DijkstraMapTile[(int)dungeonDimensions.X, (int)dungeonDimensions.Y];
         }
         #endregion
 
         #region Update Logic
         public IStateSpace UpdateSpace(GameTime gameTime, ContentManager content, GraphicsDeviceManager graphics, KeyboardState prevKeyboardState, MouseState prevMouseState, GamePadState prevGamepadState, Camera camera, ref GameSettings gameSettings)
         {
-            if(stateSpaceComponents.EntitiesToDelete.Count > 0)
-            {
-                foreach(Guid entity in stateSpaceComponents.EntitiesToDelete)
-                {
-                    stateSpaceComponents.DestroyEntity(entity);
-                }
-            }
             IStateSpace nextStateSpace = this;
-            #region Debug changing levels
-            if (Keyboard.GetState().IsKeyDown(Keys.LeftShift) && !prevKeyboardState.IsKeyDown(Keys.LeftShift))
-            {
-                nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
-                LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
-            }
-            if (Mouse.GetState().RightButton == ButtonState.Pressed)
-            {
-                camera.Target = Vector2.Transform(Mouse.GetState().Position.ToVector2(),camera.GetInverseMatrix());
-                camera.AttachedToPlayer = false;
-                MessageDisplaySystem.SetRandomGlobalMessage(stateSpaceComponents, Messages.CameraDetatchedMessage);
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.R))
-            {
-                camera.AttachedToPlayer = true;
-                MessageDisplaySystem.SetRandomGlobalMessage(stateSpaceComponents, new string[] { string.Empty });
-            }
-            #endregion
-            InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, gameSettings);
-            TileRevealSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
-            TileRevealSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime);
-            UpdateCamera(camera, gameTime);
-            MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
-            stateSpaceComponents.EntitiesToDelete.Clear();
-            return nextStateSpace;
-        }
 
-        private void UpdateCamera(Camera camera, GameTime gameTime)
-        {
-            if(camera.AttachedToPlayer)
+
+            //Check to see if the player has died
+            if(stateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).Count() == 0)
             {
-                Entity playerId = stateSpaceComponents.Entities.Where(x => (x.ComponentFlags & ComponentMasks.Player) == ComponentMasks.Player).FirstOrDefault();
-                if(playerId != null)
+                //Game End, High Score, and Save Data handling
+            }
+            else
+            {//Check to see if the next level needs to be loaded
+                if (stateSpaceComponents.PlayerComponent.GoToNextFloor || Keyboard.GetState().IsKeyDown(Keys.LeftShift))
                 {
-                    camera.Target = new Vector2((int)stateSpaceComponents.PositionComponents[playerId.Id].Position.X * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Width/2,
-                    (int)stateSpaceComponents.PositionComponents[playerId.Id].Position.Y * cellSize + stateSpaceComponents.DisplayComponents[playerId.Id].SpriteSource.Height/2);
+                    nextStateSpace = new RandomlyGeneratedStateSpace(new CaveGeneration(), 75, 125);
+                    PlayerComponent player = stateSpaceComponents.PlayerComponent;
+                    player.GoToNextFloor = false;
+                    player.PlayerJustLoaded = true;
+                    stateSpaceComponents.PlayerComponent = player;
+                    LevelChangeSystem.RetainPlayerStatistics(stateComponents, stateSpaceComponents);
+                    LevelChangeSystem.RetainNecessaryComponents(stateComponents, stateSpaceComponents);
+                }
+                //Toggle Inventory Menu
+                if (Keyboard.GetState().IsKeyDown(Keys.I) && prevKeyboardState.IsKeyUp(Keys.I) && !showObserver)
+                {
+                    showInventory = !showInventory;
+                }
+                else if (Keyboard.GetState().IsKeyDown(Keys.Enter) && prevKeyboardState.IsKeyUp(Keys.Enter) && !showInventory)
+                {
+                    //If observer exists, remove it and add input component to player(s), otherwise, remove input component from all players and create an observer.
+                    if (ObserverSystem.CreateOrDestroyObserver(stateSpaceComponents))
+                    {
+                        showObserver = true;
+                    }
+                    else
+                    {
+                        showObserver = false;
+                    }
+                }
+
+                //Actions to complete if the inventory is open
+                if (showInventory)
+                {
+                    //Deletion and Cleanup
+                    if (stateSpaceComponents.EntitiesToDelete.Count > 0)
+                    {
+                        foreach (Guid entity in stateSpaceComponents.EntitiesToDelete)
+                        {
+                            stateSpaceComponents.DestroyEntity(entity);
+                        }
+                        stateSpaceComponents.EntitiesToDelete.Clear();
+                    }
+                    showInventory = InventorySystem.HandleInventoryInput(stateSpaceComponents, gameTime, prevKeyboardState, Keyboard.GetState());
+                }
+                //Actions to complete if inventory is not open
+                if (showObserver)
+                {
+                    ObserverComponent observer = stateSpaceComponents.ObserverComponent;
+                    observer.Observed = new List<Guid>();
+                    stateSpaceComponents.ObserverComponent = observer;
+                    InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, dungeonDimensions);
+                    CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
+                    ObserverSystem.HandleObserverFindings(stateSpaceComponents, Keyboard.GetState(), prevKeyboardState, dungeonGrid);
+                    stateSpaceComponents.InvokeDelayedActions();
+                }
+                else if (!showInventory && !showObserver)
+                {
+                    //Deletion and Cleanup
+                    DestructionSystem.UpdateDestructionTimes(stateSpaceComponents, gameTime);
+
+                    //Non-turn-based
+                    AnimationSystem.UpdateFovColors(stateSpaceComponents, gameTime);
+                    AnimationSystem.UpdateOutlineColors(stateSpaceComponents, gameTime);
+                    MovementSystem.UpdateMovingEntities(stateSpaceComponents, gameTime);
+                    MovementSystem.UpdateIndefinitelyMovingEntities(stateSpaceComponents, gameTime);
+
+                    //Movement and Reaction
+                    InputMovementSystem.HandleDungeonMovement(stateSpaceComponents, graphics, gameTime, prevKeyboardState, prevMouseState, prevGamepadState, camera, dungeonGrid, dungeonDimensions);
+                    CameraSystem.UpdateCamera(camera, gameTime, stateSpaceComponents, DevConstants.Grid.CellSize, prevKeyboardState);
+                    TileSystem.RevealTiles(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
+                    TileSystem.IncreaseTileOpacity(ref dungeonGrid, dungeonDimensions, gameTime, stateSpaceComponents);
+                    MessageDisplaySystem.ScrollMessage(prevKeyboardState, Keyboard.GetState(), stateSpaceComponents);
+                    DungeonMappingSystem.ShouldPlayerMapRecalc(stateSpaceComponents, dungeonGrid, dungeonDimensions, ref mapToPlayer);
+
+                    //AI and Combat
+                    AISystem.AICheckDetection(stateSpaceComponents);
+                    AISystem.AIMovement(stateSpaceComponents, dungeonGrid, dungeonDimensions, mapToPlayer);
+                    InventorySystem.TryPickupItems(stateSpaceComponents, dungeonGrid);
+                    AISystem.AIUpdateVision(stateSpaceComponents, dungeonGrid, dungeonDimensions);
+                    CombatSystem.HandleMeleeCombat(stateSpaceComponents, DevConstants.Grid.CellSize);
+                    AISystem.AICheckFleeing(stateSpaceComponents);
+
+                    //End-Of-Turn Status Effects
+                    StatusSystem.RegenerateHealth(stateSpaceComponents);
+                    StatusSystem.ApplyBurnDamage(stateSpaceComponents, dungeonGrid);
+                    TileSystem.SpreadFire(ref dungeonGrid, dungeonDimensions, stateSpaceComponents);
+
+                    //Resetting Systems
+                    if (stateSpaceComponents.PlayerComponent.PlayerJustLoaded || stateSpaceComponents.PlayerComponent.PlayerTookTurn)
+                    {
+                        PlayerComponent player = stateSpaceComponents.PlayerComponent;
+                        player.PlayerJustLoaded = false;
+                        player.PlayerTookTurn = false;
+                        stateSpaceComponents.PlayerComponent = player;
+                    }
+                    CollisionSystem.ResetCollision(stateSpaceComponents);
+                    if (stateSpaceComponents.EntitiesToDelete.Count > 0)
+                    {
+                        foreach (Guid entity in stateSpaceComponents.EntitiesToDelete)
+                        {
+                            stateSpaceComponents.DestroyEntity(entity);
+                        }
+                        stateSpaceComponents.EntitiesToDelete.Clear();
+                    }
+                    stateSpaceComponents.InvokeDelayedActions();
                 }
             }
-            if (Vector2.Distance(camera.Position, camera.Target) > 0)
-            {
-                float distance = Vector2.Distance(camera.Position, camera.Target);
-                Vector2 direction = Vector2.Normalize(camera.Target - camera.Position);
-                float velocity = distance * 2.5f;
-                camera.Position += direction * velocity * (camera.Scale >= 1 ? camera.Scale : 1) * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                if (distance < 2.5)
-                {
-                    camera.Position = camera.Target;
-                }
-            }
-        }
+            
+            return nextStateSpace;
+        }  
         #endregion
 
         #region Draw Logic
-        public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera)
+        public void DrawLevel(SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Camera camera, ref GameSettings gameSettings)
         {
-            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, cellSize, dungeonSprites, dungeonColorInfo);
-            DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, cellSize);
+            DisplaySystem.DrawTiles(camera, spriteBatch, dungeonGrid, dungeonDimensions, DevConstants.Grid.CellSize, dungeonSprites, dungeonColorInfo, mapToPlayer, asciiDisplay, stateSpaceComponents);
+            DisplaySystem.DrawAIFieldOfViews(stateSpaceComponents, camera, spriteBatch, UI, DevConstants.Grid.CellSize, dungeonGrid);
+            if(gameSettings.ShowGlow)
+            {
+                DisplaySystem.DrawOutlines(stateSpaceComponents, camera, spriteBatch, UI, dungeonGrid);
+            }
+            DisplaySystem.DrawDungeonEntities(stateSpaceComponents, camera, spriteBatch, sprites, DevConstants.Grid.CellSize, dungeonGrid, asciiDisplay, dungeonColorInfo);
+            LabelDisplaySystem.DrawString(spriteBatch, stateSpaceComponents, messageFont, camera);
         }
 
         public void DrawUserInterface(SpriteBatch spriteBatch, Camera camera)
         {
-            MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont);
+            if(showInventory)
+            {
+                InventorySystem.ShowInventoryMenu(stateSpaceComponents, spriteBatch, camera, messageFont, optionFont, UI);
+            }
+            //Don't show observer findings if the inventory screen is open
+            else
+            {
+                ObserverSystem.PrintObserver(stateSpaceComponents, messageFont, spriteBatch, dungeonGrid, camera, UI);
+                spriteBatch.Draw(UI, camera.DungeonUIViewport.Bounds, Color.Black);
+                spriteBatch.Draw(UI, camera.DungeonUIViewportLeft.Bounds, Color.Black);
+                MessageDisplaySystem.WriteMessages(stateSpaceComponents, spriteBatch, camera, messageFont, dungeonGrid);
+            }
         }
         #endregion
 
@@ -203,13 +255,14 @@ namespace ECSRogue.BaseEngine.StateSpaces
         {
             return new DungeonInfo()
             {
-                cellSize = this.cellSize,
                 dungeonColorInfo = this.dungeonColorInfo,
                 dungeonDimensions = this.dungeonDimensions,
                 dungeonGrid = this.dungeonGrid,
                 stateComponents = this.stateComponents,
                 dungeonSpriteFile = this.dungeonSpriteFile,
-                stateSpaceComponents = this.stateSpaceComponents
+                stateSpaceComponents = this.stateSpaceComponents,
+                freeTiles = this.freeTiles,
+                waterTiles = this.waterTiles
             };
         }
         #endregion

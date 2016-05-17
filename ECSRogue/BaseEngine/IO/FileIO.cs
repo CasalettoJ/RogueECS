@@ -65,9 +65,9 @@ namespace ECSRogue.BaseEngine.IO
             GameSettings defaultSettings = new GameSettings()
             {
                 HasChanges = false,
-                Scale = 1,
+                Scale = .5f,
                 Resolution = new Vector2(1024, 768),
-                ShowNormalMessages = true
+                ShowGlow = true
             };
             string defaultSettingsJson = JsonConvert.SerializeObject(defaultSettings);
             Directory.CreateDirectory(FileNames.SettingsDirectory);
@@ -106,6 +106,25 @@ namespace ECSRogue.BaseEngine.IO
             Directory.CreateDirectory(FileNames.DungeonDirectory);
             string jsonData = JsonConvert.SerializeObject(data);
             File.WriteAllText(FileNames.DungeonSaveFile, jsonData);
+        }
+        #endregion
+
+        #region Error Logging
+        public static void LogError(Exception ex)
+        {
+            Directory.CreateDirectory(FileNames.ErrorDirectory);
+            if(!File.Exists(FileNames.ErrorFile))
+            {
+                File.WriteAllText(FileNames.ErrorFile, System.Environment.NewLine + "=======================================================" + System.Environment.NewLine);
+            }
+            else
+            {
+                File.AppendAllText(FileNames.ErrorFile, System.Environment.NewLine + " =======================================================" + System.Environment.NewLine);
+            }
+
+            File.AppendAllText(FileNames.ErrorFile, string.Format("Date/Time: {0}" + System.Environment.NewLine, DateTime.UtcNow));
+            File.AppendAllText(FileNames.ErrorFile, ex.Message);
+            File.AppendAllText(FileNames.ErrorFile, ex.StackTrace);
         }
         #endregion
     }

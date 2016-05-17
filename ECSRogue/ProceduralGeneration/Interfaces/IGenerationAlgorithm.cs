@@ -12,9 +12,7 @@ namespace ECSRogue.ProceduralGeneration.Interfaces
 {
     public interface IGenerationAlgorithm
     {
-        Vector2 GenerateDungeon(ref DungeonTile[,] dungeonGrid, int worldMin, int worldMax, Random random);
-        void GenerateDungeonEntities(StateSpaceComponents spaceComponents);
-        int GetCellsize();
+        Vector2 GenerateDungeon(ref DungeonTile[,] dungeonGrid, int worldMin, int worldMax, Random random, List<Vector2> freeTiles);
         string GetDungeonSpritesheetFileName();
         DungeonColorInfo GetColorInfo();
     }

@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
 using ECSRogue.ECS;
 using ECSRogue.BaseEngine.IO.Objects;
+using ECSRogue.ECS.Components;
 
 namespace ECSRogue.BaseEngine.States
 {
@@ -36,7 +37,8 @@ namespace ECSRogue.BaseEngine.States
             PrevMouseState = mouseState;
             PrevGamepadState = gamePadState;
             PrevKeyboardState = keyboardState;
-            StateComponents = saveInfo == null ? new StateComponents() : saveInfo.stateComponents;
+            SkillLevelsComponent newPlayerStats = new SkillLevelsComponent() { CurrentHealth = 100, Health = 100, Accuracy = 100, Defense = 10, Wealth = 0, MinimumDamage = 1, MaximumDamage = 3, DieNumber = 1 };
+            StateComponents = saveInfo == null ? new StateComponents() { PlayerSkillLevels = newPlayerStats } : saveInfo.stateComponents;
             SetStateSpace(space, camera, saveInfo == null);
             previousState = prevState;
         }
@@ -69,9 +71,9 @@ namespace ECSRogue.BaseEngine.States
             return this;
         }
 
-        public void DrawContent(SpriteBatch spriteBatch, Camera camera)
+        public void DrawContent(SpriteBatch spriteBatch, Camera camera, ref GameSettings gameSettings)
         {
-            CurrentStateSpace.DrawLevel(spriteBatch, Graphics, camera);
+            CurrentStateSpace.DrawLevel(spriteBatch, Graphics, camera, ref gameSettings);
         }
 
         public void SetStateSpace(IStateSpace stateSpace, Camera camera, bool createEntities = true)

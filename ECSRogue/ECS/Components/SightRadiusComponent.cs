@@ -7,6 +7,8 @@ namespace ECSRogue.ECS.Components
 {
     public struct SightRadiusComponent
     {
-        public int Radius;
+        public int CurrentRadius;
+        public int MaxRadius;
+        public bool DrawRadius;
     }
 }
